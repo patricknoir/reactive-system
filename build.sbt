@@ -90,7 +90,7 @@ val coverageSettings = Seq(
 
 val dockerSettings = Seq(
   dockerRepository := Some("10.210.201.187/pdiloreto"),
-  defaultLinuxInstallLocation in Docker := "/opt/scheme-manager",
+  defaultLinuxInstallLocation in Docker := "/opt/patricknoir",
   packageName in Docker := packageName.value,
   version in Docker := version.value,
   dockerCommands := Seq(
@@ -98,7 +98,7 @@ val dockerSettings = Seq(
     Cmd("RUN", "apk upgrade --update && apk add libstdc++ && apk add bash && rm -rf /var/cache/apk/*"),
     Cmd("ADD", "opt /opt"),
     ExecCmd("RUN", "mkdir", "-p", "/var/logs/patricknoir/kafka-reactive-system"),
-    ExecCmd("ENTRYPOINT", "/opt/kafka-reactive-system/bin/kafka-reactive-system")
+    ExecCmd("ENTRYPOINT", "/opt/patricknoir/bin/kafka-reactive-system")
   )
 )
 

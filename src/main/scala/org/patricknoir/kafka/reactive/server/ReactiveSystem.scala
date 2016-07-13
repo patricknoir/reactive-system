@@ -11,7 +11,7 @@ import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequ
 import scala.concurrent.Future
 import scala.util.Try
 
-class ReactiveSystem(source: Source[KafkaRequestEnvelope, _], route: ReactiveRoute, sink: Sink[Future[KafkaResponseEnvelope], _])(implicit system: ActorSystem) {
+case class ReactiveSystem(source: Source[KafkaRequestEnvelope, _], route: ReactiveRoute, sink: Sink[Future[KafkaResponseEnvelope], _])(implicit system: ActorSystem) {
 
   //TODO: replace this naive implementation with a real fully featured one (error handling etc...)
 

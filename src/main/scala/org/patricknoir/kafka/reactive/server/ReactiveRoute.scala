@@ -17,7 +17,7 @@ object ReactiveRoute {
   def request[In: Decoder, Out: Encoder](id: String)(f: In => Future[Error Xor Out]): ReactiveRoute =
     ReactiveRoute().add(ReactiveService[In, Out](id)(f))
 
-  def request[In: Decoder, Out: Encoder](id: String)(f: In => Future[Out])(implicit ec: ExecutionContext): ReactiveRoute =
+  def requestXor[In: Decoder, Out: Encoder](id: String)(f: In => Future[Out])(implicit ec: ExecutionContext): ReactiveRoute =
     ReactiveRoute().add(ReactiveService[In, Out](id)(in => f(in).map(out => Xor.right[Error, Out](out))))
 
   def requestFuture[In: Decoder, Out: Encoder](id: String)(f: In => Out)(implicit ec: ExecutionContext): ReactiveRoute =

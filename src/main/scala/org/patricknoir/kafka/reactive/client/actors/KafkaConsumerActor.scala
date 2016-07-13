@@ -40,13 +40,20 @@ class KafkaConsumerActor(consumerSettings: Map[String, String], inboundQueue: St
 }
 
 object KafkaConsumerActor {
-  case class KafkaResponseEnvelope(correlationId: String, response: String)
+  object KafkaResponseStatusCode {
+    val Success = 200
+    val NotFound = 404
+    val BadRequest = 300
+    val InternalServerError = 500
+  }
+  case class KafkaResponseEnvelope(correlationId: String, response: String, statusCode: Int)
   object KafkaResponseEnvelope {
     implicit val respEnvelopeDecoder = Decoder.instance[KafkaResponseEnvelope] { c =>
       for {
         correlationId <- c.downField("correlationId").as[String]
         response <- c.downField("response").as[String]
-      } yield KafkaResponseEnvelope(correlationId, response)
+        statusCode <- c.downField("status").as[Int]
+      } yield KafkaResponseEnvelope(correlationId, response, statusCode)
     }
   }
   def props(consumerSettings: Map[String, String], inboundQueue: String, pollTimeout: FiniteDuration) =

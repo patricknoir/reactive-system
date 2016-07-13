@@ -27,6 +27,15 @@ class KafkaReactiveClient(settings: KafkaRClientSettings)(implicit system: Actor
 
   val kafkaClientService = system.actorOf(KafkaRClientActor.props(producerProps, consumerProps), "clientService")
 
+  /**
+   *
+   * @param destination format is: kafka:destinationTopic/serviceId
+   * @param payload
+   * @param timeout
+   * @tparam In
+   * @tparam Out
+   * @return
+   */
   def request[In: Encoder, Out: Decoder](destination: String, payload: In)(implicit timeout: Timeout): Future[Error Xor Out] =
     (kafkaClientService ? KafkaRequest(destination, payload.asJson.noSpaces, timeout, settings.inboundResponseQueue, implicitly[Decoder[Out]])).mapTo[Error Xor Out]
 

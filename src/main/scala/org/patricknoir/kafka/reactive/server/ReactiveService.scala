@@ -1,6 +1,6 @@
 package org.patricknoir.kafka.reactive.server
 
-import io.circe.{ Error, Decoder, Encoder }
+import io.circe.{ Decoder, Encoder }
 import io.circe.syntax._
 import io.circe.parser._
 import cats.std.all._
@@ -11,7 +11,7 @@ case class ReactiveService[-In: Decoder, +Out: Encoder](id: String)(f: In => Fut
   def apply(in: In): Future[Error Xor Out] = f(in)
 
   def unsafeApply(jsonStr: String)(implicit ec: ExecutionContext): Future[Error Xor String] = (for {
-    in <- XorT(Future.successful(decode[In](jsonStr)))
+    in <- XorT(Future.successful(decode[In](jsonStr))).leftMap(ex => new Error(ex))
     out <- XorT(f(in)).map(_.asJson.noSpaces)
   } yield out).value
 }

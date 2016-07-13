@@ -1,6 +1,6 @@
 package org.patricknoir.kafka.reactive.server
 
-import io.circe.{ Error, Decoder, Encoder }
+import io.circe.{ Decoder, Encoder }
 import cats.data._
 import scala.concurrent.{ ExecutionContext, Future }
 

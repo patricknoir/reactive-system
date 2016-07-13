@@ -10,7 +10,6 @@ resolvers ++= Seq(
   Resolver.jcenterRepo,
   Resolver.sonatypeRepo("snapshots"),
   "sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
-  "william hill" at "http://maven.apps.local:8082/nexus/content/groups/public",
   "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 )
 
@@ -86,7 +85,7 @@ val compileSettings = Seq(
 )
 
 val coverageSettings = Seq(
-  coverageExcludedPackages := "<empty>;com\\.williamhill\\.rewards\\.schememanager\\.Boot;com\\.williamhill\\.rewards\\.schememanager\\.actors\\..*;com\\.williamhill\\.rewards\\.schememanager\\.data\\.errors"
+
 )
 
 val dockerSettings = Seq(
@@ -98,8 +97,8 @@ val dockerSettings = Seq(
     Cmd("FROM", "java:openjdk-8-jdk-alpine"),
     Cmd("RUN", "apk upgrade --update && apk add libstdc++ && apk add bash && rm -rf /var/cache/apk/*"),
     Cmd("ADD", "opt /opt"),
-    ExecCmd("RUN", "mkdir", "-p", "/var/logs/willhill/scheme-manager"),
-    ExecCmd("ENTRYPOINT", "/opt/scheme-manager/bin/scheme-manager")
+    ExecCmd("RUN", "mkdir", "-p", "/var/logs/patricknoir/kafka-reactive-system"),
+    ExecCmd("ENTRYPOINT", "/opt/kafka-reactive-system/bin/kafka-reactive-system")
   )
 )
 

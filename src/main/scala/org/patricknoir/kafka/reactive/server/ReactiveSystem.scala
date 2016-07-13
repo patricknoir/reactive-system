@@ -20,7 +20,7 @@ case class ReactiveSystem(source: Source[KafkaRequestEnvelope, _], route: Reacti
   val g = source.map { request =>
     val result: Future[Error Xor String] = (for {
       serviceId <- XorT(Future.successful(extractServiceId(request)))
-      service <- XorT(Future.successful(Xor.fromOption[Error, ReactiveService[_, _]](route.services.get(serviceId), new Error(s""))))
+      service <- XorT(Future.successful(Xor.fromOption[Error, ReactiveService[_, _]](route.services.get(serviceId), new Error(s"service: $serviceId not found"))))
       response <- XorT(service.unsafeApply(request.payload))
     } yield response).value
 

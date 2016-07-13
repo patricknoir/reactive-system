@@ -14,8 +14,8 @@ import io.circe.syntax._
 import scala.concurrent.Future
 
 /**
-  * Created by patrick on 13/07/2016.
-  */
+ * Created by patrick on 13/07/2016.
+ */
 class ReactiveSystemSpec extends TestKit(ActorSystem("TestKit")) with SpecificationLike {
 
   def is = s2"""
@@ -26,6 +26,8 @@ class ReactiveSystemSpec extends TestKit(ActorSystem("TestKit")) with Specificat
   def simpleReactiveSystem = {
 
     import ReactiveRoute._
+
+    import system.dispatcher
 
     val source: Source[KafkaRequestEnvelope, NotUsed] = Source(1 to 10).map { i =>
       KafkaRequestEnvelope(i.toString, "kafka:destTopic/echo", "patrick".asJson.noSpaces, "inboundTopic")

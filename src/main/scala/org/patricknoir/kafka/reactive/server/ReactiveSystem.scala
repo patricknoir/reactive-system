@@ -28,7 +28,7 @@ case class ReactiveSystem(source: Source[KafkaRequestEnvelope, _], route: Reacti
       case Xor.Left(err: Error) => KafkaResponseEnvelope(request.correlationId, err.getMessage, KafkaResponseStatusCode.InternalServerError)
       case Xor.Right(jsonResp)  => KafkaResponseEnvelope(request.correlationId, jsonResp, KafkaResponseStatusCode.Success)
     }
-  }.to(sink)
+  }.toMat(sink)(Keep.right)
 
   private def extractServiceId(request: KafkaRequestEnvelope): Xor[Error, String] = Xor.fromTry(Try {
     request.destination.split("/")(1)

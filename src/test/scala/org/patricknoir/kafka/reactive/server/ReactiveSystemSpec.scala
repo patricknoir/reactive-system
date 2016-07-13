@@ -1,17 +1,17 @@
 package org.patricknoir.kafka.reactive.server
 
-import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._
 import akka.testkit.TestKit
-import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.KafkaResponseEnvelope
+import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseStatusCode, KafkaResponseEnvelope }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 import org.specs2.SpecificationLike
 
 import io.circe.syntax._
 
-import scala.concurrent.Future
+import scala.concurrent.{ Await, Future }
+import scala.concurrent.duration.Duration
 
 /**
  * Created by patrick on 13/07/2016.
@@ -20,6 +20,7 @@ class ReactiveSystemSpec extends TestKit(ActorSystem("TestKit")) with Specificat
 
   def is = s2"""
 
+  simple reactive system      $simpleReactiveSystem
 
   """
 
@@ -29,8 +30,10 @@ class ReactiveSystemSpec extends TestKit(ActorSystem("TestKit")) with Specificat
 
     import system.dispatcher
 
-    val source: Source[KafkaRequestEnvelope, NotUsed] = Source(1 to 10).map { i =>
-      KafkaRequestEnvelope(i.toString, "kafka:destTopic/echo", "patrick".asJson.noSpaces, "inboundTopic")
+    val source: Source[KafkaRequestEnvelope, _] = Source(1 to 10).map { i =>
+      val req = KafkaRequestEnvelope(i.toString, "kafka:destTopic/echo", "patrick".asJson.noSpaces, "inboundTopic")
+      println(s"Producing request: $req")
+      req
     }
 
     val route: ReactiveRoute = requestFuture("echo") { (in: String) =>
@@ -39,12 +42,15 @@ class ReactiveSystemSpec extends TestKit(ActorSystem("TestKit")) with Specificat
       in.length
     }
 
-    val sink: Sink[Future[KafkaResponseEnvelope], _] = Sink.foreach[Future[KafkaResponseEnvelope]] { future =>
-      future.onComplete(println)
-    }
+    val sink = Sink.seq[Future[KafkaResponseEnvelope]]
 
     val reactiveSystem = ReactiveSystem(source, route, sink)
 
-    reactiveSystem.run()(ActorMaterializer())
+    val fResp = (reactiveSystem.run()(ActorMaterializer())).asInstanceOf[Future[Seq[Future[KafkaResponseEnvelope]]]]
+
+    val responses = Await.result(Future.sequence(Await.result(fResp, Duration.Inf)), Duration.Inf)
+    println("=======================================")
+
+    responses.map(_.statusCode must be_==(KafkaResponseStatusCode.Success)).reduce(_ and _) and (responses.size must be_==(10))
   }
 }

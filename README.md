@@ -14,9 +14,9 @@ invocations that returns Future[_] making easy to compose different requests tog
 To Fix
 ------
 
-1 Replace io.circe.Encoder[A]/Decoder[A] typeclasses from the API and replace by a custom typeclass for kafka serialization/deserialization. We will offer implicit converters from/to circe Decoders/Encoders
-2 Generalise the API from Kafka such as it can be implemented with any messaging system
-3 FIXME: I have been messing with Xor[Error, A] (Error = java.lang.Error) => this should be replaced with Throwable or custom Error type
-4 Replace ReactiveRoute.request* DSL methods with Magnet Pattern like in Akka HTTP
-5 ReactiveSystem implementation is too naive and the only purpose is to show the API usage
-6 Implement Semantics At Least Once for Command/Event pattern
+1. Replace io.circe.Encoder[A]/Decoder[A] typeclasses from the API and replace by a custom typeclass for kafka serialization/deserialization. We will offer implicit converters from/to circe Decoders/Encoders
+2. Generalise the API from Kafka such as it can be implemented with any messaging system
+3. FIXME: I have been messing with Xor[Error, A] (Error = java.lang.Error) => this should be replaced with Throwable or custom Error type
+4. Replace ReactiveRoute.request* DSL methods with Magnet Pattern like in Akka HTTP
+5. ReactiveSystem implementation is too naive and the only purpose is to show the API usage
+6. Implement Semantics At Least Once for Command/Event pattern

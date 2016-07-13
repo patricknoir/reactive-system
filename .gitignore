@@ -1,0 +1,14 @@
+target/
+.DS_Store
+.idea/
+.worksheet/
+bin/
+.classpath
+.cache
+.project
+.settings/
+logs/
+.chace
+.tmpBin/
+.cache-main
+.cache-tests

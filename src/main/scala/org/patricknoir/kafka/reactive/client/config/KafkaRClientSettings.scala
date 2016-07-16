@@ -4,17 +4,18 @@ import com.typesafe.config.{ ConfigFactory, Config }
 
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.duration._
+import net.ceedubs.ficus.Ficus._
 
 /**
  * Created by patrick on 12/07/2016.
  */
 class KafkaRClientSettings(config: Config) {
 
-  val producerSettings = Map.empty[String, String]
-  val consumerSettings = Map.empty[String, String]
+  val producerSettings = config.as[Map[String, String]]("kafka.client.producer.settings")
+  val consumerSettings = config.as[Map[String, String]]("kafka.client.consumer.settings")
 
-  val inboundResponseQueue = "inbound"
-  val pollTimeoutDuration: FiniteDuration = 100 millis
+  val inboundResponseQueue = config.as[String]("kafka.client.queues.inbound")
+  val pollTimeoutDuration: FiniteDuration = config.as[FiniteDuration]("kafka.client.consumer.pollFrequency")
 
 }
 

@@ -20,3 +20,52 @@ To Fix
 4. Replace ReactiveRoute.request* DSL methods with Magnet Pattern like in Akka HTTP
 5. ReactiveSystem implementation is too naive and the only purpose is to show the API usage
 6. Implement Semantics At Least Once for Command/Event pattern
+
+Import the project
+------------------
+If you want to use kafka reactive services you need to import this library:
+
+Scala 2.11.x :
+
+```scala
+"org.patricknoir.kafka" %% "kafka-reactive-service" % "0.1.0-SNAPSHOT"
+```
+
+Create a Reactive Service
+-------------------------
+
+```scala
+
+import org.patricknoir.kafka.reactive.server.ReactiveRoute._
+
+implicit val system: ActorSystem = ...
+import system.dispatcher
+
+  val route = requestFuture[String, String]("echo") { in =>
+    "echoing: " + in
+  } ~ requestFuture[String, Int]("length") { in =>
+    in.length
+  } ~ request[String, Int]("parseInt") { in => Future {
+      Xor.fromTry(in.toInt)
+    }
+  }
+
+  val consumerSettings = ConsumerSettings(system, new StringDeserializer, new StringDeserializer, Set("echoInbound"))
+      .withBootstrapServers("localhost:9092")
+      .withGroupId("group1")
+      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+
+  val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
+      .withBootstrapServers("localhost:9092")
+
+  val source: Source[KafkaRequestEnvelope, _] = Consumer.atMostOnceSource(consumerSettings.withClientId("client1"))
+      .map { record =>
+        println(s"\n\n\nSource decoding: ${record.value}\n\n")
+        decode[KafkaRequestEnvelope](record.value)
+      }.filter(_.isRight).map { case (Xor.Right(kkReqEnvelope)) => kkReqEnvelope }
+
+  val sink: Sink[Future[KafkaResponseEnvelope], _] = Flow[Future[KafkaResponseEnvelope]].map[ProducerRecord[String, String]] { fResp =>
+      ...
+    }.to(Producer.plainSink(producerSettings))
+
+```

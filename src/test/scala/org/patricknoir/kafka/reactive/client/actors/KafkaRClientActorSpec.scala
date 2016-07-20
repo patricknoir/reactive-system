@@ -69,7 +69,7 @@ class MockKafkaConsumerActor(queue: BlockingQueue[KafkaRequestEnvelope]) extends
   val future = Future {
     while (!terminate) {
       val request = queue.take()
-      context.actorSelection(request.correlationId) ! KafkaResponseEnvelope(request.correlationId, request.payload, KafkaResponseStatusCode.Success)
+      context.actorSelection(request.correlationId) ! KafkaResponseEnvelope(request.correlationId, request.replyTo, request.payload, KafkaResponseStatusCode.Success)
     }
   }
 

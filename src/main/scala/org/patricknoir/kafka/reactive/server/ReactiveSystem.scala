@@ -24,16 +24,16 @@ case class ReactiveSystem(source: Source[KafkaRequestEnvelope, _], route: Reacti
       response <- XorT(service.unsafeApply(request.payload))
     } yield response).value
 
-    result.map(toKafkaResponseEnvelope(request.correlationId, _))
+    result.map(toKafkaResponseEnvelope(request.correlationId, request.replyTo, _))
   }.toMat(sink)(Keep.right)
 
   private def extractServiceId(request: KafkaRequestEnvelope): Xor[Error, String] = Xor.fromTry(Try {
     request.destination.split("/")(1)
   }).leftMap(throwable => new Error(throwable))
 
-  private def toKafkaResponseEnvelope(correlationId: String, xor: Xor[Error, String]): KafkaResponseEnvelope = xor match {
-    case Xor.Left(err: Error) => KafkaResponseEnvelope(correlationId, err.getMessage, KafkaResponseStatusCode.InternalServerError)
-    case Xor.Right(jsonResp)  => KafkaResponseEnvelope(correlationId, jsonResp, KafkaResponseStatusCode.Success)
+  private def toKafkaResponseEnvelope(correlationId: String, origin: String, xor: Xor[Error, String]): KafkaResponseEnvelope = xor match {
+    case Xor.Left(err: Error) => KafkaResponseEnvelope(correlationId, origin, err.getMessage, KafkaResponseStatusCode.InternalServerError)
+    case Xor.Right(jsonResp)  => KafkaResponseEnvelope(correlationId, origin, jsonResp, KafkaResponseStatusCode.Success)
   }
 
   def run()(implicit materializer: Materializer) = g.run()

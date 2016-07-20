@@ -14,7 +14,7 @@ public class KafkaLocal {
 	public KafkaServerStartable kafka;
 	public ZooKeeperLocal zookeeper;
 	
-	public KafkaLocal(Properties kafkaProperties, Properties zkProperties) throws IOException, InterruptedException{
+	public KafkaLocal(Properties kafkaProperties, Properties zkProperties) throws IOException, InterruptedException {
 		KafkaConfig kafkaConfig = new KafkaConfig(kafkaProperties);
 		
 		//start local zookeeper

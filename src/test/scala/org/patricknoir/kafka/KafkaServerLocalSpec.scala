@@ -11,7 +11,7 @@ class KafkaServerLocalSpec extends Specification {
 
   def is = s2"""
 
-    starting and stopping kafka     $kafkaStartStop
+    starting and stopping kafka     
 
   """
 

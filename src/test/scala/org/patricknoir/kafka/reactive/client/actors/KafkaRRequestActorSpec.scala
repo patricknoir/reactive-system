@@ -63,6 +63,6 @@ class KafkaRRequestActorSpec extends TestKit(ActorSystem("TestKit")) with Specif
 class KafkaEchoMockActor extends Actor {
   def receive = {
     case KafkaRequestEnvelope(correlationId, destination, payload, replyTo) =>
-      sender ! KafkaResponseEnvelope(correlationId, payload, KafkaResponseStatusCode.Success)
+      sender ! KafkaResponseEnvelope(correlationId, replyTo, payload, KafkaResponseStatusCode.Success)
   }
 }

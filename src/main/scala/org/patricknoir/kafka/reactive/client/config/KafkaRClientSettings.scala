@@ -10,7 +10,7 @@ import net.ceedubs.ficus.Ficus._
  */
 class KafkaRClientSettings(config: Config) {
 
-  val producerSettings = Util.convertToMap(config.getConfig("kafka.client.consumer.settings")) //config.as[Map[String, String]]("kafka.client.producer.settings")
+  val producerSettings = Util.convertToMap(config.getConfig("kafka.client.producer.settings")) //config.as[Map[String, String]]("kafka.client.producer.settings")
   val consumerSettings = Util.convertToMap(config.getConfig("kafka.client.consumer.settings")) //config.as[Map[String, String]]("kafka.client.consumer.settings")
 
   val inboundResponseQueue = config.as[String]("kafka.client.queues.inbound")

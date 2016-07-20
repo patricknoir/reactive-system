@@ -19,21 +19,28 @@ class KafkaConsumerActor(consumerSettings: Map[String, String], inboundQueue: St
 
   import context.dispatcher
 
+  var running = true
+
   val consumer = new KafkaConsumer[String, String](consumerSettings)
   consumer.subscribe(List(inboundQueue))
 
   val loop = Future {
-    consumer.poll(pollTimeout.toMillis).foreach { record =>
-      val result = decode[KafkaResponseEnvelope](record.value)(respEnvelopeDecoder)
-      result.foreach { envelope =>
-        context.actorSelection(envelope.correlationId) ! envelope
+    while (running) {
+      consumer.poll(pollTimeout.toMillis).foreach { record =>
+        val result = decode[KafkaResponseEnvelope](record.value)(respEnvelopeDecoder)
+        result.foreach { envelope =>
+          context.actorSelection(envelope.correlationId) ! envelope
+        }
       }
     }
   }
 
+  loop.onComplete(result => println(s"\n\n\nKafka Consumer completed: $result\n\n"))
+
   def receive = Actor.emptyBehavior
 
   override def postStop() = {
+    running = false
     consumer.close()
   }
 
@@ -46,14 +53,15 @@ object KafkaConsumerActor {
     val BadRequest = 300
     val InternalServerError = 500
   }
-  case class KafkaResponseEnvelope(correlationId: String, response: String, statusCode: Int)
+  case class KafkaResponseEnvelope(correlationId: String, replyTo: String, response: String, statusCode: Int)
   object KafkaResponseEnvelope {
     implicit val respEnvelopeDecoder = Decoder.instance[KafkaResponseEnvelope] { c =>
       for {
         correlationId <- c.downField("correlationId").as[String]
+        replyTo <- c.downField("replyTo").as[String]
         response <- c.downField("response").as[String]
-        statusCode <- c.downField("status").as[Int]
-      } yield KafkaResponseEnvelope(correlationId, response, statusCode)
+        statusCode <- c.downField("statusCode").as[Int]
+      } yield KafkaResponseEnvelope(correlationId, replyTo, response, statusCode)
     }
   }
   def props(consumerSettings: Map[String, String], inboundQueue: String, pollTimeout: FiniteDuration) =

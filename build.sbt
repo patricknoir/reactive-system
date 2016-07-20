@@ -80,7 +80,7 @@ val compileSettings = Seq(
   "-Yno-adapted-args",
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
-  "-Ywarn-unused-import",
+//  "-Ywarn-unused-import",
   "-Ywarn-value-discard"
 )
 
@@ -149,6 +149,24 @@ val settings = Seq(
   scriptClasspath += "../conf/",
   //mainClass in (Compile, run) := Option("org.patricknoir.kafka.service.Boot"),
   ScalariformKeys.preferences := PreferencesImporterExporter.loadPreferences((file(".") / "formatter.preferences").getPath)
+  //  initialCommands in console :=
+  //  """
+  //  | import org.patricknoir.kafka.reactive.client.config._
+  //  | import scala.concurrent.ExecutionContext.Implicits.global
+  //  | import scala.concurrent.duration._
+  //  | import akka.util.Timeout
+  //  | import org.patricknoir.kafka.reactive.client._
+  //  | import akka.actor.ActorSystem
+  //  |
+  //  | implicit val timeout = Timeout(2 minutes)
+  //  | implicit val system = ActorSystem("testConsole")
+  //  |
+  //  | val config = KafkaRClientSettings.default
+  //  | val client = new KafkaReactiveClient(config)
+  //  |
+  //  | def quickRequest(dest: String) = client.request[String, String](s"kafka:$dest/echo", "patrick").onComplete(println)
+  //  |
+  //  """.stripMargin
 )
 
 val environment = System.getProperties.getProperty("stage", "local")

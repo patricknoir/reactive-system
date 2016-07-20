@@ -73,3 +73,17 @@ import system.dispatcher
   reactiveSys.run()
 
 ```
+
+Consume a Reactive Service
+--------------------------
+
+```scala
+implicit system: ActorSystem = ...
+import system.dispatcher
+implicit val timeout = Timeout(3 seconds)
+val client = new KafkaReactiveClient(KafkaRClientSettings.default)
+val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
+val Xor.Right(result: String) = Await.result(fResponse, Duration.Inf)
+
+println(result)
+```

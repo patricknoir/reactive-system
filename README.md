@@ -68,4 +68,8 @@ import system.dispatcher
       ...
     }.to(Producer.plainSink(producerSettings))
 
+  val reactiveSys = ReactiveSystem(source, route, sink)
+
+  reactiveSys.run()
+
 ```

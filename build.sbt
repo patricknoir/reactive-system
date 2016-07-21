@@ -50,13 +50,14 @@ val rootDependencies = Seq(
 )
 
 val testDependencies = Seq (
-  "org.apache.kafka"               %% "kafka"                  % "0.9.0.1"       % "test",
-  "com.typesafe.akka"              %% "akka-stream-testkit"    % Versions.Akka   % "test",
-  "com.typesafe.akka"              %% "akka-http-testkit"      % Versions.Akka   % "test",
-  "org.scalatest"                  %% "scalatest"              % "2.2.6"         % "test",
-  "org.specs2"                     %% "specs2-core"            % Versions.Specs2 % "test",
-  "org.specs2"                     %% "specs2-scalacheck"      % Versions.Specs2 % "test",
-  "org.specs2"                     %% "specs2-mock"            % Versions.Specs2 % "test"
+  "org.apache.kafka"               %% "kafka"                    % "0.9.0.1"       % "test",
+  "com.typesafe.akka"              %% "akka-stream-testkit"      % Versions.Akka   % "test",
+  "com.typesafe.akka"              %% "akka-http-testkit"        % Versions.Akka   % "test",
+  "org.scalatest"                  %% "scalatest"                % "2.2.6"         % "test",
+  "org.specs2"                     %% "specs2-core"              % Versions.Specs2 % "test",
+  "org.specs2"                     %% "specs2-scalacheck"        % Versions.Specs2 % "test",
+  "org.specs2"                     %% "specs2-mock"              % Versions.Specs2 % "test",
+  "net.manub"                      %% "scalatest-embedded-kafka" % "0.6.1"         % "test"
 )
 
 val dependencies =

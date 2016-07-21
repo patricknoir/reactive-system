@@ -9,6 +9,8 @@ import akka.stream.{ ActorMaterializer, Materializer }
 import akka.testkit.TestKit
 import akka.util.Timeout
 import cats.data.Xor
+import com.typesafe.config.ConfigFactory
+import net.manub.embeddedkafka.{ EmbeddedKafkaConfig, EmbeddedKafka }
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.{ StringSerializer, StringDeserializer }
@@ -19,14 +21,54 @@ import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequ
 import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
 import org.patricknoir.kafka.reactive.server.ReactiveSystem
 import org.specs2.SpecificationLike
+import org.specs2.mutable.BeforeAfter
 import scala.concurrent.{ Future, Await }
 import scala.concurrent.duration._
 import akka.stream.scaladsl._
 
+import scala.reflect.io.Directory
+
 /**
  * Created by patrick on 16/07/2016.
  */
-abstract class BaseIntegrationSpecification extends TestKit(ActorSystem("TestKit")) with SpecificationLike {
+abstract class BaseIntegrationSpecification extends TestKit(ActorSystem("TestKit", ConfigFactory.parseString(
+  """
+    |akka {
+    |  log-config-on-start = off
+    |
+    |  loggers = ["akka.testkit.TestEventListener"]
+    |  loglevel = "DEBUG"
+    |  stdout-loglevel = "DEBUG"
+    |
+    |  logger-startup-timeout = 10s
+    |  jvm-exit-on-fatal-error = off
+    |
+    |  log-dead-letters = on
+    |  log-dead-letters-during-shutdown = on
+    |
+    |  actor {
+    |    debug {
+    |      autoreceive = on
+    |      receive = on
+    |      lifecycle = on
+    |      fsm = on
+    |      event-stream = on
+    |      unhandled = on
+    |    }
+    |
+    |    custom {
+    |      dispatchers {
+    |        bounded-fork-join-dispatcher {
+    |          type = Dispatcher
+    |          executor = "fork-join-executor"
+    |          mailbox-requirement = "akka.dispatch.BoundedMessageQueueSemantics"
+    |        }
+    |      }
+    |    }
+    |  }
+    |}
+  """.stripMargin
+))) with SpecificationLike {
 
   var kafka = Option.empty[KafkaLocal]
 
@@ -48,29 +90,41 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
 
   def is = s2"""
 
-    base test
+    base test  $simpleTest (#simpleTest) //commented out for now
 
   """
 
-  def before() = {
-    implicit val materializer = ActorMaterializer()
+  implicit val kafkaConfig = EmbeddedKafkaConfig(kafkaPort = 9092, zooKeeperPort = 2181)
+  implicit val materializer = ActorMaterializer()
+
+  def startServer() = {
+
     val echoService = new KafkaEchoService()
     echoService.run()
   }
 
+  def before() = {
+    EmbeddedKafka.start()
+    startServer()
+  }
+
   def simpleTest = {
-    startUp()
-    Thread.sleep(10 * 1000) //10secs
     before()
-    Thread.sleep(5 * 1000) //5secs
-    implicit val timeout = Timeout(3 seconds)
+
+    implicit val timeout = Timeout(10 seconds)
     val client = new KafkaReactiveClient(KafkaRClientSettings.default)
-    Thread.sleep(5 * 1000) //5secs
+
     val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
 
     val Xor.Right(result: String) = Await.result(fResponse, Duration.Inf)
 
+    after()
     result must be_==("patrick")
+  }
+
+  def after() = {
+    materializer.shutdown()
+    EmbeddedKafka.stop()
   }
 }
 
@@ -103,9 +157,8 @@ class KafkaEchoService(implicit system: ActorSystem, materializer: Materializer)
     }
 
   val sink: Sink[Future[KafkaResponseEnvelope], _] = Flow[Future[KafkaResponseEnvelope]].map[ProducerRecord[String, String]] { fResp =>
-    //only because this is a test class!!!
+    //TODO: only because this is a test class, I will create a source ad hoc to support Future[ProducerRecord]!!!
     val resp = Await.result(fResp, Duration.Inf)
-    println(s"\n\n\nSink replying to: ${resp.replyTo}\n\n")
     new ProducerRecord[String, String](resp.replyTo, resp.asJson.noSpaces)
   }.to(Producer.plainSink(producerSettings))
 

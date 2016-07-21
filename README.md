@@ -31,6 +31,31 @@ Scala 2.11.x :
 "org.patricknoir.kafka" %% "kafka-reactive-service" % "0.1.0-SNAPSHOT"
 ```
 
+Depends on kafka-reactive-service from github:
+
+```scala
+
+object V {
+  val depProject = "master"
+  // Other library versions
+}
+
+object Projects {
+  lazy val depProject = RootProject(uri("git://github.com/me/dep-project.git#%s".format(V.depProject)))
+}
+
+// Library dependencies
+lazy val myProject = Project("my-project", file("."))
+.settings(myProjectSettings: _*)
+.dependsOn(Projects.depProject)
+.settings(
+  libraryDependencies ++= Seq(...)
+  ...
+)
+
+
+```
+
 Create a Reactive Service
 -------------------------
 

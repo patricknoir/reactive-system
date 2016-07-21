@@ -84,14 +84,12 @@ class KafkaEchoService(implicit system: ActorSystem, materializer: Materializer)
   import io.circe.syntax._
   import system.dispatcher
 
-  val route = requestFuture[String, String]("echo") { in =>
-    println(s"\n\n\nRoute received input: $in\n\n")
-    in
-  }
+  val route = requestFuture[String, String]("echo")(identity)
 
   val consumerSettings = ConsumerSettings(system, new StringDeserializer, new StringDeserializer, Set("echoInbound"))
     .withBootstrapServers("localhost:9092")
     .withGroupId("group1")
+    .withClientId("reactiveService1")
     .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 
   val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
@@ -99,9 +97,10 @@ class KafkaEchoService(implicit system: ActorSystem, materializer: Materializer)
 
   val source: Source[KafkaRequestEnvelope, _] = Consumer.atMostOnceSource(consumerSettings.withClientId("client1"))
     .map { record =>
-      println(s"\n\n\nSource decoding: ${record.value}\n\n")
       decode[KafkaRequestEnvelope](record.value)
-    }.filter(_.isRight).map { case (Xor.Right(kkReqEnvelope)) => kkReqEnvelope }
+    }.filter(_.isRight).map {
+      case (Xor.Right(kkReqEnvelope)) => kkReqEnvelope
+    }
 
   val sink: Sink[Future[KafkaResponseEnvelope], _] = Flow[Future[KafkaResponseEnvelope]].map[ProducerRecord[String, String]] { fResp =>
     //only because this is a test class!!!

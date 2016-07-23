@@ -1,4 +1,4 @@
-package org.patricknoir.kafka.reactive.server.source
+package org.patricknoir.kafka.reactive.server.streams
 
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.{ Producer, Consumer }

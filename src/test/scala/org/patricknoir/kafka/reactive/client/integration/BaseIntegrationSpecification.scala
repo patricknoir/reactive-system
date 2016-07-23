@@ -15,12 +15,11 @@ import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.KafkaResp
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
 import org.patricknoir.kafka.reactive.server.ReactiveSystem
-import org.patricknoir.kafka.reactive.server.source.{ReactiveKafkaSink, ReactiveKafkaSource}
+import org.patricknoir.kafka.reactive.server.streams.{ ReactiveKafkaSink, ReactiveKafkaSource }
 import org.specs2.SpecificationLike
 import scala.concurrent.{ Future, Await }
 import scala.concurrent.duration._
 import akka.stream.scaladsl._
-
 
 /**
  * Created by patrick on 16/07/2016.
@@ -124,12 +123,12 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
 
 class KafkaEchoService(implicit system: ActorSystem, materializer: Materializer) {
 
+  import system.dispatcher
   import org.patricknoir.kafka.reactive.server.ReactiveRoute._
 
   val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create("echoInbound", Set("localhost:9092"), "client1", "group1")
   val route = requestFuture[String, String]("echo")(identity)
   val sink: Sink[Future[KafkaResponseEnvelope], _] = ReactiveKafkaSink.create(Set("localhost:9092"))
-
 
   val rsys = ReactiveSystem(source, route, sink)
 

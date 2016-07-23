@@ -63,7 +63,8 @@ Create a Reactive Service
 
 import org.patricknoir.kafka.reactive.server.ReactiveRoute._
 
-implicit val system: ActorSystem = ...
+  implicit val system: ActorSystem = ...
+  import system.dispatcher
 
   val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create("echoInbound", Set("localhost:9092"), "client1", "group1")
 

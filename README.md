@@ -64,34 +64,19 @@ Create a Reactive Service
 import org.patricknoir.kafka.reactive.server.ReactiveRoute._
 
 implicit val system: ActorSystem = ...
-import system.dispatcher
+
+  val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create("echoInbound", Set("localhost:9092"), "client1", "group1")
 
   val route = requestFuture[String, String]("echo") { in =>
-    "echoing: " + in
-  } ~ requestFuture[String, Int]("length") { in =>
-    in.length
-  } ~ request[String, Int]("parseInt") { in => Future {
-      Xor.fromTry(in.toInt)
+      "echoing: " + in
+    } ~ requestFuture[String, Int]("length") { in =>
+      in.length
+    } ~ request[String, Int]("parseInt") { in => Future {
+        Xor.fromTry(in.toInt)
+      }
     }
-  }
 
-  val consumerSettings = ConsumerSettings(system, new StringDeserializer, new StringDeserializer, Set("echoInbound"))
-      .withBootstrapServers("localhost:9092")
-      .withGroupId("group1")
-      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
-
-  val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
-      .withBootstrapServers("localhost:9092")
-
-  val source: Source[KafkaRequestEnvelope, _] = Consumer.atMostOnceSource(consumerSettings.withClientId("client1"))
-      .map { record =>
-        println(s"\n\n\nSource decoding: ${record.value}\n\n")
-        decode[KafkaRequestEnvelope](record.value)
-      }.filter(_.isRight).map { case (Xor.Right(kkReqEnvelope)) => kkReqEnvelope }
-
-  val sink: Sink[Future[KafkaResponseEnvelope], _] = Flow[Future[KafkaResponseEnvelope]].map[ProducerRecord[String, String]] { fResp =>
-      ...
-    }.to(Producer.plainSink(producerSettings))
+  val sink: Sink[Future[KafkaResponseEnvelope], _] = ReactiveKafkaSink.create(Set("localhost:9092"))
 
   val reactiveSys = ReactiveSystem(source, route, sink)
 

@@ -1,0 +1,53 @@
+package org.patricknoir.kafka.reactive.server.source
+
+import akka.actor.ActorSystem
+import akka.kafka.scaladsl.{ Producer, Consumer }
+import akka.kafka.{ ProducerSettings, ConsumerSettings }
+import akka.stream.scaladsl.{ Flow, Sink, Source }
+import cats.data.Xor
+import io.circe.parser._
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.serialization.{ StringSerializer, StringDeserializer }
+import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.KafkaResponseEnvelope
+import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
+
+import scala.concurrent.duration.Duration
+import scala.concurrent.{ Await, Future }
+import io.circe.generic.auto._
+import io.circe.syntax._
+
+/**
+ * Created by patrick on 23/07/2016.
+ */
+object ReactiveKafkaSource {
+
+  def create(requestTopic: String, bootstrapServers: Set[String], clientId: String, groupId: String = "group1")(implicit system: ActorSystem): Source[KafkaRequestEnvelope, _] =
+    Consumer.atMostOnceSource(createConsumerSettings(requestTopic, bootstrapServers, clientId, groupId))
+      .map { record =>
+        decode[KafkaRequestEnvelope](record.value)
+      }.filter(_.isRight).map {
+        case (Xor.Right(kkReqEnvelope)) => kkReqEnvelope
+      }
+
+  private def createConsumerSettings(topic: String, servers: Set[String], clientId: String, groupId: String)(implicit system: ActorSystem) =
+    ConsumerSettings(system, new StringDeserializer, new StringDeserializer, Set(topic))
+      .withBootstrapServers(servers.mkString(","))
+      .withGroupId(groupId)
+      .withClientId(clientId)
+      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+
+}
+
+object ReactiveKafkaSink {
+  def create(bootstrapServers: Set[String])(implicit system: ActorSystem): Sink[Future[KafkaResponseEnvelope], _] = {
+    val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
+      .withBootstrapServers(bootstrapServers.mkString(","))
+
+    Flow[Future[KafkaResponseEnvelope]].map[ProducerRecord[String, String]] { fResp =>
+      //FIXME: I will create a source ad hoc to support Future[ProducerRecord], this is just to test the functionality
+      val resp = Await.result(fResp, Duration.Inf)
+      new ProducerRecord[String, String](resp.replyTo, resp.asJson.noSpaces)
+    }.to(Producer.plainSink(producerSettings))
+  }
+}

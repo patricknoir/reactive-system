@@ -3,11 +3,11 @@ package org.patricknoir.kafka.reactive.client
 import akka.actor.ActorSystem
 import akka.util.Timeout
 import cats.data.Xor
-import io.circe.{ Decoder, Encoder }
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.KafkaRequest
 import org.patricknoir.kafka.reactive.client.actors.{ KafkaRClientActor, KafkaConsumerActor, KafkaProducerActor }
 import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
-import io.circe.syntax._
+import org.patricknoir.kafka.reactive.common.{ ReactiveDeserializer, ReactiveSerializer }
+import org.patricknoir.kafka.reactive.common.serializer._
 import scala.concurrent.Future
 import akka.pattern.ask
 
@@ -16,7 +16,7 @@ import akka.pattern.ask
  */
 trait ReactiveClient {
 
-  def request[In: Encoder, Out: Decoder](destination: String, payload: In)(implicit timeout: Timeout): Future[Error Xor Out]
+  def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout): Future[Error Xor Out]
 
 }
 
@@ -37,7 +37,7 @@ class KafkaReactiveClient(settings: KafkaRClientSettings)(implicit system: Actor
    * @return
    */
   //TODO: I'm messing with Error vs Throwable => replace Error with Throwable!
-  def request[In: Encoder, Out: Decoder](destination: String, payload: In)(implicit timeout: Timeout): Future[Error Xor Out] =
-    (kafkaClientService ? KafkaRequest(destination, payload.asJson.noSpaces, timeout, settings.inboundResponseQueue, implicitly[Decoder[Out]])).mapTo[Error Xor Out]
+  def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout): Future[Error Xor Out] =
+    (kafkaClientService ? KafkaRequest(destination, new String(serialize(payload)), timeout, settings.inboundResponseQueue, implicitly[ReactiveDeserializer[Out]])).mapTo[Error Xor Out]
 
 }

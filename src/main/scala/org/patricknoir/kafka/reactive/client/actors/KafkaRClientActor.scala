@@ -5,8 +5,8 @@ import java.util.UUID
 import akka.actor.{ ActorRef, Props, Actor, ActorLogging }
 import akka.event.LoggingReceive
 import akka.util.Timeout
-import io.circe.Decoder
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.KafkaRequest
+import org.patricknoir.kafka.reactive.common.ReactiveDeserializer
 
 /**
  * Created by patrick on 12/07/2016.
@@ -29,7 +29,7 @@ class KafkaRClientActor(producerProps: Props, consumerProps: Props) extends Acto
 
 object KafkaRClientActor {
 
-  case class KafkaRequest(destination: String, payload: String, timeout: Timeout, replyTo: String, decoder: Decoder[_])
+  case class KafkaRequest(destination: String, payload: String, timeout: Timeout, replyTo: String, decoder: ReactiveDeserializer[_])
 
   def props(producerProps: Props, consumerProps: Props) = Props(new KafkaRClientActor(producerProps, consumerProps))
 }

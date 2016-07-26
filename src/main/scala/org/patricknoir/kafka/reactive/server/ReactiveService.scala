@@ -11,8 +11,8 @@ case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](
   def apply(in: In): Future[Error Xor Out] = f(in)
 
   def unsafeApply(jsonStr: String)(implicit ec: ExecutionContext): Future[Error Xor String] = (for {
-    in <- XorT(Future.successful(deserialize[In](jsonStr.getBytes)))
-    out <- XorT(f(in)).map(out => new String(serialize[Out](out)))
+    in <- XorT(Future.successful(deserialize[In](jsonStr)))
+    out <- XorT(f(in)).map(out => serialize[Out](out))
   } yield out).value
 }
 

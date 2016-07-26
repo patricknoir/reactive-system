@@ -8,11 +8,11 @@ import cats.data.Xor
 package object common {
 
   object deserializer {
-    def deserialize[Out: ReactiveDeserializer](in: Array[Byte]): Xor[Error, Out] = implicitly[ReactiveDeserializer[Out]].deserialize(in)
+    def deserialize[Out: ReactiveDeserializer](in: String): Xor[Error, Out] = implicitly[ReactiveDeserializer[Out]].deserialize(in.getBytes)
   }
 
   object serializer {
-    def serialize[In: ReactiveSerializer](in: In): Array[Byte] = implicitly[ReactiveSerializer[In]].serialize(in)
+    def serialize[In: ReactiveSerializer](in: In): String = new String(implicitly[ReactiveSerializer[In]].serialize(in))
   }
 
 }

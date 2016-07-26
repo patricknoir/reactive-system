@@ -35,7 +35,7 @@ class KafkaConsumerActor(consumerSettings: Map[String, String], inboundQueue: St
     }
   }
 
-  loop.onComplete(result => println(s"\n\n\nKafka Consumer completed: $result\n\n"))
+  loop.onComplete(result => println(log.info("Kafka Consumer Terminated")))
 
   def receive = Actor.emptyBehavior
 

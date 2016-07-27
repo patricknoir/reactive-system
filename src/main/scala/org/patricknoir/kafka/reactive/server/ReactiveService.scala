@@ -1,18 +1,18 @@
 package org.patricknoir.kafka.reactive.server
 
-import io.circe.{ Decoder, Encoder }
-import io.circe.syntax._
-import io.circe.parser._
-import cats.std.all._
+import org.patricknoir.kafka.reactive.common.serializer._
+import org.patricknoir.kafka.reactive.common.deserializer._
 import cats.data._
+import cats.std.all._
+import org.patricknoir.kafka.reactive.common.{ ReactiveSerializer, ReactiveDeserializer }
 import scala.concurrent.{ ExecutionContext, Future }
 
-case class ReactiveService[-In: Decoder, +Out: Encoder](id: String)(f: In => Future[Error Xor Out]) {
+case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out]) {
   def apply(in: In): Future[Error Xor Out] = f(in)
 
   def unsafeApply(jsonStr: String)(implicit ec: ExecutionContext): Future[Error Xor String] = (for {
-    in <- XorT(Future.successful(decode[In](jsonStr))).leftMap(ex => new Error(ex))
-    out <- XorT(f(in)).map(_.asJson.noSpaces)
+    in <- XorT(Future.successful(deserialize[In](jsonStr)))
+    out <- XorT(f(in)).map(out => serialize[Out](out))
   } yield out).value
 }
 

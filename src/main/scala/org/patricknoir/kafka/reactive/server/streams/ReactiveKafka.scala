@@ -46,6 +46,7 @@ object ReactiveKafkaSink {
 
     Flow[Future[KafkaResponseEnvelope]].map[ProducerRecord[String, String]] { fResp =>
       //FIXME: I will create a source ad hoc to support Future[ProducerRecord], this is just to test the functionality
+      //TODO: replace this with KafkaProducerActor with consumerSettings.properties and map over the future in order to send the message
       val resp = Await.result(fResp, Duration.Inf)
       new ProducerRecord[String, String](resp.replyTo, resp.asJson.noSpaces)
     }.to(Producer.plainSink(producerSettings))

@@ -6,10 +6,10 @@ import akka.actor.{ Props, Actor, ActorSystem }
 import akka.testkit.TestKit
 import akka.util.Timeout
 import cats.data.Xor
-import io.circe.Decoder
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseStatusCode, KafkaResponseEnvelope }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.KafkaRequest
+import org.patricknoir.kafka.reactive.common.ReactiveDeserializer
 import org.specs2.SpecificationLike
 
 import scala.concurrent.{ Await, Future }
@@ -46,7 +46,7 @@ class KafkaRClientActorSpec extends TestKit(ActorSystem("TestKit")) with Specifi
 
     val porsche997 = Car("Carrera S 997", "Porsche", 2008)
 
-    val fResp = (client ? KafkaRequest("kafka:destinationTopic/echoService", porsche997.asJson.noSpaces, timeout, "replyTopic", implicitly[Decoder[Car]])).mapTo[Error Xor Car]
+    val fResp = (client ? KafkaRequest("kafka:destinationTopic/echoService", porsche997.asJson.noSpaces, timeout, "replyTopic", implicitly[ReactiveDeserializer[Car]])).mapTo[Error Xor Car]
 
     val Xor.Right(result) = Await.result(fResp, Duration.Inf)
 

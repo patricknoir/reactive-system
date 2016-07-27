@@ -4,15 +4,15 @@ import akka.actor.{ Props, Actor, ActorSystem }
 import akka.testkit.TestKit
 import akka.util.Timeout
 import cats.data.Xor
-import io.circe.Decoder
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseStatusCode, KafkaResponseEnvelope }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.KafkaRequest
 import org.specs2.SpecificationLike
 import akka.pattern.ask
-import io.circe.syntax._
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import org.patricknoir.kafka.reactive.common.{ ReactiveDeserializer }
+import org.patricknoir.kafka.reactive.common.serializer._
 
 /**
  * Created by patrick on 13/07/2016.
@@ -33,7 +33,7 @@ class KafkaRRequestActorSpec extends TestKit(ActorSystem("TestKit")) with Specif
     implicit val timeout = Timeout(10 seconds)
     val requestActor = system.actorOf(KafkaRRequestActor.props(echoActor), "request-1")
 
-    val fResp = (requestActor ? KafkaRequest("kafka:destinationTopic/echoService", "simple message".asJson.noSpaces, timeout, "replyTopic", implicitly[Decoder[String]])).mapTo[Error Xor String]
+    val fResp = (requestActor ? KafkaRequest("kafka:destinationTopic/echoService", new String(serialize("simple message".getBytes)), timeout, "replyTopic", implicitly[ReactiveDeserializer[String]])).mapTo[Error Xor String]
 
     val Xor.Right(result) = Await.result(fResp, Duration.Inf)
 
@@ -50,7 +50,7 @@ class KafkaRRequestActorSpec extends TestKit(ActorSystem("TestKit")) with Specif
     implicit val timeout = Timeout(10 seconds)
     val requestActor = system.actorOf(KafkaRRequestActor.props(echoActor), "request-2")
 
-    val fResp = (requestActor ? KafkaRequest("kafka:destinationTopic/echoService", car.asJson.noSpaces, timeout, "replyTopic", implicitly[Decoder[Car]])).mapTo[Error Xor Car]
+    val fResp = (requestActor ? KafkaRequest("kafka:destinationTopic/echoService", new String(serialize(car)), timeout, "replyTopic", implicitly[ReactiveDeserializer[Car]])).mapTo[Error Xor Car]
 
     val Xor.Right(carResult) = Await.result(fResp, Duration.Inf)
 

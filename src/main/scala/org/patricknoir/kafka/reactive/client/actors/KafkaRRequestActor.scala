@@ -3,11 +3,10 @@ package org.patricknoir.kafka.reactive.client.actors
 import akka.actor._
 import akka.event.LoggingReceive
 import cats.data.Xor
-import io.circe.Decoder
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseStatusCode, KafkaResponseEnvelope }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.KafkaRequest
-import io.circe.parser._
+import org.patricknoir.kafka.reactive.common.ReactiveDeserializer
 
 /**
  * Created by patrick on 12/07/2016.
@@ -21,10 +20,9 @@ class KafkaRRequestActor(producer: ActorRef) extends Actor with ActorLogging {
       context.become(waitingResponse(sender, decoder))
   }
 
-  def waitingResponse(client: ActorRef, decoder: Decoder[_]): Receive = LoggingReceive {
+  def waitingResponse(client: ActorRef, decoder: ReactiveDeserializer[_]): Receive = LoggingReceive {
     case resp @ KafkaResponseEnvelope(_, _, response, KafkaResponseStatusCode.Success) =>
-      println(s"\n\n\nActorRequest: Received response $resp\n\n")
-      client ! decode(response)(decoder)
+      client ! decoder.deserialize(response.getBytes)
       context stop self
     case KafkaResponseEnvelope(_, _, response, _) =>
       client ! Xor.left(new Error(response))

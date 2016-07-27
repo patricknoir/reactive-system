@@ -68,9 +68,9 @@ import org.patricknoir.kafka.reactive.server.ReactiveRoute._
 
   val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create("echoInbound", Set("localhost:9092"), "client1", "group1")
 
-  val route = requestFuture[String, String]("echo") { in =>
+  val route = request.sync[String, String]("echo") { in =>
       "echoing: " + in
-    } ~ requestFuture[String, Int]("length") { in =>
+    } ~ request.aSync[String, Int]("length") { in =>
       in.length
     } ~ request[String, Int]("parseInt") { in => Future {
         Xor.fromTry(in.toInt)

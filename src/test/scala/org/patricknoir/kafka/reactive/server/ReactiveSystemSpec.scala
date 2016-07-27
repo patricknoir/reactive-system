@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._
 import akka.testkit.TestKit
+import cats.data.Xor
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseStatusCode, KafkaResponseEnvelope }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 import org.specs2.SpecificationLike
@@ -12,6 +13,7 @@ import io.circe.syntax._
 
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.Duration
+import scala.util.Try
 
 /**
  * Created by patrick on 13/07/2016.
@@ -36,11 +38,16 @@ class ReactiveSystemSpec extends TestKit(ActorSystem("TestKit")) with Specificat
       req
     }
 
-    val route: ReactiveRoute = requestFuture("echo") { (in: String) =>
-      s"echo $in"
-    } ~ requestFuture("length") { (in: String) =>
+    val route: ReactiveRoute = request.sync("echo") {
+      (in: String) => s"echo $in"
+    } ~ request.sync("length") { (in: String) =>
       in.length
     }
+    //    ~ request("toInt") { (in: String) =>
+    //      Try {
+    //        in.toInt
+    //      }
+    //    }
 
     val sink = Sink.seq[Future[KafkaResponseEnvelope]]
 

@@ -1,7 +1,7 @@
 Reactive Kafka Service
 ======================
 
-Current Version: **1.0.0-SNAPSHOT**
+Current Version: **0.1.0-SNAPSHOT**
 
 Introduction
 ------------

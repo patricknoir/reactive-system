@@ -1,7 +1,7 @@
 Reactive Kafka Service
 ======================
 
-Current Version: **1.0.0-SNAPSHOT**
+Current Version: **0.1.0-SNAPSHOT**
 
 Introduction
 ------------
@@ -14,12 +14,13 @@ invocations that returns Future[_] making easy to compose different requests tog
 To Fix
 ------
 
-1. Replace io.circe.Encoder[A]/Decoder[A] typeclasses from the API and replace by a custom typeclass for kafka serialization/deserialization. We will offer implicit converters from/to circe Decoders/Encoders
-2. Generalise the API from Kafka such as it can be implemented with any messaging system
+1. --Replace io.circe.Encoder[A]/Decoder[A] typeclasses from the API and replace by a custom typeclass for kafka serialization/deserialization. We will offer implicit converters from/to circe Decoders/Encoders--
+2. --Generalise the API from Kafka such as it can be implemented with any messaging system--
 3. FIXME: I have been messing with (Error Xor A) (Error = java.lang.Error) => this should be replaced with Throwable or custom Error type
-4. Replace ReactiveRoute.request* DSL methods with Magnet Pattern like in Akka HTTP
+4. --Replace ReactiveRoute.request* DSL methods with Magnet Pattern like in Akka HTTP--
 5. ReactiveSystem implementation is too naive and the only purpose is to show the API usage
 6. Implement Semantics At Least Once for Command/Event pattern
+7. Implement a ReactiveKafkaSink that accepts Future[KafkaEnvelopeResponse] and is non-blocking.
 
 Import the project
 ------------------
@@ -68,9 +69,9 @@ import org.patricknoir.kafka.reactive.server.ReactiveRoute._
 
   val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create("echoInbound", Set("localhost:9092"), "client1", "group1")
 
-  val route = requestFuture[String, String]("echo") { in =>
+  val route = request.sync[String, String]("echo") { in =>
       "echoing: " + in
-    } ~ requestFuture[String, Int]("length") { in =>
+    } ~ request.aSync[String, Int]("length") { in =>
       in.length
     } ~ request[String, Int]("parseInt") { in => Future {
         Xor.fromTry(in.toInt)

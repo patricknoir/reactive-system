@@ -29,7 +29,7 @@ If you want to use kafka reactive services you need to import this library:
 Scala 2.11.x :
 
 ```scala
-"org.patricknoir.kafka" %% "kafka-reactive-service" % "0.1.0-SNAPSHOT"
+"org.patricknoir.kafka" %% "kafka-reactive-service" % "0.2.0-SNAPSHOT"
 ```
 
 Depends on kafka-reactive-service from github:

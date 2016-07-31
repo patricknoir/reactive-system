@@ -83,7 +83,7 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
 
   def is = s2"""
 
-    base test  $simpleTest (#simpleTest) //commented out for now
+    base test  $simpleTest
 
   """
 

@@ -28,25 +28,16 @@ val compilerPlugins = Seq(
 )
 
 val rootDependencies = Seq(
-  "ch.qos.logback"                 %  "logback-classic"        % "1.1.7",
+  "org.slf4j"                      % "slf4j-api"               % Versions.Slf4j,
+  "org.slf4j"                      % "slf4j-log4j12"           % Versions.Slf4j,
   "com.iheart"                     %% "ficus"                  % "1.2.5",
-  "com.typesafe.akka"              %% "akka-cluster"           % Versions.Akka,
-  "com.typesafe.akka"              %% "akka-cluster-metrics"   % Versions.Akka,
-  "com.typesafe.akka"              %% "akka-cluster-sharding"  % Versions.Akka,
-  "com.typesafe.akka"              %% "akka-cluster-tools"     % Versions.Akka,
-  "com.typesafe.akka"              %% "akka-http-experimental" % Versions.Akka,
-  "com.typesafe.akka"              %% "akka-persistence"       % Versions.Akka,
   "com.typesafe.akka"              %% "akka-slf4j"             % Versions.Akka,
-  //"com.github.krasserm" %% "akka-persistence-cassandra" % "0.6",
-  "org.iq80.leveldb"               % "leveldb"                 % "0.7",
-  "org.fusesource.leveldbjni"      % "leveldbjni-all"          % "1.8",
   "com.typesafe.akka"              %% "akka-stream-kafka"      % "0.11-M3",
   "io.circe"                       %% "circe-core"             % Versions.Circe,
   "io.circe"                       %% "circe-generic"          % Versions.Circe,
   "io.circe"                       %% "circe-parser"           % Versions.Circe,
   "io.circe"                       %% "circe-java8"            % Versions.Circe,
-  "io.circe"                       %% "circe-optics"            % Versions.Circe,
-  "io.reactivex"                   %% "rxscala"                % "0.26.2"
+  "io.circe"                       %% "circe-optics"            % Versions.Circe
 )
 
 val testDependencies = Seq (
@@ -146,28 +137,32 @@ val settings = Seq(
   javaOptions in run ++= forkedJvmOption ++ jmxJvmOption,
   javaOptions in Test ++= forkedJvmOption,
   scalacOptions := compileSettings,
-  unmanagedClasspath in Runtime += baseDirectory.value / "env/local",  
+  unmanagedClasspath in Runtime += baseDirectory.value / "env/local",
+  unmanagedClasspath in Compile += baseDirectory.value / "env/console",
   scriptClasspath += "../conf/",
   //mainClass in (Compile, run) := Option("org.patricknoir.kafka.service.Boot"),
-  ScalariformKeys.preferences := PreferencesImporterExporter.loadPreferences((file(".") / "formatter.preferences").getPath)
-  //  initialCommands in console :=
-  //  """
-  //  | import org.patricknoir.kafka.reactive.client.config._
-  //  | import scala.concurrent.ExecutionContext.Implicits.global
-  //  | import scala.concurrent.duration._
-  //  | import akka.util.Timeout
-  //  | import org.patricknoir.kafka.reactive.client._
-  //  | import akka.actor.ActorSystem
-  //  |
-  //  | implicit val timeout = Timeout(2 minutes)
-  //  | implicit val system = ActorSystem("testConsole")
-  //  |
-  //  | val config = KafkaRClientSettings.default
-  //  | val client = new KafkaReactiveClient(config)
-  //  |
-  //  | def quickRequest(dest: String) = client.request[String, String](s"kafka:$dest/echo", "patrick").onComplete(println)
-  //  |
-  //  """.stripMargin
+  ScalariformKeys.preferences := PreferencesImporterExporter.loadPreferences((file(".") / "formatter.preferences").getPath),
+  initialCommands in console :=
+    """
+    | import org.patricknoir.kafka.reactive.client.config._
+    | import scala.concurrent.ExecutionContext.Implicits.global
+    | import scala.concurrent.duration._
+    | import akka.util.Timeout
+    | import org.patricknoir.kafka.reactive.client._
+    | import akka.actor.ActorSystem
+    | import com.typesafe.config.ConfigFactory
+    |
+    | val akkaConfig = ConfigFactory.load("application.conf")
+    |
+    | implicit val timeout = Timeout(2 minutes)
+    | implicit val system = ActorSystem("testConsole", akkaConfig)
+    |
+    | val config = KafkaRClientSettings.default
+    | val client = new KafkaReactiveClient(config)
+    |
+    | def quickRequest(dest: String, message: String) = client.request[String, String](s"kafka:$dest/echo", message).onComplete(println)
+    |
+    """.stripMargin
 )
 
 val environment = System.getProperties.getProperty("stage", "local")

@@ -116,6 +116,19 @@ The above router configuration will be translated into the below:
 ```
 
 #### Reactive Route API
+There is a simple API which allows to create simple Reactive Routes. The key object for the API is the entity request defined as per below:
+
+```scala
+
+object request {
+    def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out]): ReactiveRoute =
+      ReactiveRoute().add(ReactiveService[In, Out](id)(f))
+    def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out)): ReactiveRoute =
+      ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future.successful(f(in))))
+    def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out))(implicit ec: ExecutionContext): ReactiveRoute =
+      ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future(f(in))))
+  }
+```
 
 ...
 

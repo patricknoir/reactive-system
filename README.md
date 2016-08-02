@@ -62,13 +62,15 @@ Reactive System
 
 ### Introduction
 A Reactive System is an abstraction of a server which offers different services using message exchange pattern.
+
 The basic idea is that a Reactive System is very similar to a server which exposes services using web-services through RESTful
 interfaces, however web-services have most of the time a point-to-point communication which makes composition very hard as the
-component are strongly coupled. Even if this problem can be mitigated using proxies, load balancers, with Reactive Systems I take
-a totally different approach, still offers the ability to expose Request/Response services similar to the web-service pattern,
-however all the communications are happening trough message exchange and for this implementation we use Kafka.
+components are strongly coupled. 
+Even if this problem can be mitigated using proxies, load balancing; with Reactive Systems I take
+a totally different approach, it still offers the ability to expose Request/Response services similar to the web-service pattern,
+however all the communications are happening trough message exchange.
 
-A Reactive System has an inbound queue for requests addressed to the system. Attached to the inbound queue is the key component of a Reactive System:
+A Reactive System has an inbound queue for the requests addressed to the system. Attached to the inbound queue is the key component of a Reactive System:
 the *Reactive Route*.
 
 ### Reactive Route
@@ -118,6 +120,14 @@ The above router configuration will be translated into the below:
 ...
 
 ### Reactive System
+
+### Service Discovery
+
+### Service URL
+
+```
+URL : kafka://localhost:9092/inboundTopic/serviceName
+```
 
 ...
 

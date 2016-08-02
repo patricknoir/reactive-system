@@ -57,8 +57,73 @@ lazy val myProject = Project("my-project", file("."))
 
 ```
 
-Create a Reactive Service
--------------------------
+Reactive System
+---------------
+
+### Introduction
+A Reactive System is an abstraction of a server which offers different services using message exchange pattern.
+The basic idea is that a Reactive System is very similar to a server which exposes services using web-services through RESTful
+interfaces, however web-services have most of the time a point-to-point communication which makes composition very hard as the
+component are strongly coupled. Even if this problem can be mitigated using proxies, load balancers, with Reactive Systems I take
+a totally different approach, still offers the ability to expose Request/Response services similar to the web-service pattern,
+however all the communications are happening trough message exchange and for this implementation we use Kafka.
+
+A Reactive System has an inbound queue for requests addressed to the system. Attached to the inbound queue is the key component of a Reactive System:
+the *Reactive Route*.
+
+### Reactive Route
+
+The Reactive Route consumes Reactive Requests from an Akka Streams Source and dispatch the messages to the relative service. 
+When you build a reactive system the first thing to define is the Route:
+
+```scala
+
+import ReactiveRoute._
+
+val route: ReactiveRoute = request.aSync("echo") { (in: String) => 
+    s"echoing: $in" 
+  } ~
+  request.aSync[String, Int]("size") { in =>
+    in.length
+  } ~
+  request.sync[String, String]("reverse") { in => in.reverse }
+
+```
+
+The above router configuration will be translated into the below:
+
+```
+
+                                    ______________________________________________________________________________
+                                   |                                    Reactive System                           |
+                                   |                                                                              |
+                                   |                                                                              |
+                                   |                                        /---->{Service: echo}                 |
+                                   |                                        |                                     |
+                                   |             __________                 |                                     |
+                                   |            |          |----------------'                                     |
+                           ________|______      | Reactive |                                                      |
+----[Request Message]---->| Inbound Queue |---->|  Route   |------------------------>{Service: size}              |
+                          '--------|------'     |          |                                                      |
+                                   |            '----------'                                                      |
+                                   |                    |                                                         |
+                                   |                    \--------------->{Service: reverse}                       |
+                                   |                                                                              |
+                                   |                                                                              |
+                                   '------------------------------------------------------------------------------'                                   
+```
+
+#### Reactive Route API
+
+...
+
+### Reactive System
+
+...
+
+### Example
+
+...
 
 ```scala
 

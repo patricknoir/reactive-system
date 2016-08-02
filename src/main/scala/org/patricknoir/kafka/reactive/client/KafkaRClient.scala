@@ -39,5 +39,4 @@ class KafkaReactiveClient(settings: KafkaRClientSettings)(implicit system: Actor
   //TODO: I'm messing with Error vs Throwable => replace Error with Throwable!
   def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout): Future[Error Xor Out] =
     (kafkaClientService ? KafkaRequest(destination, serialize(payload), timeout, settings.inboundResponseQueue, implicitly[ReactiveDeserializer[Out]])).mapTo[Error Xor Out]
-
 }

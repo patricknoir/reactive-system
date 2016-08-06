@@ -13,7 +13,7 @@ import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.KafkaResp
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{ Await, Future }
+import scala.concurrent.{ ExecutionContext, Await, Future }
 import io.circe.generic.auto._
 import io.circe.syntax._
 
@@ -40,15 +40,26 @@ object ReactiveKafkaSource {
 }
 
 object ReactiveKafkaSink {
-  def create(bootstrapServers: Set[String])(implicit system: ActorSystem): Sink[Future[KafkaResponseEnvelope], _] = {
+  //  def create(bootstrapServers: Set[String])(implicit system: ActorSystem): Sink[Future[KafkaResponseEnvelope], _] = {
+  //    val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
+  //      .withBootstrapServers(bootstrapServers.mkString(","))
+  //
+  //    Flow[Future[KafkaResponseEnvelope]].map[ProducerRecord[String, String]] { fResp =>
+  //      //FIXME: I will create a source ad hoc to support Future[ProducerRecord], this is just to test the functionality
+  //      //TODO: replace this with KafkaProducerActor with consumerSettings.properties and map over the future in order to send the message
+  //      val resp = Await.result(fResp, Duration.Inf)
+  //      new ProducerRecord[String, String](resp.replyTo, resp.asJson.noSpaces)
+  //    }.to(Producer.plainSink(producerSettings))
+  //  }
+
+  def create(bootstrapServers: Set[String])(implicit system: ActorSystem, ec: ExecutionContext): Sink[Future[KafkaResponseEnvelope], _] = {
     val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
       .withBootstrapServers(bootstrapServers.mkString(","))
 
-    Flow[Future[KafkaResponseEnvelope]].map[ProducerRecord[String, String]] { fResp =>
-      //FIXME: I will create a source ad hoc to support Future[ProducerRecord], this is just to test the functionality
-      //TODO: replace this with KafkaProducerActor with consumerSettings.properties and map over the future in order to send the message
-      val resp = Await.result(fResp, Duration.Inf)
-      new ProducerRecord[String, String](resp.replyTo, resp.asJson.noSpaces)
+    Flow[Future[KafkaResponseEnvelope]].mapAsync[ProducerRecord[String, String]](1) { fResp =>
+      fResp.map { resp =>
+        new ProducerRecord[String, String](resp.replyTo, resp.asJson.noSpaces)
+      }
     }.to(Producer.plainSink(producerSettings))
   }
 }

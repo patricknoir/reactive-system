@@ -123,6 +123,7 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
 
 class KafkaEchoService(implicit system: ActorSystem, materializer: Materializer) {
 
+  import system.dispatcher
   import org.patricknoir.kafka.reactive.server.ReactiveRoute._
 
   val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create("echoInbound", Set("localhost:9092"), "client1", "group1")

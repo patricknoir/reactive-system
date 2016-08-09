@@ -1,189 +1,176 @@
-Reactive Kafka Service
-======================
+Introduction to: Reactive System
+================================
 
-Current Version: **0.2.0-SNAPSHOT**
+A reactive system is a server which exposes services using message exchange pattern rather than synchronos IO communications (for example HTTP).
+Using message exchange rather than synchronous communication helps to build more decoupled systems, which gives us several advatages like:
 
-Introduction
-------------
-This project aims to provide a new paradigm to implement Reactive Service which are message driven and purely reactive.
-This library will enable you to declare server side services exposed by your application using a DSL similar to Akka HTTP
-using Kafka Topics rather than http requests/responses.
-This project also provides a client library to consume those services which will hide the publisher/consumer by simple function
-invocations that returns Future[_] making easy to compose different requests together.
+1. Isolation: if a reactive system fails it doesn't affect its client.
+2. Location transparency: reactive systems they don't communicate directly but through messages sent to 
+   an address (topic), that way is not necessary to know the location of the reactive system exposing the
+   service as long we can send a message to the topic address.
+3. Elasticity: reactive services can implement scaling strategy on the way they consume the messages from a
+   topic allowing to add (scale out) and remove (scale down) more reactive systems depending on the current
+   demand.
+4. DOS Immune: ...
 
-To Fix
-------
-
-1. ~~Replace io.circe.Encoder[A]/Decoder[A] typeclasses from the API and replace by a custom typeclass for kafka serialization/deserialization. We will offer implicit converters from/to circe Decoders/Encoders~~
-2. ~~Generalise the API from Kafka such as it can be implemented with any messaging system~~
-3. FIXME: I have been messing with (Error Xor A) (Error = java.lang.Error) => this should be replaced with Throwable or custom Error type
-4. ~~Replace ReactiveRoute.request* DSL methods with Magnet Pattern like in Akka HTTP~~
-5. ReactiveSystem implementation is too naive and the only purpose is to show the API usage
-6. Implement Semantics At Least Once for Command/Event pattern
-7. Implement a ReactiveKafkaSink that accepts Future[KafkaEnvelopeResponse] and is non-blocking.
-
-Import the project
-------------------
-If you want to use kafka reactive services you need to import this library:
-
-Scala 2.11.x :
-
-```scala
-"org.patricknoir.kafka" %% "kafka-reactive-service" % "0.2.0-SNAPSHOT"
-```
-
-Depends on kafka-reactive-service from github:
-
-```scala
-
-object V {
-  val depProject = "master"
-  // Other library versions
-}
-
-object Projects {
-  lazy val depProject = RootProject(uri("git://github.com/me/dep-project.git#%s".format(V.depProject)))
-}
-
-// Library dependencies
-lazy val myProject = Project("my-project", file("."))
-.settings(myProjectSettings: _*)
-.dependsOn(Projects.depProject)
-.settings(
-  libraryDependencies ++= Seq(...)
-  ...
-)
-
-
-```
 
 Reactive System
 ---------------
 
-### Introduction
-A Reactive System is an abstraction of a server which offers different services using message exchange pattern.
+In order to build a reactive system you need 3 elements:
 
-The basic idea is that a Reactive System is very similar to a server which exposes services using web-services through RESTful
-interfaces, however web-services have most of the time a point-to-point communication which makes composition very hard as the
-components are strongly coupled. 
-Even if this problem can be mitigated using proxies, load balancing; with Reactive Systems I take
-a totally different approach, it still offers the ability to expose Request/Response services similar to the web-service pattern,
-however all the communications are happening trough message exchange.
+1. A source of ReactiveRequest messages
+2. A router able to dispatch ReactiveRequest messages to the associated ReactiveService
+3. A sink of ReactiveResponse messages which will send the response to the right destination
 
-A Reactive System has an inbound queue for the requests addressed to the system. Attached to the inbound queue is the key component of a Reactive System:
-the *Reactive Route*.
+```
+    _____________________________________________
+   |               REACTIVE SYSTEM               |
+   |                                             |
+   |      ________      _______      ______      |
+   |     |        |    |       |    |      |     |
+   |     | Source | ~> | Route | ~> | Sink |     |
+   |     |________|    |_______|    |______|     |
+   |                                             |
+   |_____________________________________________|
+   
+```
 
-### Reactive Route
-
-The Reactive Route consumes Reactive Requests from an Akka Streams Source and dispatch the messages to the relative service. 
-When you build a reactive system the first thing to define is the Route:
+*Scala API:*
 
 ```scala
 
-import ReactiveRoute._
+import org.patricknoir.kafka.reactive.server.dsl._
 
-val route: ReactiveRoute = request.aSync("echo") { (in: String) => 
-    s"echoing: $in" 
-  } ~
-  request.aSync[String, Int]("size") { in =>
-    in.length
-  } ~
-  request.sync[String, String]("reverse") { in => in.reverse }
-
-```
-
-The above router configuration will be translated into the below:
-
-```
-
-                                    ______________________________________________________________________________
-                                   |                                    Reactive System                           |
-                                   |                                                                              |
-                                   |                                                                              |
-                                   |                                        /---->{Service: echo}                 |
-                                   |                                        |                                     |
-                                   |             __________                 |                                     |
-                                   |            |          |----------------'                                     |
-                           ________|______      | Reactive |                                                      |
-----[Request Message]---->| Inbound Queue |---->|  Route   |------------------------>{Service: size}              |
-                          '--------|------'     |          |                                                      |
-                                   |            '----------'                                                      |
-                                   |                    |                                                         |
-                                   |                    \--------------->{Service: reverse}                       |
-                                   |                                                                              |
-                                   |                                                                              |
-                                   '------------------------------------------------------------------------------'                                   
-```
-
-#### Reactive Route API
-There is a simple API which allows to create simple Reactive Routes. The key object for the API is the entity request defined as per below:
-
-```scala
-
-object request {
-    def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out]): ReactiveRoute =
-      ReactiveRoute().add(ReactiveService[In, Out](id)(f))
-    def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out)): ReactiveRoute =
-      ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future.successful(f(in))))
-    def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out))(implicit ec: ExecutionContext): ReactiveRoute =
-      ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future(f(in))))
-  }
-```
-
-...
-
-### Reactive System
-
-### Service Discovery
-
-### Service URL
-
-```
-URL : kafka://localhost:9092/inboundTopic/serviceName
-```
-
-...
-
-### Example
-
-...
-
-```scala
-
-import org.patricknoir.kafka.reactive.server.ReactiveRoute._
-
-  implicit val system: ActorSystem = ...
-  import system.dispatcher
-
-  val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create("echoInbound", Set("localhost:9092"), "client1", "group1")
-
-  val route = request.sync[String, String]("echo") { in =>
-      "echoing: " + in
-    } ~ request.aSync[String, Int]("length") { in =>
-      in.length
-    } ~ request[String, Int]("parseInt") { in => Future {
-        Xor.fromTry(in.toInt)
-      }
-    }
-
-  val sink: Sink[Future[KafkaResponseEnvelope], _] = ReactiveKafkaSink.create(Set("localhost:9092"))
-
-  val reactiveSys = ReactiveSystem(source, route, sink)
-
-  reactiveSys.run()
-
-```
-
-Consume a Reactive Service
---------------------------
-
-```scala
-implicit system: ActorSystem = ...
+implicit val system: ActorSystem = ...
 import system.dispatcher
-implicit val timeout = Timeout(3 seconds)
-val client = new KafkaReactiveClient(KafkaRClientSettings.default)
-val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
-val Xor.Right(result: String) = Await.result(fResponse, Duration.Inf)
 
-println(result)
+val source: Source[KafkaRequestEnvelope, _] = ...
+
+val route: ReactiveRoute = ...
+
+val sink: Sink[Future[kafkaResponseEnvelope], _] = ...
+
+val reactiveSys: ReactiveSystem = source ~> route ~> sink
+
+// Or alternatively the DSL exposes also:
+val reactiveSys: ReactiveSystem = source via route to sink
+
+// Or more basic:
+val reactiveSystem: ReactiveSystem = ReactiveSystem(source, route, sink)
+
 ```
+
+
+Reactive Source
+---------------
+
+A reactive source is the inbound gateway from which request messages are processed by the reactive system.
+As part of the Kafka-Reactive-System there is a KafkaReactiveSource object which provides a method create to build
+a reactive source able to consume from a Kafka topic.
+
+```
+   _________________       ______________________________________ . _ . _ _ 
+  |      KAFKA      |     |                                 REACTIVE SYSTEM 
+  |     _______     |     |     ________________________________     
+  |    | topic |~~~~~~~~~~~~~~>|  Source[KafkaRequestEnvelope]  |
+  |    '-------'    |     |    |________________________________|
+  |_________________|     |_______________________________________ . _ . _ .
+  
+
+```
+
+*Scala API:*
+
+```scala
+
+val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create(
+  requestTopic = "simpleService", 
+  bootstrapServers = Set("localhost:9092"), 
+  clientId: "simpleServiceClient1"
+)
+
+```
+
+Reactive Route
+--------------
+
+The reactive route is the component in charge to analise the KafkaRequestEnvelope message and dispatch the request to the relevant service.
+In order to accomplish to its task the reactive route must know all the reactive services we want to expose.
+
+A reactive route can be though as a mapping between the Reactive Service URI and its current implementation:
+
+``` 
+                                    
+                                        /---->{Service: echo}
+                                        |                    
+             __________                 |                    
+            |          |----------------'                    
+            | Reactive |                                     
+            |  Route   |------------------------>{Service: size}
+            |          |                                        
+            '----------'                                        
+                    |                                           
+                    \--------------->{Service: reverse}         
+                                   
+                                      
+```
+
+### Reactive Service
+
+The reactive service represents the entry point of your business logic. A reactive service is nothing more than a function which has an input 
+and can produce a result, because the input and output are delivered through messages the input type must be deserializable and the output serializable.
+
+*Scala API:*
+
+```scala
+
+case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out])
+
+```
+
+From the Scala API you can notice that the service has a unique DI, the execution of the ReactiveService is "intrinsicly" asynchronous and might return a business error.  
+
+### Reactive Route DSL
+
+In order to make it easy to create a ReactiveRoute with all its services associated a specific dsl has been developed.
+
+*Scala API:*
+
+```scala
+
+val route: ReactiveRoute = request.aSync[String, String]("echo") { in => 
+    s"echoing: $in"
+  } ~ request.aSync("size") { (in: String) =>
+    in.length
+  } ~ request.sync("reverse") { (in: String) =>
+    in.reverse
+  }
+
+```
+
+#### Route DSL: Future Flatten
+
+...
+
+#### Route DSL: Handle Xor
+
+...
+
+Reactive Sink
+-------------
+
+...
+
+Reactive Client
+---------------
+
+...
+
+### Reactive Serializer/Deserializer
+
+...
+
+### Actor Per Request - Correlation Header
+
+...

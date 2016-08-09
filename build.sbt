@@ -124,12 +124,10 @@ val pluginsSettings =
   dockerSettings ++
   scalariformSettings
 
-val settings = Seq(
-  name := "kafka-reactive-service",
+val commonSettings = Seq(
   organization := "org.patricknoir.kafka",
   version := "0.2.0-SNAPSHOT",
   scalaVersion := "2.11.8",
-  libraryDependencies ++= dependencies,
   fork in run := true,
   fork in Test := true,
   fork in testOnly := true,
@@ -137,11 +135,16 @@ val settings = Seq(
   javaOptions in run ++= forkedJvmOption ++ jmxJvmOption,
   javaOptions in Test ++= forkedJvmOption,
   scalacOptions := compileSettings,
+  ScalariformKeys.preferences := PreferencesImporterExporter.loadPreferences((file(".") / "formatter.preferences").getPath)
+)
+
+val settings = commonSettings ++ Seq(
+  name := "kafka-reactive-service",
+  libraryDependencies ++= dependencies,
   unmanagedClasspath in Runtime += baseDirectory.value / "env/local",
   unmanagedClasspath in Compile += baseDirectory.value / "env/console",
   scriptClasspath += "../conf/",
   //mainClass in (Compile, run) := Option("org.patricknoir.kafka.service.Boot"),
-  ScalariformKeys.preferences := PreferencesImporterExporter.loadPreferences((file(".") / "formatter.preferences").getPath),
   initialCommands in console :=
     """
     | import org.patricknoir.kafka.reactive.client.config._
@@ -166,16 +169,42 @@ val settings = Seq(
 )
 
 val environment = System.getProperties.getProperty("stage", "local")
-mappings in Universal ++= {
-  (baseDirectory.value / "env" / environment * "*").get.map { f =>
-    f -> s"conf/${f.name}"
+val kafkaRSSettings = Seq(
+  mappings in Universal ++= {
+    (baseDirectory.value / "env" / environment * "*").get.map { f =>
+      f -> s"conf/${f.name}"
+    }
   }
-}
+)
 
-lazy val main =
+lazy val kafkaRS =
   project
-    .in(file("."))
+    .in(file("kafka-reactive-system"))
     .settings(
-       pluginsSettings ++ settings:_*
+       pluginsSettings ++ kafkaRSSettings ++ settings:_*
     )
     .enablePlugins(AshScriptPlugin,JavaServerAppPackaging, UniversalDeployPlugin)
+
+lazy val examplesServer =
+  project
+    .in(file("examples/server"))
+    .dependsOn(kafkaRS)
+    .settings(commonSettings: _*)
+    .settings(
+      name := "examples-server"
+    )
+
+lazy val examplesClient = 
+  project
+    .in(file("examples/client"))
+    .dependsOn(kafkaRS)
+    .settings(commonSettings: _*)
+    .settings(
+      name := "examples-client"
+    )
+
+lazy val root =
+  project
+    .in(file("."))
+    .settings(moduleName := "reactive-system")
+    .aggregate(kafkaRS, examplesServer, examplesClient)

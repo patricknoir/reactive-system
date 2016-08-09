@@ -136,7 +136,7 @@ case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](
 
 ```
 
-From the Scala API you can notice that the service has a unique DI, the execution of the ReactiveService is "intrinsicly" asynchronous and might return a business error.  
+From the Scala API you can notice that the service has a unique ID, the execution of the ReactiveService is "intrinsicly" asynchronous and eventually returns a business error.  
 
 ### Reactive Route DSL
 

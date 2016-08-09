@@ -182,6 +182,43 @@ Reactive Client
 
 ...
 
+
+```scala
+
+trait ReactiveClient {
+
+  def request[In: ReactiveSerializer, Out: ReactiveDeserializer]
+    (destination: String, payload: In)(implicit timeout: Timeout): Future[Error Xor Out]
+
+}
+```
+
+
+*Kafka Implementation:*
+
+```scala
+class KafkaReactiveClient(settings: KafkaRClientSettings)(implicit system: ActorSystem) extends ReactiveClient
+```
+
+
+*Scala API:*
+
+```scala
+
+implicit system: ActorSystem = ...
+import system.dispatcher
+implicit val timeout = Timeout(3 seconds)
+val client = new KafkaReactiveClient(KafkaRClientSettings.default)
+val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
+
+result.onSuccess { 
+    case Xor.Right(result: String) = println(result)
+}
+
+...
+
+```
+
 ### Reactive Serializer/Deserializer
 
 ...

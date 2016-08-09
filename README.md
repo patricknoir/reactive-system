@@ -156,6 +156,14 @@ val route: ReactiveRoute = request.aSync[String, String]("echo") { in =>
 
 ```
 
+### Route DSL: The request object
+
+...
+
+#### sync vs aSync
+
+...
+
 #### Route DSL: Future Flatten
 
 ...

@@ -94,7 +94,7 @@ a reactive source able to consume from a Kafka topic.
 val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create(
   requestTopic = "simpleService", 
   bootstrapServers = Set("localhost:9092"), 
-  clientId: "simpleServiceClient1"
+  clientId = "simpleServiceClient1"
 )
 
 ```

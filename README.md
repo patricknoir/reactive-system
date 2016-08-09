@@ -52,13 +52,20 @@ val route: ReactiveRoute = ...
 val sink: Sink[Future[kafkaResponseEnvelope], _] = ...
 
 val reactiveSys: ReactiveSystem = source ~> route ~> sink
+```
 
-// Or alternatively the DSL exposes also:
+Or alternatively the DSL exposes also:
+
+```scala
+
 val reactiveSys: ReactiveSystem = source via route to sink
+```
 
-// Or more basic:
+Or more basic:
+
+```scala
+
 val reactiveSystem: ReactiveSystem = ReactiveSystem(source, route, sink)
-
 ```
 
 

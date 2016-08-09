@@ -223,6 +223,68 @@ result.onSuccess {
 
 ...
 
+```scala
+package object common {
+
+  object deserializer {
+    def deserialize[Out: ReactiveDeserializer](in: String): Xor[Error, Out] = implicitly[ReactiveDeserializer[Out]].deserialize(in.getBytes)
+  }
+
+  object serializer {
+    def serialize[In: ReactiveSerializer](in: In): String = new String(implicitly[ReactiveSerializer[In]].serialize(in))
+  }
+
+}
+```
+
+#### Default Serializers
+
+```scala
+trait ReactiveSerializer[Payload] {
+
+  def serialize(payload: Payload): Array[Byte]
+
+}
+
+object ReactiveSerializer {
+  implicit val stringSerializer = new ReactiveSerializer[String] {
+    override def serialize(payload: String) = payload.getBytes
+  }
+
+  implicit def circeEncoderSerializer[In: Encoder] = new ReactiveSerializer[In] {
+    override def serialize(payload: In) = payload.asJson.noSpaces.getBytes
+  }
+
+  implicit val byteArraySerializer = new ReactiveSerializer[Array[Byte]] {
+    override def serialize(payload: Array[Byte]) = payload
+  }
+}
+```
+
+#### Default Deserializers
+
+```scala
+trait ReactiveDeserializer[Payload] {
+
+  def deserialize(input: Array[Byte]): Xor[Error, Payload]
+
+}
+
+object ReactiveDeserializer {
+  implicit val stringDeserializer = new ReactiveDeserializer[String] {
+    override def deserialize(input: Array[Byte]) = Xor.Right(new String(input))
+  }
+
+  implicit def circeDecoderDeserializer[Out: Decoder] = new ReactiveDeserializer[Out] {
+    override def deserialize(input: Array[Byte]) = decode[Out](new String(input)).leftMap(err => new Error(err)) //FIXME : use custom errors
+  }
+
+  implicit val byteArrayDeserializer = new ReactiveDeserializer[Array[Byte]] {
+    override def deserialize(input: Array[Byte]) = Xor.Right(input)
+  }
+}
+```
+
 ### Actor Per Request - Correlation Header
 
 ...

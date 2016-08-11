@@ -158,24 +158,86 @@ val route: ReactiveRoute = request.aSync[String, String]("echo") { in =>
 
 ### Route DSL: The request object
 
-...
+The Reactive Route DSL is built around the *request* object which exposes the following functions:
+
+```scala
+object request {
+    def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out]): ReactiveRoute =
+      ReactiveRoute().add(ReactiveService[In, Out](id)(f))
+    def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out)): ReactiveRoute =
+      ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future.successful(f(in))))
+    def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out))(implicit ec: ExecutionContext): ReactiveRoute =
+      ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future(f(in))))
+  }
+```
+
+It allows to map ReactiveService against a specific service ID, lifting the service to a future in a syhcnronos or asynchronous way.
+If the function in request is already returning a Future than you can simply use the apply function.
 
 #### sync vs aSync
 
-...
+So the DSL offers you the option to lift a function to a reactive service by lifting it to a future:
+
+```scala
+
+//sync:
+def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out)): ReactiveRoute =
+      ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future.successful(f(in))))
+```
+
+In this scenario we will be using the same thread the router is running on.
+
+In the case of aSync:
+
+```scala
+def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out))(implicit ec: ExecutionContext): ReactiveRoute =
+      ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future(f(in))))
+```
+
+the ReactiveService is using a Future on a new thread and an implicit execution context is necessary.
 
 #### Route DSL: Future Flatten
 
-...
+Last but not least if your function is already returning a Future you can simply use the *request.apply*:
+
+```scala
+def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out]): ReactiveRoute =
+      ReactiveRoute().add(ReactiveService[In, Out](id)(f))
+```
 
 #### Route DSL: Handle Xor
 
-...
+Last but not least is the cats *Xor* type. As you could have seen the ReactiveService combine the effect of a Future with a Xor\[Error, A\].
+If your function is not already returning a *Xor\[Error, A\]* then we will implicitly lift it:
+
+```scala
+implicit def unsafe[Out: ReactiveSerializer](out: => Out): (Error Xor Out) = Xor.fromTry(Try(out)).leftMap(thr => new Error(thr))
+```
 
 Reactive Sink
 -------------
 
-...
+Once a ReactiveService has been executed by the ReactiveRoute a *Future\[Error Xor A\]* will be returned where if you remember the signature of the ReactiveService
+the type *A* is a member of *ReactiveSerialzable*. What we need to do now is to send this Future to a Sink which can handle that type, once the Future completes we 
+can then Serialize either the result *A* or the *Error* from the Xor, wrap it into a *KafkaResponseEnveplope* and send it back to the client who requested it.
+
+```
+  ._._._.___________________________________________ 
+     REACTIVE SYSTEM                                |
+       ______________________________________       |
+      |  Sink[Future[KafkaRequestEnvelope]]  |      |
+      |                                      |      |           ____________________
+      |     ______________________           |      |          |    KAFKA BROKER    |
+      |    |    KAFKA PRODUCER    |~~~~~~~~~~~~~~~~~~~~~~~~~~~>|____________________|
+      |    |______________________|          |      |
+      |                                      |      |
+      |                                      |      |
+      |______________________________________|      |
+                                                    |
+  ._._._.___________________________________________|
+  
+
+```
 
 Reactive Client
 ---------------
@@ -221,6 +283,8 @@ result.onSuccess {
 
 ### Reactive Serializer/Deserializer
 
+
+In order to serialise/deserialise message payloads two methods are available which make usage of the relative Typeclasses: ReactiveSerializer/ReactiveDeserializer:
 ...
 
 ```scala

@@ -207,7 +207,7 @@ def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In =
 
 #### Route DSL: Handle Xor
 
-Last but not least is the cats *Xor* type. As you could have seen the ReactiveService combine the effect of a Future with a Xor\[Error, A\].
+As you could have noticed the ReactiveService combine the effect of a Future with a Xor\[Error, A\].
 If your function is not already returning a *Xor\[Error, A\]* then we will implicitly lift it:
 
 ```scala

@@ -1,7 +1,7 @@
 Introduction to: Reactive System
 ================================
 
-A reactive system is a server which exposes services using message exchange pattern rather than synchronos IO communications (for example HTTP).
+A reactive system is a server which exposes services using message exchange pattern rather than synchronous IO communications (for example HTTP).
 Using message exchange rather than synchronous communication helps to build more decoupled systems, which gives us several advatages like:
 
 1. Isolation: if a reactive system fails it doesn't affect its client.

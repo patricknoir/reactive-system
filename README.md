@@ -171,7 +171,7 @@ object request {
   }
 ```
 
-It allows to map ReactiveService against a specific service ID, lifting the service to a future in a syhcnronos or asynchronous way.
+It allows to map ReactiveService against a specific service ID, lifting the service to a future in a synchronous or asynchronous way.
 If the function in request is already returning a Future than you can simply use the apply function.
 
 #### sync vs aSync

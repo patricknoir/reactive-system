@@ -1,7 +1,7 @@
 Introduction to: Reactive System
 ================================
 
-A reactive system is a server which exposes services using message exchange pattern rather than synchronos IO communications (for example HTTP).
+A reactive system is a server which exposes services using message exchange pattern rather than synchronous IO communications (for example HTTP).
 Using message exchange rather than synchronous communication helps to build more decoupled systems, which gives us several advatages like:
 
 1. Isolation: if a reactive system fails it doesn't affect its client.
@@ -171,7 +171,7 @@ object request {
   }
 ```
 
-It allows to map ReactiveService against a specific service ID, lifting the service to a future in a syhcnronos or asynchronous way.
+It allows to map ReactiveService against a specific service ID, lifting the service to a future in a synchronous or asynchronous way.
 If the function in request is already returning a Future than you can simply use the apply function.
 
 #### sync vs aSync

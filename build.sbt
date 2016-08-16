@@ -30,7 +30,7 @@ val compilerPlugins = Seq(
 val rootDependencies = Seq(
   "org.slf4j"                      % "slf4j-api"               % Versions.Slf4j,
   "org.slf4j"                      % "slf4j-log4j12"           % Versions.Slf4j,
-  "com.iheart"                     %% "ficus"                  % "1.2.5",
+  //"com.iheart"                     %% "ficus"                  % "1.2.6",
   "com.typesafe.akka"              %% "akka-slf4j"             % Versions.Akka,
   "com.typesafe.akka"              %% "akka-stream-kafka"      % "0.11-M3",
   "io.circe"                       %% "circe-core"             % Versions.Circe,

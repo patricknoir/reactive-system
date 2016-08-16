@@ -3,7 +3,6 @@ Introduction to: Reactive System
 
 [![Build Status](https://travis-ci.org/patricknoir/reactive-system.svg?branch=develop)](https://travis-ci.org/patricknoir/reactive-system) 
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/30da61d791464dbbb26eeaaeb5b35cb4)](https://www.codacy.com/app/diloreto-p/reactive-system)
-
 [![Gitter](https://badges.gitter.im/reactive-system/dev.svg)](https://gitter.im/reactive-system/dev?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 A reactive system is a server which exposes services using message exchange pattern rather than synchronous IO communications (for example HTTP).

@@ -1,6 +1,8 @@
 Introduction to: Reactive System
 ================================
 
+[![Gitter](https://badges.gitter.im/reactive-system/dev.svg)](https://gitter.im/reactive-system/dev?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 A reactive system is a server which exposes services using message exchange pattern rather than synchronous IO communications (for example HTTP).
 Using message exchange rather than synchronous communication helps to build more decoupled systems, which gives us several advatages like:
 

@@ -37,7 +37,11 @@ val rootDependencies = Seq(
   "io.circe"                       %% "circe-generic"          % Versions.Circe,
   "io.circe"                       %% "circe-parser"           % Versions.Circe,
   "io.circe"                       %% "circe-java8"            % Versions.Circe,
-  "io.circe"                       %% "circe-optics"            % Versions.Circe
+  "io.circe"                       %% "circe-optics"           % Versions.Circe
+)
+
+val httpInterfaceDependencies = Seq(
+  "com.typesafe.akka" %% "akka-http-experimental" % Versions.Akka
 )
 
 val testDependencies = Seq (
@@ -185,6 +189,18 @@ lazy val kafkaRS =
     )
     .enablePlugins(AshScriptPlugin,JavaServerAppPackaging, UniversalDeployPlugin)
 
+lazy val httpInterface =
+  project
+    .in(file("http-interface"))
+    .dependsOn(kafkaRS)
+    .settings(commonSettings: _*)
+    .settings(
+      libraryDependencies ++= httpInterfaceDependencies
+    )
+    .settings(
+      name := "http-interface"
+    )
+
 lazy val examplesServer =
   project
     .in(file("examples/server"))
@@ -207,4 +223,4 @@ lazy val root =
   project
     .in(file("."))
     .settings(moduleName := "reactive-system")
-    .aggregate(kafkaRS, examplesServer, examplesClient)
+    .aggregate(kafkaRS, httpInterface, examplesServer, examplesClient)

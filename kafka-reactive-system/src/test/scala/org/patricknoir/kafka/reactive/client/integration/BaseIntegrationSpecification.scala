@@ -127,10 +127,15 @@ class KafkaEchoService(implicit system: ActorSystem, materializer: Materializer)
   import system.dispatcher
 
   val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create("echoInbound", Set("localhost:9092"), "client1", "group1")
-  val route = request.sync[String, String]("echo")(identity[String])
+  val route = request.sync[String, String]("echo") { in =>
+    println("received request: " + in)
+    in
+  }
+
+  //  (identity[String])
   val sink: Sink[Future[KafkaResponseEnvelope], _] = ReactiveKafkaSink.create(Set("localhost:9092"))
 
-  val rsys = ReactiveSystem(source, route, sink)
+  val rsys = source ~> route ~> sink
 
   def run() = rsys.run()
 

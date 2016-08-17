@@ -1,5 +1,7 @@
 language: scala
 sudo: true
 jdk: oraclejdk8
+notifications:
+  slack: reactivedivision:wi3jVznCjQiS8nxj3xeKBEmr
 scala:
   - 2.11.8

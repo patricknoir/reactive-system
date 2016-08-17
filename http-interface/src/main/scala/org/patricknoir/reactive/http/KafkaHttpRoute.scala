@@ -13,8 +13,6 @@ import scala.concurrent.{ ExecutionContext, Future }
  */
 object KafkaHttpRoute {
 
-  def create2(client: ReactiveClient, kafkaHost: String)(implicit ec: ExecutionContext, timeout: Timeout): Route =
-
   /**
    * Note: There is also an implicit conversion from Route to
    *

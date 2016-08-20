@@ -181,6 +181,14 @@ val kafkaRSSettings = Seq(
   }
 )
 
+
+lazy val main =
+  project
+    .in(file("."))
+    .settings(moduleName := "reactive-system")
+    .settings(name := "reactive-system")
+    .aggregate(kafkaRS, httpInterface, examplesServer, examplesClient)
+
 lazy val kafkaRS =
   project
     .in(file("kafka-reactive-system"))
@@ -218,9 +226,3 @@ lazy val examplesClient =
     .settings(
       name := "examples-client"
     )
-
-lazy val root =
-  project
-    .in(file("."))
-    .settings(moduleName := "reactive-system")
-    .aggregate(kafkaRS, httpInterface, examplesServer, examplesClient)

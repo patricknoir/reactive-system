@@ -25,3 +25,7 @@ addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.3.5")
 // Update plugin
 //
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.1.10")
+
+// Bintray plugin
+//
+addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")

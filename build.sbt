@@ -10,7 +10,8 @@ resolvers ++= Seq(
   Resolver.jcenterRepo,
   Resolver.sonatypeRepo("snapshots"),
   "sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/",
-  "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
+  "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
+  Resolver.url("patricknoir ivy resolver", url("http://dl.bintray.com/patricknoir/maven"))(Resolver.ivyStylePatterns)
 )
 
 val Versions = new {
@@ -130,7 +131,7 @@ val pluginsSettings =
 
 val commonSettings = Seq(
   organization := "org.patricknoir.kafka",
-  version := "0.2.0-SNAPSHOT",
+  version := "0.2.0",
   scalaVersion := "2.11.8",
   fork in run := true,
   fork in Test := true,
@@ -139,8 +140,16 @@ val commonSettings = Seq(
   javaOptions in run ++= forkedJvmOption ++ jmxJvmOption,
   javaOptions in Test ++= forkedJvmOption,
   scalacOptions := compileSettings,
-  ScalariformKeys.preferences := PreferencesImporterExporter.loadPreferences((file(".") / "formatter.preferences").getPath)
+  ScalariformKeys.preferences := PreferencesImporterExporter.loadPreferences((file(".") / "formatter.preferences").getPath),
+  licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
+  publishMavenStyle := false,
+  publishArtifact := true,
+  publishArtifact in Test := false,
+  bintrayReleaseOnPublish := false,
+  bintrayOrganization in bintray := None,
+  bintrayRepository := "maven"
 )
+
 
 val settings = commonSettings ++ Seq(
   name := "kafka-reactive-service",
@@ -185,8 +194,8 @@ val kafkaRSSettings = Seq(
 lazy val main =
   project
     .in(file("."))
-    .settings(moduleName := "reactive-system")
     .settings(name := "reactive-system")
+    .settings(commonSettings:_*)
     .aggregate(kafkaRS, httpInterface, examplesServer, examplesClient)
 
 lazy val kafkaRS =

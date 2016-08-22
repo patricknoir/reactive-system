@@ -299,7 +299,7 @@ val client = new KafkaReactiveClient(KafkaRClientSettings.default)
 val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
 
 result.onSuccess { 
-    case Xor.Right(result: String) = println(result)
+    case Xor.Right(result: String) => println(result)
 }
 
 ...

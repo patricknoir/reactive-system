@@ -11,6 +11,17 @@ Branch statuses:
 
 [![Gitter](https://badges.gitter.im/reactive-system/dev.svg)](https://gitter.im/reactive-system/dev?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
+Import the Library
+------------------
+Add patricknoir bintray repository to your resolvers:
+```scala
+resolvers += "patricknoir-bintray" at "https://dl.bintray.com/patricknoir/releases"
+```
+
+Add to the dependencies the latest stable version (Scala 2.11):
+```scala
+"org.patricknoir.reactive.kafka" %% "kafka-reactive-service" % "0.2.0"
+```
 
 Introduction
 ------------

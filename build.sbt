@@ -142,12 +142,12 @@ val commonSettings = Seq(
   scalacOptions := compileSettings,
   ScalariformKeys.preferences := PreferencesImporterExporter.loadPreferences((file(".") / "formatter.preferences").getPath),
   licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
-  publishMavenStyle := false,
+  publishMavenStyle := true,
   publishArtifact := true,
   publishArtifact in Test := false,
   bintrayReleaseOnPublish := false,
   bintrayOrganization in bintray := None,
-  bintrayRepository := "maven"
+  bintrayRepository := "releases"
 )
 
 

@@ -4,6 +4,7 @@ import akka.actor.{ Props, Actor, ActorLogging }
 import io.circe.Decoder
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.KafkaResponseEnvelope
+import org.patricknoir.kafka.reactive.ex.ConsumerException
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
@@ -33,6 +34,10 @@ class KafkaConsumerActor(consumerSettings: Map[String, String], inboundQueue: St
         }
       }
     }
+  }
+
+  loop.onFailure {
+    case err: Throwable => throw new ConsumerException(err)
   }
 
   loop.onComplete(result => println(log.info("Kafka Consumer Terminated")))

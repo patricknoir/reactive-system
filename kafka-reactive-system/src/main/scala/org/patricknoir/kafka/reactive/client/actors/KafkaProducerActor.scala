@@ -22,7 +22,7 @@ class KafkaProducerActor(producerSettings: Map[String, String]) extends Actor wi
     case envelope: KafkaRequestEnvelope =>
       val result = extractDestinationTopic(envelope.destination).map { destTopic =>
         val record = new ProducerRecord[String, String](destTopic, envelope.asJson.noSpaces)
-        producer.send(record)
+        producer.send(record) //TODO: handle the error by throwing a ProducerException to be handled by the suprvisor.
       }
       if (result.isEmpty) log.warning(s"Discarding message: $envelope, couldn't extract destination topic")
       ()

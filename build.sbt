@@ -18,7 +18,7 @@ val Versions = new {
   val Scala = "2.11.8"
   val ScalaBinary = "2.11"
   val Slf4j = "1.7.12"
-  val Akka = "2.4.7"
+  val Akka = "2.4.9"
   val Circe = "0.4.1"
   val Specs2 = "3.8.2"
 }

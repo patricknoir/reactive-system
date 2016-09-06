@@ -41,6 +41,11 @@ val rootDependencies = Seq(
   "io.circe"                       %% "circe-optics"           % Versions.Circe
 )
 
+val embeddedKafkaDependencies = Seq(
+  "org.apache.kafka"               %% "kafka"                    % "0.9.0.1",
+  "net.manub"                      %% "scalatest-embedded-kafka" % "0.6.1"
+)
+
 val httpInterfaceDependencies = Seq(
   "com.typesafe.akka" %% "akka-http-experimental" % Versions.Akka
 )
@@ -116,12 +121,12 @@ val forkedJvmOption = Seq(
 )
 
 val jmxJvmOption = Seq (
-  "-Dcom.sun.management.jmxremote",
-  "-Dcom.sun.management.jmxremote.port=9199",
-  "-Dcom.sun.management.jmxremote.rmi.port=9199",
-  "-Dcom.sun.management.jmxremote.local.only=false",
-  "-Dcom.sun.management.jmxremote.authenticate=false",
-  "-Dcom.sun.management.jmxremote.ssl=false"
+//  "-Dcom.sun.management.jmxremote",
+//  "-Dcom.sun.management.jmxremote.port=9199",
+//  "-Dcom.sun.management.jmxremote.rmi.port=9199",
+//  "-Dcom.sun.management.jmxremote.local.only=false",
+//  "-Dcom.sun.management.jmxremote.authenticate=false",
+//  "-Dcom.sun.management.jmxremote.ssl=false"
 )
 
 val pluginsSettings =
@@ -223,6 +228,9 @@ lazy val examplesServer =
     .in(file("examples/server"))
     .dependsOn(kafkaRS)
     .settings(commonSettings: _*)
+    .settings(
+      libraryDependencies ++= embeddedKafkaDependencies
+    )
     .settings(
       name := "examples-server"
     )

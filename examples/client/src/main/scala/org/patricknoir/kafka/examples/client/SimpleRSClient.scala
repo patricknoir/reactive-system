@@ -11,7 +11,7 @@ import scala.concurrent.duration._
 /**
  * Created by patrick on 09/08/2016.
  */
-class SimpleRSClient {
+object SimpleRSClient extends App {
 
   implicit val system = ActorSystem("ReactiveClient")
   implicit val timeout = Timeout(10 seconds)
@@ -25,4 +25,5 @@ class SimpleRSClient {
   response.onComplete(println)
 
   Await.ready(response, Duration.Inf)
+
 }

@@ -3,7 +3,7 @@ package org.patricknoir.kafka.reactive.server
 import org.patricknoir.kafka.reactive.common.serializer._
 import org.patricknoir.kafka.reactive.common.deserializer._
 import cats.data._
-import cats.std.all._
+import cats.instances.all._
 import org.patricknoir.kafka.reactive.common.{ ReactiveSerializer, ReactiveDeserializer }
 import scala.concurrent.{ ExecutionContext, Future }
 

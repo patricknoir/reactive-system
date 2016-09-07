@@ -1,19 +1,19 @@
 package org.patricknoir.kafka.reactive.server.streams
 
 import akka.actor.ActorSystem
-import akka.kafka.scaladsl.{ Producer, Consumer }
-import akka.kafka.{ ProducerSettings, ConsumerSettings }
+import akka.kafka.scaladsl.{ Consumer, Producer }
+import akka.kafka.{ ConsumerSettings, ProducerSettings, Subscriptions }
 import akka.stream.scaladsl.{ Flow, Sink, Source }
 import cats.data.Xor
 import io.circe.parser._
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.serialization.{ StringSerializer, StringDeserializer }
+import org.apache.kafka.common.serialization.{ StringDeserializer, StringSerializer }
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.KafkaResponseEnvelope
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{ ExecutionContext, Await, Future }
+import scala.concurrent.{ Await, ExecutionContext, Future }
 import io.circe.generic.auto._
 import io.circe.syntax._
 
@@ -23,15 +23,15 @@ import io.circe.syntax._
 object ReactiveKafkaSource {
 
   def create(requestTopic: String, bootstrapServers: Set[String], clientId: String, groupId: String = "group1")(implicit system: ActorSystem): Source[KafkaRequestEnvelope, _] =
-    Consumer.atMostOnceSource(createConsumerSettings(requestTopic, bootstrapServers, clientId, groupId))
+    Consumer.atMostOnceSource(createConsumerSettings(bootstrapServers, clientId, groupId), Subscriptions.topics(Set(requestTopic)))
       .map { record =>
         decode[KafkaRequestEnvelope](record.value)
       }.filter(_.isRight).map {
         case (Xor.Right(kkReqEnvelope)) => kkReqEnvelope
       }
 
-  private def createConsumerSettings(topic: String, servers: Set[String], clientId: String, groupId: String)(implicit system: ActorSystem) =
-    ConsumerSettings(system, new StringDeserializer, new StringDeserializer, Set(topic))
+  private def createConsumerSettings(servers: Set[String], clientId: String, groupId: String)(implicit system: ActorSystem) =
+    ConsumerSettings(system, new StringDeserializer, new StringDeserializer)
       .withBootstrapServers(servers.mkString(","))
       .withGroupId(groupId)
       .withClientId(clientId)

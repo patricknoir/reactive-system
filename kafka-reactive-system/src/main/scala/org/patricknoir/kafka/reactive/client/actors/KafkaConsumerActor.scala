@@ -11,6 +11,8 @@ import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 import io.circe.parser._
 
+import scala.util.{ Failure, Success, Try }
+
 /**
  * Created by patrick on 12/07/2016.
  */
@@ -18,18 +20,22 @@ class KafkaConsumerActor(consumerSettings: Map[String, String], inboundQueue: St
 
   import KafkaResponseEnvelope._
 
-  import context.dispatcher
+  import scala.concurrent.ExecutionContext.Implicits.global
 
   var running = true
+
+  println("Starting Kafka Consumer")
 
   val consumer = new KafkaConsumer[String, String](consumerSettings)
   consumer.subscribe(List(inboundQueue))
 
   val loop = Future {
     while (running) {
+      //      println("polling messages from kafka")
       consumer.poll(pollTimeout.toMillis).foreach { record =>
         val result = decode[KafkaResponseEnvelope](record.value)(respEnvelopeDecoder)
         result.foreach { envelope =>
+          log.debug(s"Received message: $result")
           context.actorSelection(envelope.correlationId) ! envelope
         }
       }
@@ -37,10 +43,12 @@ class KafkaConsumerActor(consumerSettings: Map[String, String], inboundQueue: St
   }
 
   loop.onFailure {
-    case err: Throwable => throw new ConsumerException(err)
+    case err: Throwable =>
+      log.error("Error on the Kafka Consumer", err)
+      throw new ConsumerException(err)
   }
 
-  loop.onComplete(result => println(log.info("Kafka Consumer Terminated")))
+  loop.onComplete(result => log.info("Kafka Consumer Terminated"))
 
   def receive = Actor.emptyBehavior
 

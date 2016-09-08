@@ -10,17 +10,13 @@ import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 import io.circe.parser._
-
-import scala.util.{ Failure, Success, Try }
+import scala.concurrent.ExecutionContext.Implicits.global
+import KafkaResponseEnvelope._
 
 /**
  * Created by patrick on 12/07/2016.
  */
 class KafkaConsumerActor(consumerSettings: Map[String, String], inboundQueue: String, pollTimeout: FiniteDuration) extends Actor with ActorLogging {
-
-  import KafkaResponseEnvelope._
-
-  import scala.concurrent.ExecutionContext.Implicits.global
 
   var running = true
 
@@ -31,8 +27,7 @@ class KafkaConsumerActor(consumerSettings: Map[String, String], inboundQueue: St
 
   val loop = Future {
     while (running) {
-      //      println("polling messages from kafka")
-      consumer.poll(pollTimeout.toMillis).foreach { record =>
+      consumer.poll(Long.MaxValue).foreach { record =>
         val result = decode[KafkaResponseEnvelope](record.value)(respEnvelopeDecoder)
         result.foreach { envelope =>
           log.debug(s"Received message: $result")

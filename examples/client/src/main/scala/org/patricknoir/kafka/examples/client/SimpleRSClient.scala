@@ -15,7 +15,7 @@ import scala.io.StdIn
 object SimpleRSClient extends App {
 
   implicit val system = ActorSystem("ReactiveClient")
-  implicit val timeout = Timeout(30 seconds)
+  implicit val timeout = Timeout(5 seconds)
 
   import system.dispatcher
 

@@ -108,7 +108,7 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
     implicit val timeout = Timeout(10 seconds)
     val client = new KafkaReactiveClient(KafkaRClientSettings.default)
 
-    val fResponse = client.request[String, String]("echoInbound/echo", "patrick")
+    val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
 
     val Xor.Right(result: String) = Await.result(fResponse, Duration.Inf)
 

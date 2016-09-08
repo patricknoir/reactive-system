@@ -48,8 +48,6 @@ class KafkaConsumerActor(consumerSettings: Map[String, String], inboundQueue: St
       throw new ConsumerException(err)
   }
 
-  loop.onComplete(result => log.info("Kafka Consumer Terminated"))
-
   def receive = Actor.emptyBehavior
 
   override def postStop() = {

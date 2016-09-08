@@ -40,7 +40,7 @@ class KafkaProducerActor(producerSettings: Map[String, String]) extends Actor wi
   }
 
   private def extractDestinationTopic(destination: String): Option[String] = Try {
-    destination.split("/")(0)
+    destination.split(":")(1).split("/")(0)
   }.toOption
 
   override def postStop() = {

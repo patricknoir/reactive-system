@@ -24,7 +24,7 @@ object SimpleRSClient extends App {
   var repeat = true
 
   while (repeat) {
-    val response: Future[Error Xor String] = client.request[String, String]("simple/echo", "hello world!")
+    val response: Future[Error Xor String] = client.request[String, String]("kafka:simple/echo", "hello world!")
 
     response.onComplete(println)
 

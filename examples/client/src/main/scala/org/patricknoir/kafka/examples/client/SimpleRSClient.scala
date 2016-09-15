@@ -11,7 +11,7 @@ import scala.concurrent.duration._
 /**
  * Created by patrick on 09/08/2016.
  */
-class SimpleRSClient {
+object SimpleRSClient extends App{
 
   implicit val system = ActorSystem("ReactiveClient")
   implicit val timeout = Timeout(10 seconds)
@@ -20,7 +20,7 @@ class SimpleRSClient {
 
   val client = new KafkaReactiveClient(KafkaRClientSettings.default)
 
-  val response: Future[Error Xor String] = client.request[String, String]("simple/echo", "hello world!")
+  val response: Future[Error Xor String] = client.request[String, String]("kafka:simple/echo", "hello world!")
 
   response.onComplete(println)
 

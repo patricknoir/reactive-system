@@ -3,7 +3,7 @@ package org.patricknoir.kafka.reactive.server
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl._
-import cats.std.all._
+import cats.instances.all._
 import cats.data.{ XorT, Xor }
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseStatusCode, KafkaResponseEnvelope }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope

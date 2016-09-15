@@ -17,15 +17,20 @@ resolvers ++= Seq(
 val Versions = new {
   val Scala = "2.11.8"
   val ScalaBinary = "2.11"
-  val Slf4j = "1.7.12"
-  val Akka = "2.4.7"
-  val Circe = "0.4.1"
-  val Specs2 = "3.8.2"
+  val Slf4j = "1.7.21"
+  val Akka = "2.4.10"
+  val Circe = "0.5.1"
+  val Specs2 = "3.8.4"
+  val EmbeddedKafka = "0.7.1"
+  val Kafka = "0.10.0.1"
+  val KindProjector = "0.8.2"
+  val ScalaTest = "3.0.0"
+  val AkkaStreamKafka = "0.11-RC2"
 }
 
 // Dependencies
 val compilerPlugins = Seq(
-  compilerPlugin("org.spire-math"  %% "kind-projector"      % "0.7.1")
+  compilerPlugin("org.spire-math"  %% "kind-projector"      % Versions.KindProjector)
 )
 
 val rootDependencies = Seq(
@@ -33,7 +38,7 @@ val rootDependencies = Seq(
 //  "org.slf4j"                      % "slf4j-log4j12"           % Versions.Slf4j,
   //"com.iheart"                     %% "ficus"                  % "1.2.6",
   "com.typesafe.akka"              %% "akka-slf4j"             % Versions.Akka,
-  "com.typesafe.akka"              %% "akka-stream-kafka"      % "0.11-M3",
+  "com.typesafe.akka"              %% "akka-stream-kafka"      % Versions.AkkaStreamKafka,
   "io.circe"                       %% "circe-core"             % Versions.Circe,
   "io.circe"                       %% "circe-generic"          % Versions.Circe,
   "io.circe"                       %% "circe-parser"           % Versions.Circe,
@@ -41,19 +46,24 @@ val rootDependencies = Seq(
   "io.circe"                       %% "circe-optics"           % Versions.Circe
 )
 
+val embeddedKafkaDependencies = Seq(
+  "org.apache.kafka"               %% "kafka"                    % Versions.Kafka,
+  "net.manub"                      %% "scalatest-embedded-kafka" % Versions.EmbeddedKafka
+)
+
 val httpInterfaceDependencies = Seq(
   "com.typesafe.akka" %% "akka-http-experimental" % Versions.Akka
 )
 
 val testDependencies = Seq (
-  "org.apache.kafka"               %% "kafka"                    % "0.9.0.1"       % "test",
-  "com.typesafe.akka"              %% "akka-stream-testkit"      % Versions.Akka   % "test",
-  "com.typesafe.akka"              %% "akka-http-testkit"        % Versions.Akka   % "test",
-  "org.scalatest"                  %% "scalatest"                % "2.2.6"         % "test",
-  "org.specs2"                     %% "specs2-core"              % Versions.Specs2 % "test",
-  "org.specs2"                     %% "specs2-scalacheck"        % Versions.Specs2 % "test",
-  "org.specs2"                     %% "specs2-mock"              % Versions.Specs2 % "test",
-  "net.manub"                      %% "scalatest-embedded-kafka" % "0.6.1"         % "test"
+  "org.apache.kafka"               %% "kafka"                    % Versions.Kafka                 % "test",
+  "com.typesafe.akka"              %% "akka-stream-testkit"      % Versions.Akka                  % "test",
+  "com.typesafe.akka"              %% "akka-http-testkit"        % Versions.Akka                  % "test",
+  "org.scalatest"                  %% "scalatest"                % Versions.ScalaTest             % "test",
+  "org.specs2"                     %% "specs2-core"              % Versions.Specs2                % "test",
+  "org.specs2"                     %% "specs2-scalacheck"        % Versions.Specs2                % "test",
+  "org.specs2"                     %% "specs2-mock"              % Versions.Specs2                % "test",
+  "net.manub"                      %% "scalatest-embedded-kafka" % Versions.EmbeddedKafka         % "test"
 )
 
 val dependencies =
@@ -116,12 +126,12 @@ val forkedJvmOption = Seq(
 )
 
 val jmxJvmOption = Seq (
-  "-Dcom.sun.management.jmxremote",
-  "-Dcom.sun.management.jmxremote.port=9199",
-  "-Dcom.sun.management.jmxremote.rmi.port=9199",
-  "-Dcom.sun.management.jmxremote.local.only=false",
-  "-Dcom.sun.management.jmxremote.authenticate=false",
-  "-Dcom.sun.management.jmxremote.ssl=false"
+//  "-Dcom.sun.management.jmxremote",
+//  "-Dcom.sun.management.jmxremote.port=9199",
+//  "-Dcom.sun.management.jmxremote.rmi.port=9199",
+//  "-Dcom.sun.management.jmxremote.local.only=false",
+//  "-Dcom.sun.management.jmxremote.authenticate=false",
+//  "-Dcom.sun.management.jmxremote.ssl=false"
 )
 
 val pluginsSettings =
@@ -131,7 +141,7 @@ val pluginsSettings =
 
 val commonSettings = Seq(
   organization := "org.patricknoir.kafka",
-  version := "0.2.0",
+  version := "0.2.1",
   scalaVersion := "2.11.8",
   fork in run := true,
   fork in Test := true,
@@ -223,6 +233,9 @@ lazy val examplesServer =
     .in(file("examples/server"))
     .dependsOn(kafkaRS)
     .settings(commonSettings: _*)
+    .settings(
+      libraryDependencies ++= embeddedKafkaDependencies
+    )
     .settings(
       name := "examples-server"
     )

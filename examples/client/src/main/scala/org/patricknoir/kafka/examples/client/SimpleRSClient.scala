@@ -7,22 +7,35 @@ import org.patricknoir.kafka.reactive.client.KafkaReactiveClient
 import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
+import scala.io.StdIn
 
 /**
  * Created by patrick on 09/08/2016.
  */
-object SimpleRSClient extends App{
+object SimpleRSClient extends App {
+
 
   implicit val system = ActorSystem("ReactiveClient")
-  implicit val timeout = Timeout(10 seconds)
+  implicit val timeout = Timeout(5 seconds)
 
   import system.dispatcher
 
   val client = new KafkaReactiveClient(KafkaRClientSettings.default)
 
-  val response: Future[Error Xor String] = client.request[String, String]("kafka:simple/echo", "hello world!")
+  var repeat = true
 
-  response.onComplete(println)
+  while (repeat) {
+    val response: Future[Error Xor String] = client.request[String, String]("kafka:simple/echo", "hello world!")
 
-  Await.ready(response, Duration.Inf)
+    response.onComplete(println)
+
+    Await.ready(response, Duration.Inf)
+    println("press e + enter to exit, otherwise enter to repeat the request!")
+    if (StdIn.readLine() == "e")
+      repeat = false
+  }
+
+  Await.ready(system.terminate(), Duration.Inf)
+  println("program terminated")
+
 }

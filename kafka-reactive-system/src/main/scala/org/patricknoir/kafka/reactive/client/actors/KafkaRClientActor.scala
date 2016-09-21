@@ -45,9 +45,9 @@ object KafkaRClientActor {
     def unapply(destination: String): Option[(String, String, String)] = Try {
       val mediumAndTopic = destination.split(":")
       val medium = mediumAndTopic(0)
-      val topicAndRoute = mediumAndTopic(1).split("/")
-      val topic = topicAndRoute(0)
-      val route = topicAndRoute(1)
+      val topicAndRoutes = mediumAndTopic(1).split("/")
+      val topic = topicAndRoutes(0)
+      val route = topicAndRoutes.drop(1).mkString("/")
       (medium, topic, route)
     }.toOption
   }

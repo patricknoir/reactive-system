@@ -6,13 +6,13 @@ import akka.util.Timeout
 import cats.data.Xor
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
-import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.{ Destination, KafkaRequest }
+import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.KafkaRequest
 import org.specs2.SpecificationLike
 import akka.pattern.ask
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import org.patricknoir.kafka.reactive.common.ReactiveDeserializer
+import org.patricknoir.kafka.reactive.common.{ Destination, ReactiveDeserializer }
 import org.patricknoir.kafka.reactive.common.serializer._
 
 /**

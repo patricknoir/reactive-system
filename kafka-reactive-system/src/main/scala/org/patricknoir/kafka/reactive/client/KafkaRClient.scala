@@ -3,10 +3,10 @@ package org.patricknoir.kafka.reactive.client
 import akka.actor.ActorSystem
 import akka.util.Timeout
 import cats.data.Xor
-import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.{ Destination, KafkaRequest }
+import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.KafkaRequest
 import org.patricknoir.kafka.reactive.client.actors.{ KafkaConsumerActor, KafkaProducerActor, KafkaRClientActor }
 import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
-import org.patricknoir.kafka.reactive.common.{ ReactiveDeserializer, ReactiveSerializer }
+import org.patricknoir.kafka.reactive.common.{ Destination, ReactiveDeserializer, ReactiveSerializer }
 import org.patricknoir.kafka.reactive.common.serializer._
 
 import scala.concurrent.Future

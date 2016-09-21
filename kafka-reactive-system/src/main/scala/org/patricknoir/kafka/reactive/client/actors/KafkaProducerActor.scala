@@ -9,7 +9,7 @@ import org.apache.kafka.clients.producer.{ KafkaProducer, ProducerRecord }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 import io.circe.generic.auto._
 import io.circe.syntax._
-import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.Destination
+import org.patricknoir.kafka.reactive.common.Destination
 import org.patricknoir.kafka.reactive.ex.ProducerException
 
 import scala.collection.JavaConversions._

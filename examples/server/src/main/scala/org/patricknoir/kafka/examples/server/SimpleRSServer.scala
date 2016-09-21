@@ -12,8 +12,8 @@ import org.patricknoir.kafka.reactive.server.streams.{ ReactiveKafkaSink, Reacti
  */
 object SimpleRSServer extends App {
 
-    implicit val config = EmbeddedKafkaConfig(zooKeeperPort = 2181, kafkaPort = 9092)
-    EmbeddedKafka.start()
+  implicit val config = EmbeddedKafkaConfig(zooKeeperPort = 2181, kafkaPort = 9092)
+  EmbeddedKafka.start()
 
   implicit val system = ActorSystem("SimpleService")
   implicit val materializer = ActorMaterializer()

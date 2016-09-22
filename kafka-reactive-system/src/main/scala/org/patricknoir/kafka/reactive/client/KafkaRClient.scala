@@ -48,6 +48,7 @@ class KafkaReactiveClient(settings: KafkaRClientSettings)(implicit system: Actor
           settings.inboundResponseQueue,
           implicitly[ReactiveDeserializer[Out]]
         )).mapTo[Error Xor Out]
+      case _ => Future.successful(Xor.left[Error, Out](new Error("unknown destination")))
     }
   }
 }

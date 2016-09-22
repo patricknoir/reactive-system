@@ -9,7 +9,9 @@ import akka.util.Timeout
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.KafkaRequest
 import org.patricknoir.kafka.reactive.common.ReactiveDeserializer
 import org.patricknoir.kafka.reactive.ex.{ ConsumerException, ProducerException }
+
 import scala.concurrent.duration._
+import scala.util.Try
 
 /**
  * Created by patrick on 12/07/2016.
@@ -38,7 +40,19 @@ class KafkaRClientActor(producerProps: Props, consumerProps: Props) extends Acto
 
 object KafkaRClientActor {
 
-  case class KafkaRequest(destination: String, payload: String, timeout: Timeout, replyTo: String, decoder: ReactiveDeserializer[_])
+  case class Destination(medium: String, topic: String, serviceId: String)
+  object Destination {
+    def unapply(destination: String): Option[(String, String, String)] = Try {
+      val mediumAndTopic = destination.split(":")
+      val medium = mediumAndTopic(0)
+      val topicAndRoutes = mediumAndTopic(1).split("/")
+      val topic = topicAndRoutes(0)
+      val route = topicAndRoutes.drop(1).mkString("/")
+      (medium, topic, route)
+    }.toOption
+  }
+
+  case class KafkaRequest(destination: Destination, payload: String, timeout: Timeout, replyTo: String, decoder: ReactiveDeserializer[_])
 
   def props(producerProps: Props, consumerProps: Props) = Props(new KafkaRClientActor(producerProps, consumerProps))
 }

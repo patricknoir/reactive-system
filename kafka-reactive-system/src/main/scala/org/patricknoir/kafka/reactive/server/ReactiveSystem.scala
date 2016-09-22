@@ -28,7 +28,7 @@ case class ReactiveSystem(source: Source[KafkaRequestEnvelope, _], route: Reacti
   }.toMat(sink)(Keep.right)
 
   private def extractServiceId(request: KafkaRequestEnvelope): Xor[Error, String] = Xor.fromTry(Try {
-    request.destination.split("/")(1)
+    request.destination.serviceId
   }).leftMap(throwable => new Error(throwable))
 
   private def toKafkaResponseEnvelope(correlationId: String, origin: String, xor: Xor[Error, String]): KafkaResponseEnvelope = xor match {

@@ -5,11 +5,11 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._
 import akka.testkit.TestKit
 import org.patricknoir.kafka.reactive.server.dsl._
-import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseStatusCode, KafkaResponseEnvelope }
+import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 import org.specs2.SpecificationLike
-
 import io.circe.syntax._
+import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.Destination
 
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.Duration
@@ -30,8 +30,10 @@ class ReactiveSystemSpec extends TestKit(ActorSystem("TestKit")) with Specificat
 
     import system.dispatcher
 
+    val destination = Destination("kafka", "destTopic", "echo")
+
     val source: Source[KafkaRequestEnvelope, _] = Source(1 to 10).map { i =>
-      val req = KafkaRequestEnvelope(i.toString, "kafka:destTopic/echo", "patrick".asJson.noSpaces, "inboundTopic")
+      val req = KafkaRequestEnvelope(i.toString, destination, "patrick".asJson.noSpaces, "inboundTopic")
       println(s"Producing request: $req")
       req
     }

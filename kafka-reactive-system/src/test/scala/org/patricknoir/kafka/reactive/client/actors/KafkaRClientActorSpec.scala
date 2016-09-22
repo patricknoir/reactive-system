@@ -2,18 +2,19 @@ package org.patricknoir.kafka.reactive.client.actors
 
 import java.util.concurrent.{ ArrayBlockingQueue, BlockingQueue }
 
-import akka.actor.{ Props, Actor, ActorSystem }
+import akka.actor.{ Actor, ActorSystem, Props }
 import akka.testkit.TestKit
 import akka.util.Timeout
 import cats.data.Xor
-import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseStatusCode, KafkaResponseEnvelope }
+import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
-import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.KafkaRequest
+import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.{ Destination, KafkaRequest }
 import org.patricknoir.kafka.reactive.common.ReactiveDeserializer
 import org.specs2.SpecificationLike
 
 import scala.concurrent.{ Await, Future }
 import akka.pattern.ask
+
 import scala.concurrent.duration._
 import io.circe.syntax._
 
@@ -45,8 +46,9 @@ class KafkaRClientActorSpec extends TestKit(ActorSystem("TestKit")) with Specifi
     case class Car(model: String, constructor: String, year: Int)
 
     val porsche997 = Car("Carrera S 997", "Porsche", 2008)
+    val destination = Destination("kafka", "destinationTopic", "echoService")
 
-    val fResp = (client ? KafkaRequest("kafka:destinationTopic/echoService", porsche997.asJson.noSpaces, timeout, "replyTopic", implicitly[ReactiveDeserializer[Car]])).mapTo[Error Xor Car]
+    val fResp = (client ? KafkaRequest(destination, porsche997.asJson.noSpaces, timeout, "replyTopic", implicitly[ReactiveDeserializer[Car]])).mapTo[Error Xor Car]
 
     val Xor.Right(result) = Await.result(fResp, Duration.Inf)
 

@@ -7,7 +7,7 @@ import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequ
 import org.patricknoir.kafka.reactive.common.{ ReactiveSerializer, ReactiveDeserializer }
 
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.Try
+import scala.util.{ Failure, Success, Try }
 
 /**
  * Created by patrick on 09/08/2016.
@@ -17,9 +17,14 @@ package object dsl {
   object request {
     def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Out]): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(f))
-    def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Out)): ReactiveRoute =
-      ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future.successful(f(in))))
-    def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Out))(implicit ec: ExecutionContext): ReactiveRoute =
+    def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Out): ReactiveRoute =
+      ReactiveRoute().add(ReactiveService[In, Out](id) { in =>
+        Try(f(in)) match {
+          case Success(result) => Future.successful(result)
+          case Failure(err)    => Future.failed(err)
+        }
+      })
+    def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Out)(implicit ec: ExecutionContext): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future(f(in))))
   }
   implicit def unsafe[Out: ReactiveSerializer](out: => Out): Try[Out] = Try(out)

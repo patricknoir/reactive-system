@@ -157,7 +157,7 @@ and can produce a result, because the input and output are delivered through mes
 
 ```scala
 
-case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out])
+case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](id: String)(f: In => Future[Out])
 
 ```
 
@@ -187,11 +187,11 @@ The Reactive Route DSL is built around the *request* object which exposes the fo
 
 ```scala
 object request {
-    def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out]): ReactiveRoute =
+    def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Out]): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(f))
-    def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out)): ReactiveRoute =
+    def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Out)): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future.successful(f(in))))
-    def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out))(implicit ec: ExecutionContext): ReactiveRoute =
+    def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Out))(implicit ec: ExecutionContext): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future(f(in))))
   }
 ```
@@ -206,8 +206,12 @@ So the DSL offers you the option to lift a function to a reactive service by lif
 ```scala
 
 //sync:
-def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out)): ReactiveRoute =
-      ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future.successful(f(in))))
+def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Out): ReactiveRoute =
+  ReactiveRoute().add(ReactiveService[In, Out](id) { in => Try(f(in)) match {
+      case Success(result) => Future.successful(result)
+      case Failure(err)    => Future.failed(err)
+    }
+  })
 ```
 
 In this scenario we will be using the same thread the router is running on.
@@ -215,7 +219,7 @@ In this scenario we will be using the same thread the router is running on.
 In the case of aSync:
 
 ```scala
-def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out))(implicit ec: ExecutionContext): ReactiveRoute =
+def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Out)(implicit ec: ExecutionContext): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future(f(in))))
 ```
 

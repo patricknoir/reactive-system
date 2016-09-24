@@ -2,7 +2,6 @@ package org.patricknoir.kafka.reactive.server
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{ Sink, Source }
-import cats.data.Xor
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.KafkaResponseEnvelope
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.common.{ ReactiveSerializer, ReactiveDeserializer }
@@ -16,14 +15,14 @@ import scala.util.Try
 package object dsl {
 
   object request {
-    def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out]): ReactiveRoute =
+    def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Out]): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(f))
-    def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out)): ReactiveRoute =
+    def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Out)): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future.successful(f(in))))
-    def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out))(implicit ec: ExecutionContext): ReactiveRoute =
+    def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Out))(implicit ec: ExecutionContext): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future(f(in))))
   }
-  implicit def unsafe[Out: ReactiveSerializer](out: => Out): (Error Xor Out) = Xor.fromTry(Try(out)).leftMap(thr => new Error(thr))
+  implicit def unsafe[Out: ReactiveSerializer](out: => Out): Try[Out] = Try(out)
 
   implicit class ReactiveSourceShape(source: Source[KafkaRequestEnvelope, _])(implicit system: ActorSystem) {
     def via(route: ReactiveRoute): ReactiveSourceRouteShape = new ReactiveSourceRouteShape(source, route)

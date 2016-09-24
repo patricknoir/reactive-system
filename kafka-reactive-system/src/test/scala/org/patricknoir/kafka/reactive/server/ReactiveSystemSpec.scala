@@ -13,7 +13,6 @@ import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.Destinatio
 
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.Duration
-import scala.util.Try
 
 /**
  * Created by patrick on 13/07/2016.

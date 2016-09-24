@@ -7,13 +7,17 @@ import cats.instances.all._
 import org.patricknoir.kafka.reactive.common.{ ReactiveSerializer, ReactiveDeserializer }
 import scala.concurrent.{ ExecutionContext, Future }
 
-case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out]) {
-  def apply(in: In): Future[Error Xor Out] = f(in)
+case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](id: String)(f: In => Future[Out]) {
+  def apply(in: In): Future[Out] = f(in)
 
-  def unsafeApply(jsonStr: String)(implicit ec: ExecutionContext): Future[Error Xor String] = (for {
-    in <- XorT(Future.successful(deserialize[In](jsonStr)))
-    out <- XorT(f(in)).map(out => serialize[Out](out))
-  } yield out).value
+  def unsafeApply(jsonStr: String)(implicit ec: ExecutionContext): Future[String] = {
+    val xorData = deserialize[In](jsonStr)
+    xorData match {
+      case Xor.Right(in) => f(in).map(serialize[Out])
+      case Xor.Left(err) => Future.failed(new Exception(err.getMessage))
+    }
+  }
+
 }
 
 object ReactiveService {

@@ -18,11 +18,11 @@ import scala.util.Try
  */
 class KafkaRClientActor(producerProps: Props, consumerProps: Props) extends Actor with ActorLogging {
 
-  //TODO: add supervisor strategy to handle KafkaProducerException and KafkaConsumerException in order to restart
   // kafka consumer and producer
+  // TODO: move th retry timeout to the configuration
   override val supervisorStrategy = OneForOneStrategy(5, 60 seconds) {
     case _: ProducerException | _: ConsumerException =>
-      println("producer or consumer failed: restarting actor!")
+      log.warning("producer or consumer failed: restarting actor!")
       Restart
 
   }

@@ -21,7 +21,7 @@ case class ReactiveSystem(source: Source[KafkaRequestEnvelope, _], route: Reacti
     val result: Future[Error Xor String] = (for {
       serviceId <- XorT(Future.successful(extractServiceId(request)))
       service <- XorT(Future.successful(Xor.fromOption[Error, ReactiveService[_, _]](route.services.get(serviceId), new Error(s"service: $serviceId not found"))))
-      response <- XorT(service.unsafeApply(request.payload))
+      response <- XorT(service.unsafeApply(request.payload).map(Xor.right[Error, String]))
     } yield response).value
 
     result.map(toKafkaResponseEnvelope(request.correlationId, request.replyTo, _))
@@ -32,8 +32,8 @@ case class ReactiveSystem(source: Source[KafkaRequestEnvelope, _], route: Reacti
   }).leftMap(throwable => new Error(throwable))
 
   private def toKafkaResponseEnvelope(correlationId: String, origin: String, xor: Xor[Error, String]): KafkaResponseEnvelope = xor match {
-    case Xor.Left(err: Error) => KafkaResponseEnvelope(correlationId, origin, err.getMessage, KafkaResponseStatusCode.InternalServerError)
-    case Xor.Right(jsonResp)  => KafkaResponseEnvelope(correlationId, origin, jsonResp, KafkaResponseStatusCode.Success)
+    case Xor.Left(err: Error)        => KafkaResponseEnvelope(correlationId, origin, err.getMessage, KafkaResponseStatusCode.InternalServerError)
+    case Xor.Right(jsonResp: String) => KafkaResponseEnvelope(correlationId, origin, jsonResp, KafkaResponseStatusCode.Success)
   }
 
   def run()(implicit materializer: Materializer) = g.run()

@@ -7,6 +7,7 @@ import cats.data.Xor
 import org.patricknoir.kafka.reactive.client.ReactiveClient
 
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.Try
 
 /**
  * Created by patrick on 13/08/2016.
@@ -14,6 +15,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 object KafkaHttpRoute {
 
   /**
+   *  
    * Note: There is also an implicit conversion from Route to
    *
    * Flow[HttpRequest, HttpResponse, Unit]
@@ -30,13 +32,13 @@ object KafkaHttpRoute {
 
     val pathString = context.request.getUri().path()
 
-    val response: Future[Error Xor String] = client.request[String, String](s"$kafkaHost/$pathString", extractPayload(context.request))
+    val response: Future[String] = client.request[String, String](s"$kafkaHost/$pathString", extractPayload(context.request))
 
     response.map(createRouteResult)
   }
 
   private def extractPayload(request: HttpRequest): String = ???
 
-  private def createRouteResult(result: Xor[Error, String]): RouteResult = ???
+  private def createRouteResult(result: String): RouteResult = ???
 
 }

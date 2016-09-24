@@ -6,7 +6,6 @@ import akka.actor.ActorSystem
 import akka.stream.{ ActorMaterializer, Materializer }
 import akka.testkit.TestKit
 import akka.util.Timeout
-import cats.data.Xor
 import com.typesafe.config.ConfigFactory
 import net.manub.embeddedkafka.{ EmbeddedKafkaConfig, EmbeddedKafka }
 import org.patricknoir.kafka.KafkaLocal
@@ -14,7 +13,6 @@ import org.patricknoir.kafka.reactive.client.KafkaReactiveClient
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.KafkaResponseEnvelope
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
-import org.patricknoir.kafka.reactive.server.ReactiveSystem
 import org.patricknoir.kafka.reactive.server.streams.{ ReactiveKafkaSink, ReactiveKafkaSource }
 import org.specs2.SpecificationLike
 import scala.concurrent.{ Future, Await }
@@ -110,7 +108,7 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
 
     val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
 
-    val Xor.Right(result: String) = Await.result(fResponse, Duration.Inf)
+    val result: String = Await.result(fResponse, Duration.Inf)
 
     after()
     result must be_==("patrick")

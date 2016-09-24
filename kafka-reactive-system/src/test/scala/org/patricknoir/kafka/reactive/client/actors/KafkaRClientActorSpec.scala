@@ -48,9 +48,9 @@ class KafkaRClientActorSpec extends TestKit(ActorSystem("TestKit")) with Specifi
     val porsche997 = Car("Carrera S 997", "Porsche", 2008)
     val destination = Destination("kafka", "destinationTopic", "echoService")
 
-    val fResp = (client ? KafkaRequest(destination, porsche997.asJson.noSpaces, timeout, "replyTopic", implicitly[ReactiveDeserializer[Car]])).mapTo[Error Xor Car]
+    val fResp: Future[Car] = (client ? KafkaRequest(destination, porsche997.asJson.noSpaces, timeout, "replyTopic", implicitly[ReactiveDeserializer[Car]])).mapTo[Car]
 
-    val Xor.Right(result) = Await.result(fResp, Duration.Inf)
+    val result: Car = Await.result(fResp, Duration.Inf)
 
     result must be_==(porsche997)
   }

@@ -3,6 +3,7 @@ package org.patricknoir.kafka.reactive.common
 import cats.data.Xor
 import io.circe.Decoder
 import io.circe.parser._
+import io.circe.Error
 
 /**
  * Created by patrick on 25/07/2016.
@@ -19,7 +20,7 @@ object ReactiveDeserializer {
   }
 
   implicit def circeDecoderDeserializer[Out: Decoder] = new ReactiveDeserializer[Out] {
-    override def deserialize(input: Array[Byte]) = decode[Out](new String(input)).leftMap(err => new Error(err)) //FIXME : use custom errors
+    override def deserialize(input: Array[Byte]) = decode[Out](new String(input))
   }
 
   implicit val byteArrayDeserializer = new ReactiveDeserializer[Array[Byte]] {

@@ -1,6 +1,7 @@
 package org.patricknoir.kafka.reactive
 
 import cats.data.Xor
+import io.circe.Error
 
 /**
  * Created by patrick on 26/07/2016.

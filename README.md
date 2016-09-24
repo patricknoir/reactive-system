@@ -230,17 +230,8 @@ the ReactiveService is using a Future on a new thread and an implicit execution 
 Last but not least if your function is already returning a Future you can simply use the *request.apply*:
 
 ```scala
-def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out]): ReactiveRoute =
+def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Out]): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(f))
-```
-
-#### Route DSL: Handle Xor
-
-As you could have noticed the ReactiveService combine the effect of a Future with a Xor\[Error, A\].
-If your function is not already returning a *Xor\[Error, A\]* then we will implicitly lift it:
-
-```scala
-implicit def unsafe[Out: ReactiveSerializer](out: => Out): (Error Xor Out) = Xor.fromTry(Try(out)).leftMap(thr => new Error(thr))
 ```
 
 Reactive Sink
@@ -279,7 +270,7 @@ Reactive Client
 trait ReactiveClient {
 
   def request[In: ReactiveSerializer, Out: ReactiveDeserializer]
-    (destination: String, payload: In)(implicit timeout: Timeout): Future[Error Xor Out]
+    (destination: String, payload: In)(implicit timeout: Timeout): Future[Out]
 
 }
 ```
@@ -303,7 +294,7 @@ val client = new KafkaReactiveClient(KafkaRClientSettings.default)
 val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
 
 result.onSuccess { 
-    case Xor.Right(result: String) => println(result)
+    case result: String => println(result)
 }
 
 ...

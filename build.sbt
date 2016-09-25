@@ -141,7 +141,7 @@ val pluginsSettings =
 
 val commonSettings = Seq(
   organization := "org.patricknoir.kafka",
-  version := "0.2.1",
+  version := "0.3.0",
   scalaVersion := "2.11.8",
   fork in run := true,
   fork in Test := true,

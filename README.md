@@ -20,7 +20,7 @@ resolvers += "patricknoir-bintray" at "https://dl.bintray.com/patricknoir/releas
 
 Add to the dependencies the latest stable version (Scala 2.11):
 ```scala
-"org.patricknoir.reactive.kafka" %% "kafka-reactive-service" % "0.2.0"
+"org.patricknoir.reactive.kafka" %% "kafka-reactive-service" % "0.3.0"
 ```
 
 Introduction

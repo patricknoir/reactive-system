@@ -110,7 +110,7 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
 
     val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
 
-    val Xor.Right(result: String) = Await.result(fResponse, Duration.Inf)
+    val Right(result: String) = Await.result(fResponse, Duration.Inf)
 
     after()
     result must be_==("patrick")

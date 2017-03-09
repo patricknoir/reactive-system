@@ -7,12 +7,21 @@ import cats.instances.all._
 import org.patricknoir.kafka.reactive.common.{ ReactiveSerializer, ReactiveDeserializer }
 import scala.concurrent.{ ExecutionContext, Future }
 
-case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out]) {
-  def apply(in: In): Future[Error Xor Out] = f(in)
+/**
+ * A reactive service is the abstraction of a function uniquely identified by an ID.
+ * The service function accept an input type that can be deserialized and produces a Future whichc an return
+ * either an Error or an Output that can be serialized.
+ * @param id
+ * @param f
+ * @tparam In
+ * @tparam Out
+ */
+case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](id: String)(f: In => Future[Error Either Out]) {
+  def apply(in: In): Future[Error Either Out] = f(in)
 
-  def unsafeApply(jsonStr: String)(implicit ec: ExecutionContext): Future[Error Xor String] = (for {
-    in <- XorT(Future.successful(deserialize[In](jsonStr)))
-    out <- XorT(f(in)).map(out => serialize[Out](out))
+  def unsafeApply(jsonStr: String)(implicit ec: ExecutionContext): Future[Error Either String] = (for {
+    in <- EitherT(Future.successful(deserialize[In](jsonStr)))
+    out <- EitherT(f(in)).map(out => serialize[Out](out))
   } yield out).value
 }
 

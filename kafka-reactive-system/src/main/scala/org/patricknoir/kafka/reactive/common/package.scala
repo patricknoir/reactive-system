@@ -8,7 +8,7 @@ import cats.data.Xor
 package object common {
 
   object deserializer {
-    def deserialize[Out: ReactiveDeserializer](in: String): Xor[Error, Out] = implicitly[ReactiveDeserializer[Out]].deserialize(in.getBytes)
+    def deserialize[Out: ReactiveDeserializer](in: String): Either[Error, Out] = implicitly[ReactiveDeserializer[Out]].deserialize(in.getBytes)
   }
 
   object serializer {

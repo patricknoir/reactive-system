@@ -2,7 +2,6 @@ package org.patricknoir.kafka.reactive.client
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
-import cats.data.Xor
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.{ Destination, KafkaRequest }
 import org.patricknoir.kafka.reactive.client.actors.{ KafkaConsumerActor, KafkaProducerActor, KafkaRClientActor }
 import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
@@ -17,7 +16,7 @@ import akka.pattern.ask
  */
 trait ReactiveClient {
 
-  def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout): Future[Error Xor Out]
+  def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout): Future[Error Either Out]
 
 }
 
@@ -38,7 +37,7 @@ class KafkaReactiveClient(settings: KafkaRClientSettings)(implicit system: Actor
    * @return
    */
   //TODO: I'm messing with Error vs Throwable => replace Error with Throwable!
-  def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout): Future[Error Xor Out] = {
+  def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout): Future[Error Either Out] = {
     destination match {
       case Destination(medium, topic, route) =>
         (kafkaClientService ? KafkaRequest(
@@ -47,8 +46,8 @@ class KafkaReactiveClient(settings: KafkaRClientSettings)(implicit system: Actor
           timeout,
           settings.inboundResponseQueue,
           implicitly[ReactiveDeserializer[Out]]
-        )).mapTo[Error Xor Out]
-      case _ => Future.successful(Xor.left[Error, Out](new Error("unknown destination")))
+        )).mapTo[Error Either Out]
+      case _ => Future.successful(Left[Error, Out](new Error("unknown destination")))
     }
   }
 }

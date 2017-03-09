@@ -1,6 +1,5 @@
 package org.patricknoir.kafka.reactive.common
 
-import cats.data.Xor
 import io.circe.Decoder
 import io.circe.parser._
 
@@ -9,20 +8,20 @@ import io.circe.parser._
  */
 trait ReactiveDeserializer[Payload] {
 
-  def deserialize(input: Array[Byte]): Xor[Error, Payload]
+  def deserialize(input: Array[Byte]): Either[Error, Payload]
 
 }
 
 object ReactiveDeserializer {
   implicit val stringDeserializer = new ReactiveDeserializer[String] {
-    override def deserialize(input: Array[Byte]) = Xor.Right(new String(input))
+    override def deserialize(input: Array[Byte]) = Right(new String(input))
   }
 
   implicit def circeDecoderDeserializer[Out: Decoder] = new ReactiveDeserializer[Out] {
-    override def deserialize(input: Array[Byte]) = decode[Out](new String(input)).leftMap(err => new Error(err)) //FIXME : use custom errors
+    override def deserialize(input: Array[Byte]) = decode[Out](new String(input)).leftMap(err => new Error(err)).toEither //FIXME : use custom errors
   }
 
   implicit val byteArrayDeserializer = new ReactiveDeserializer[Array[Byte]] {
-    override def deserialize(input: Array[Byte]) = Xor.Right(input)
+    override def deserialize(input: Array[Byte]) = Right(input)
   }
 }

@@ -5,7 +5,6 @@ import java.util.concurrent.{ ArrayBlockingQueue, BlockingQueue }
 import akka.actor.{ Actor, ActorSystem, Props }
 import akka.testkit.TestKit
 import akka.util.Timeout
-import cats.data.Xor
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.{ Destination, KafkaRequest }
@@ -48,9 +47,9 @@ class KafkaRClientActorSpec extends TestKit(ActorSystem("TestKit")) with Specifi
     val porsche997 = Car("Carrera S 997", "Porsche", 2008)
     val destination = Destination("kafka", "destinationTopic", "echoService")
 
-    val fResp = (client ? KafkaRequest(destination, porsche997.asJson.noSpaces, timeout, "replyTopic", implicitly[ReactiveDeserializer[Car]])).mapTo[Error Xor Car]
+    val fResp = (client ? KafkaRequest(destination, porsche997.asJson.noSpaces, timeout, "replyTopic", implicitly[ReactiveDeserializer[Car]])).mapTo[Error Either Car]
 
-    val Xor.Right(result) = Await.result(fResp, Duration.Inf)
+    val Right(result) = Await.result(fResp, Duration.Inf)
 
     result must be_==(porsche997)
   }

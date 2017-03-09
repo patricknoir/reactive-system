@@ -2,7 +2,6 @@ package org.patricknoir.kafka.reactive.client.actors
 
 import akka.actor._
 import akka.event.LoggingReceive
-import cats.data.Xor
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseStatusCode, KafkaResponseEnvelope }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.KafkaRequest
@@ -25,7 +24,7 @@ class KafkaRRequestActor(producer: ActorRef) extends Actor with ActorLogging {
       client ! decoder.deserialize(response.getBytes)
       context stop self
     case KafkaResponseEnvelope(_, _, response, _) =>
-      client ! Xor.left(new Error(response))
+      client ! Left(new Error(response))
       context stop self
     case ReceiveTimeout => context stop self
   }

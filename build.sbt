@@ -15,17 +15,18 @@ resolvers ++= Seq(
 )
 
 val Versions = new {
-  val Scala = "2.11.8"
-  val ScalaBinary = "2.11"
+  val Scala = "2.12.1"
+  val ScalaBinary = "2.12"
   val Slf4j = "1.7.21"
-  val Akka = "2.4.10"
+  val Akka = "2.4.17"
+  val AkkaHttp = "10.0.4"
   val Circe = "0.5.1"
   val Specs2 = "3.8.4"
-  val EmbeddedKafka = "0.7.1"
-  val Kafka = "0.10.0.1"
+  val EmbeddedKafka = "0.12.0"
+  val Kafka = "0.10.2.0"
   val KindProjector = "0.8.2"
   val ScalaTest = "3.0.0"
-  val AkkaStreamKafka = "0.11-RC2"
+  val AkkaStreamKafka = "0.14"
 }
 
 // Dependencies
@@ -52,13 +53,13 @@ val embeddedKafkaDependencies = Seq(
 )
 
 val httpInterfaceDependencies = Seq(
-  "com.typesafe.akka" %% "akka-http-experimental" % Versions.Akka
+  "com.typesafe.akka" %% "akka-http" % Versions.AkkaHttp
 )
 
 val testDependencies = Seq (
   "org.apache.kafka"               %% "kafka"                    % Versions.Kafka                 % "test",
   "com.typesafe.akka"              %% "akka-stream-testkit"      % Versions.Akka                  % "test",
-  "com.typesafe.akka"              %% "akka-http-testkit"        % Versions.Akka                  % "test",
+  "com.typesafe.akka"              %% "akka-http-testkit"        % Versions.AkkaHttp              % "test",
   "org.scalatest"                  %% "scalatest"                % Versions.ScalaTest             % "test",
   "org.specs2"                     %% "specs2-core"              % Versions.Specs2                % "test",
   "org.specs2"                     %% "specs2-scalacheck"        % Versions.Specs2                % "test",

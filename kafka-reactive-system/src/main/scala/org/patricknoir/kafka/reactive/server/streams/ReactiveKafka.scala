@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import akka.kafka.scaladsl.{ Consumer, Producer }
 import akka.kafka.{ ConsumerSettings, ProducerSettings, Subscriptions }
 import akka.stream.scaladsl.{ Flow, Sink, Source }
-import cats.data.Xor
 import io.circe.parser._
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -27,7 +26,7 @@ object ReactiveKafkaSource {
       .map { record =>
         decode[KafkaRequestEnvelope](record.value)
       }.filter(_.isRight).map {
-        case (Xor.Right(kkReqEnvelope)) => kkReqEnvelope
+        case (Right(kkReqEnvelope)) => kkReqEnvelope
       }
 
   private def createConsumerSettings(servers: Set[String], clientId: String, groupId: String)(implicit system: ActorSystem) =

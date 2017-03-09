@@ -1,7 +1,5 @@
 package org.patricknoir.kafka.reactive
 
-import cats.data.Xor
-
 /**
  * Created by patrick on 26/07/2016.
  */

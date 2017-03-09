@@ -3,8 +3,8 @@ package org.patricknoir.kafka.reactive.server
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl._
+import cats.data.EitherT
 import cats.instances.all._
-import cats.data.{ EitherT, Xor, XorT }
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 
@@ -20,16 +20,16 @@ case class ReactiveSystem(source: Source[KafkaRequestEnvelope, _], route: Reacti
   val g = source.map { request =>
     val result: Future[Error Either String] = (for {
       serviceId <- EitherT(Future.successful(extractServiceId(request)))
-      service <- EitherT(Future.successful(Xor.fromOption[Error, ReactiveService[_, _]](route.services.get(serviceId), new Error(s"service: $serviceId not found")).toEither))
+      service <- EitherT(Future.successful(Either.cond[Error, ReactiveService[_, _]](route.services.get(serviceId).isDefined, route.services(serviceId), new Error(s"service: $serviceId not found"))))
       response <- EitherT(service.unsafeApply(request.payload))
     } yield response).value
 
     result.map(toKafkaResponseEnvelope(request.correlationId, request.replyTo, _))
   }.toMat(sink)(Keep.right)
 
-  private def extractServiceId(request: KafkaRequestEnvelope): Either[Error, String] = Xor.fromTry(Try {
+  private def extractServiceId(request: KafkaRequestEnvelope): Either[Error, String] = Try {
     request.destination.serviceId
-  }).leftMap(throwable => new Error(throwable)).toEither
+  }.toEither.left.map(throwable => new Error(throwable))
 
   private def toKafkaResponseEnvelope(correlationId: String, origin: String, xor: Either[Error, String]): KafkaResponseEnvelope = xor match {
     case Left(err: Error) => KafkaResponseEnvelope(correlationId, origin, err.getMessage, KafkaResponseStatusCode.InternalServerError)

@@ -2,7 +2,6 @@ package org.patricknoir.kafka.examples.client
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
-import cats.data.Xor
 import org.patricknoir.kafka.reactive.client.KafkaReactiveClient
 import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
 import scala.concurrent.{ Await, Future }

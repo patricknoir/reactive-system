@@ -3,7 +3,6 @@ package org.patricknoir.reactive.http
 import akka.http.scaladsl.model.{ HttpResponse, HttpRequest }
 import akka.http.scaladsl.server._
 import akka.util.Timeout
-import cats.data.Xor
 import org.patricknoir.kafka.reactive.client.ReactiveClient
 
 import scala.concurrent.{ ExecutionContext, Future }

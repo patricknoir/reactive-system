@@ -2,7 +2,6 @@ package org.patricknoir.kafka.reactive.server
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{ Sink, Source }
-import cats.data.Xor
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.KafkaResponseEnvelope
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.common.{ ReactiveDeserializer, ReactiveSerializer }
@@ -23,7 +22,7 @@ package object dsl {
     def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Either Out))(implicit ec: ExecutionContext): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future(f(in))))
   }
-  implicit def unsafe[Out: ReactiveSerializer](out: => Out): (Error Either Out) = Xor.fromTry(Try(out)).leftMap(thr => new Error(thr)).toEither
+  implicit def unsafe[Out: ReactiveSerializer](out: => Out): (Error Either Out) = Try(out).toEither.left.map(thr => new Error(thr))
 
   implicit class ReactiveSourceShape(source: Source[KafkaRequestEnvelope, _])(implicit system: ActorSystem) {
     def via(route: ReactiveRoute): ReactiveSourceRouteShape = new ReactiveSourceRouteShape(source, route)

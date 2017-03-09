@@ -18,7 +18,7 @@ object ReactiveDeserializer {
   }
 
   implicit def circeDecoderDeserializer[Out: Decoder] = new ReactiveDeserializer[Out] {
-    override def deserialize(input: Array[Byte]) = decode[Out](new String(input)).leftMap(err => new Error(err)).toEither //FIXME : use custom errors
+    override def deserialize(input: Array[Byte]) = decode[Out](new String(input)).left.map(err => new Error(err)) //FIXME : use custom errors
   }
 
   implicit val byteArrayDeserializer = new ReactiveDeserializer[Array[Byte]] {

@@ -21,7 +21,7 @@ object SimpleRSClient extends App {
   val client = new KafkaReactiveClient(KafkaRClientSettings.default)
 
   do {
-    val response: Future[Error Either String] = client.request[String, String]("kafka:simple/echo", "hello world!")
+    val response: Future[String] = client.request[String, String]("kafka:simple/echo", "hello world!")
 
     response.onComplete { r =>
       println(r)

@@ -18,9 +18,9 @@ Add patricknoir bintray repository to your resolvers:
 resolvers += "patricknoir-bintray" at "https://dl.bintray.com/patricknoir/releases"
 ```
 
-Add to the dependencies the latest stable version (Scala 2.11):
+Add to the dependencies the latest stable version (Scala 2.12):
 ```scala
-"org.patricknoir.reactive.kafka" %% "kafka-reactive-service" % "0.2.0"
+"org.patricknoir.kafka" %% "kafka-reactive-service" % "0.3.0"
 ```
 
 Introduction
@@ -157,7 +157,7 @@ and can produce a result, because the input and output are delivered through mes
 
 ```scala
 
-case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out])
+case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](id: String)(f: In => Future[Error Either Out])
 
 ```
 
@@ -187,11 +187,11 @@ The Reactive Route DSL is built around the *request* object which exposes the fo
 
 ```scala
 object request {
-    def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out]): ReactiveRoute =
+    def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Either Out]): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(f))
-    def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out)): ReactiveRoute =
+    def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Either Out)): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future.successful(f(in))))
-    def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out))(implicit ec: ExecutionContext): ReactiveRoute =
+    def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Either Out))(implicit ec: ExecutionContext): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future(f(in))))
   }
 ```
@@ -206,7 +206,7 @@ So the DSL offers you the option to lift a function to a reactive service by lif
 ```scala
 
 //sync:
-def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out)): ReactiveRoute =
+def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Either Out)): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future.successful(f(in))))
 ```
 
@@ -215,7 +215,7 @@ In this scenario we will be using the same thread the router is running on.
 In the case of aSync:
 
 ```scala
-def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out))(implicit ec: ExecutionContext): ReactiveRoute =
+def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Either Out))(implicit ec: ExecutionContext): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future(f(in))))
 ```
 
@@ -226,7 +226,7 @@ the ReactiveService is using a Future on a new thread and an implicit execution 
 Last but not least if your function is already returning a Future you can simply use the *request.apply*:
 
 ```scala
-def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out]): ReactiveRoute =
+def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Either Out]): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(f))
 ```
 
@@ -236,15 +236,15 @@ As you could have noticed the ReactiveService combine the effect of a Future wit
 If your function is not already returning a *Xor\[Error, A\]* then we will implicitly lift it:
 
 ```scala
-implicit def unsafe[Out: ReactiveSerializer](out: => Out): (Error Xor Out) = Xor.fromTry(Try(out)).leftMap(thr => new Error(thr))
+implicit def unsafe[Out: ReactiveSerializer](out: => Out): (Error Xor Out) = Try(out).toEither.left.map(thr => new Error(thr))
 ```
 
 Reactive Sink
 -------------
 
-Once a ReactiveService has been executed by the ReactiveRoute a *Future\[Error Xor A\]* will be returned where if you remember the signature of the ReactiveService
+Once a ReactiveService has been executed by the ReactiveRoute a *Future\[Error Either A\]* will be returned where if you remember the signature of the ReactiveService
 the type *A* is a member of *ReactiveSerialzable*. What we need to do now is to send this Future to a Sink which can handle that type, once the Future completes we 
-can then Serialize either the result *A* or the *Error* from the Xor, wrap it into a *KafkaResponseEnveplope* and send it back to the client who requested it.
+can then Serialize either the result *A* or the *Error* from the Either, wrap it into a *KafkaResponseEnveplope* and send it back to the client who requested it.
 
 ```
   ._._._.___________________________________________ 
@@ -275,7 +275,7 @@ Reactive Client
 trait ReactiveClient {
 
   def request[In: ReactiveSerializer, Out: ReactiveDeserializer]
-    (destination: String, payload: In)(implicit timeout: Timeout): Future[Error Xor Out]
+    (destination: String, payload: In)(implicit timeout: Timeout): Future[Error Either Out]
 
 }
 ```
@@ -299,7 +299,7 @@ val client = new KafkaReactiveClient(KafkaRClientSettings.default)
 val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
 
 result.onSuccess { 
-    case Xor.Right(result: String) => println(result)
+    case Right(result: String) => println(result)
 }
 
 ...
@@ -316,7 +316,7 @@ In order to serialise/deserialise message payloads two methods are available whi
 package object common {
 
   object deserializer {
-    def deserialize[Out: ReactiveDeserializer](in: String): Xor[Error, Out] = implicitly[ReactiveDeserializer[Out]].deserialize(in.getBytes)
+    def deserialize[Out: ReactiveDeserializer](in: String): Either[Error, Out] = implicitly[ReactiveDeserializer[Out]].deserialize(in.getBytes)
   }
 
   object serializer {
@@ -355,21 +355,21 @@ object ReactiveSerializer {
 ```scala
 trait ReactiveDeserializer[Payload] {
 
-  def deserialize(input: Array[Byte]): Xor[Error, Payload]
+  def deserialize(input: Array[Byte]): Either[Error, Payload]
 
 }
 
 object ReactiveDeserializer {
   implicit val stringDeserializer = new ReactiveDeserializer[String] {
-    override def deserialize(input: Array[Byte]) = Xor.Right(new String(input))
+    override def deserialize(input: Array[Byte]) = Right(new String(input))
   }
 
   implicit def circeDecoderDeserializer[Out: Decoder] = new ReactiveDeserializer[Out] {
-    override def deserialize(input: Array[Byte]) = decode[Out](new String(input)).leftMap(err => new Error(err)) //FIXME : use custom errors
+    override def deserialize(input: Array[Byte]) = decode[Out](new String(input)).left.map(err => new Error(err)) //FIXME : use custom errors
   }
 
   implicit val byteArrayDeserializer = new ReactiveDeserializer[Array[Byte]] {
-    override def deserialize(input: Array[Byte]) = Xor.Right(input)
+    override def deserialize(input: Array[Byte]) = Right(input)
   }
 }
 ```

@@ -33,9 +33,9 @@ class KafkaRRequestActorSpec extends TestKit(ActorSystem("TestKit")) with Specif
     val requestActor = system.actorOf(KafkaRRequestActor.props(echoActor), "request-1")
     val destination = Destination("kafka", "destinationTopic", "echoService")
 
-    val fResp = (requestActor ? KafkaRequest(destination, new String(serialize("simple message".getBytes)), timeout, "replyTopic", implicitly[ReactiveDeserializer[String]])).mapTo[Error Either String]
+    val fResp = (requestActor ? KafkaRequest(destination, new String(serialize("simple message".getBytes)), timeout, "replyTopic", implicitly[ReactiveDeserializer[String]])).mapTo[String]
 
-    val Right(result) = Await.result(fResp, Duration.Inf)
+    val result = Await.result(fResp, Duration.Inf)
 
     result must be_==("simple message")
   }
@@ -52,9 +52,9 @@ class KafkaRRequestActorSpec extends TestKit(ActorSystem("TestKit")) with Specif
 
     val destination = Destination("kafka", "destinationTopic", "echoService")
 
-    val fResp = (requestActor ? KafkaRequest(destination, new String(serialize(car)), timeout, "replyTopic", implicitly[ReactiveDeserializer[Car]])).mapTo[Error Either Car]
+    val fResp = (requestActor ? KafkaRequest(destination, new String(serialize(car)), timeout, "replyTopic", implicitly[ReactiveDeserializer[Car]])).mapTo[Car]
 
-    val Right(carResult) = Await.result(fResp, Duration.Inf)
+    val carResult = Await.result(fResp, Duration.Inf)
 
     carResult must be_==(car)
 

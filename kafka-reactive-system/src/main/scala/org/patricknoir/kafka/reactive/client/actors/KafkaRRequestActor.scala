@@ -21,10 +21,10 @@ class KafkaRRequestActor(producer: ActorRef) extends Actor with ActorLogging {
 
   def waitingResponse(client: ActorRef, decoder: ReactiveDeserializer[_]): Receive = LoggingReceive {
     case resp @ KafkaResponseEnvelope(_, _, response, KafkaResponseStatusCode.Success) =>
-      client ! decoder.deserialize(response.getBytes)
+      decoder.deserialize(response.getBytes).fold(client ! Status.Failure(_), client ! _)
       context stop self
     case KafkaResponseEnvelope(_, _, response, _) =>
-      client ! Left(new Error(response))
+      client ! Status.Failure(new RuntimeException(response))
       context stop self
     case ReceiveTimeout => context stop self
   }

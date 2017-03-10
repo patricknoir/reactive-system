@@ -18,23 +18,19 @@ case class ReactiveSystem(source: Source[KafkaRequestEnvelope, _], route: Reacti
   import system.dispatcher
 
   val g = source.map { request =>
-    val result: Future[Error Either String] = (for {
-      serviceId <- EitherT(Future.successful(extractServiceId(request)))
-      service <- EitherT(Future.successful(Either.cond[Error, ReactiveService[_, _]](route.services.get(serviceId).isDefined, route.services(serviceId), new Error(s"service: $serviceId not found"))))
-      response <- EitherT(service.unsafeApply(request.payload))
-    } yield response).value
-
-    result.map(toKafkaResponseEnvelope(request.correlationId, request.replyTo, _))
+    val result: Future[String] = for {
+      serviceId <- Future.successful(extractServiceId(request))
+      service <- Try(route.services(serviceId)).fold(Future.failed[ReactiveService[_, _]](_), Future.successful(_))
+      response <- service.unsafeApply(request.payload)
+    } yield response
+    result
+      .map(KafkaResponseEnvelope(request.correlationId, request.replyTo, _, KafkaResponseStatusCode.Success))
+      .recover {
+        case err: Throwable => KafkaResponseEnvelope(request.correlationId, request.replyTo, err.getMessage, KafkaResponseStatusCode.InternalServerError)
+      }
   }.toMat(sink)(Keep.right)
 
-  private def extractServiceId(request: KafkaRequestEnvelope): Either[Error, String] = Try {
-    request.destination.serviceId
-  }.toEither.left.map(throwable => new Error(throwable))
-
-  private def toKafkaResponseEnvelope(correlationId: String, origin: String, xor: Either[Error, String]): KafkaResponseEnvelope = xor match {
-    case Left(err: Error) => KafkaResponseEnvelope(correlationId, origin, err.getMessage, KafkaResponseStatusCode.InternalServerError)
-    case Right(jsonResp)  => KafkaResponseEnvelope(correlationId, origin, jsonResp, KafkaResponseStatusCode.Success)
-  }
+  private def extractServiceId(request: KafkaRequestEnvelope): String = request.destination.serviceId
 
   def run()(implicit materializer: Materializer) = g.run()
 }

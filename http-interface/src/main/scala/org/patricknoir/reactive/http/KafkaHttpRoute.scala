@@ -29,13 +29,13 @@ object KafkaHttpRoute {
 
     val pathString = context.request.getUri().path()
 
-    val response: Future[Error Either String] = client.request[String, String](s"$kafkaHost/$pathString", extractPayload(context.request))
+    val response: Future[String] = client.request[String, String](s"$kafkaHost/$pathString", extractPayload(context.request))
 
     response.map(createRouteResult)
   }
 
   private def extractPayload(request: HttpRequest): String = ???
 
-  private def createRouteResult(result: Either[Error, String]): RouteResult = ???
+  private def createRouteResult(result: String): RouteResult = ???
 
 }

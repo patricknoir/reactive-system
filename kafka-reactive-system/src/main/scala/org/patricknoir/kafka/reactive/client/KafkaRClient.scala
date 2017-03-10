@@ -11,12 +11,14 @@ import org.patricknoir.kafka.reactive.common.serializer._
 import scala.concurrent.Future
 import akka.pattern.ask
 
+import scala.reflect.ClassTag
+
 /**
  * Created by patrick on 12/07/2016.
  */
 trait ReactiveClient {
 
-  def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout): Future[Error Either Out]
+  def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout, ct: ClassTag[Out]): Future[Out]
 
 }
 
@@ -36,8 +38,7 @@ class KafkaReactiveClient(settings: KafkaRClientSettings)(implicit system: Actor
    * @tparam Out
    * @return
    */
-  //TODO: I'm messing with Error vs Throwable => replace Error with Throwable!
-  def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout): Future[Error Either Out] = {
+  def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout, ct: ClassTag[Out]): Future[Out] = {
     destination match {
       case Destination(medium, topic, route) =>
         (kafkaClientService ? KafkaRequest(
@@ -46,8 +47,8 @@ class KafkaReactiveClient(settings: KafkaRClientSettings)(implicit system: Actor
           timeout,
           settings.inboundResponseQueue,
           implicitly[ReactiveDeserializer[Out]]
-        )).mapTo[Error Either Out]
-      case _ => Future.successful(Left[Error, Out](new Error("unknown destination")))
+        )).mapTo[Out]
+      case _ => Future.failed[Out](new RuntimeException("unknown destination"))
     }
   }
 }

@@ -3,9 +3,9 @@ package org.patricknoir.kafka.reactive.server
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import akka.stream.scaladsl._
+import cats.data.EitherT
 import cats.instances.all._
-import cats.data.{ XorT, Xor }
-import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseStatusCode, KafkaResponseEnvelope }
+import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 
 import scala.concurrent.Future
@@ -18,23 +18,19 @@ case class ReactiveSystem(source: Source[KafkaRequestEnvelope, _], route: Reacti
   import system.dispatcher
 
   val g = source.map { request =>
-    val result: Future[Error Xor String] = (for {
-      serviceId <- XorT(Future.successful(extractServiceId(request)))
-      service <- XorT(Future.successful(Xor.fromOption[Error, ReactiveService[_, _]](route.services.get(serviceId), new Error(s"service: $serviceId not found"))))
-      response <- XorT(service.unsafeApply(request.payload))
-    } yield response).value
-
-    result.map(toKafkaResponseEnvelope(request.correlationId, request.replyTo, _))
+    val result: Future[String] = for {
+      serviceId <- Future.successful(extractServiceId(request))
+      service <- Try(route.services(serviceId)).fold(Future.failed[ReactiveService[_, _]](_), Future.successful(_))
+      response <- service.unsafeApply(request.payload)
+    } yield response
+    result
+      .map(KafkaResponseEnvelope(request.correlationId, request.replyTo, _, KafkaResponseStatusCode.Success))
+      .recover {
+        case err: Throwable => KafkaResponseEnvelope(request.correlationId, request.replyTo, err.getMessage, KafkaResponseStatusCode.InternalServerError)
+      }
   }.toMat(sink)(Keep.right)
 
-  private def extractServiceId(request: KafkaRequestEnvelope): Xor[Error, String] = Xor.fromTry(Try {
-    request.destination.serviceId
-  }).leftMap(throwable => new Error(throwable))
-
-  private def toKafkaResponseEnvelope(correlationId: String, origin: String, xor: Xor[Error, String]): KafkaResponseEnvelope = xor match {
-    case Xor.Left(err: Error) => KafkaResponseEnvelope(correlationId, origin, err.getMessage, KafkaResponseStatusCode.InternalServerError)
-    case Xor.Right(jsonResp)  => KafkaResponseEnvelope(correlationId, origin, jsonResp, KafkaResponseStatusCode.Success)
-  }
+  private def extractServiceId(request: KafkaRequestEnvelope): String = request.destination.serviceId
 
   def run()(implicit materializer: Materializer) = g.run()
 }

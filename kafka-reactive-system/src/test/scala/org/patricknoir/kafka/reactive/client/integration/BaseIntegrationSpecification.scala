@@ -6,7 +6,6 @@ import akka.actor.ActorSystem
 import akka.stream.{ ActorMaterializer, Materializer }
 import akka.testkit.TestKit
 import akka.util.Timeout
-import cats.data.Xor
 import com.typesafe.config.ConfigFactory
 import net.manub.embeddedkafka.{ EmbeddedKafkaConfig, EmbeddedKafka }
 import org.patricknoir.kafka.KafkaLocal
@@ -110,7 +109,7 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
 
     val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
 
-    val Xor.Right(result: String) = Await.result(fResponse, Duration.Inf)
+    val result: String = Await.result(fResponse, Duration.Inf)
 
     after()
     result must be_==("patrick")

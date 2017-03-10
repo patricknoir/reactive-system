@@ -2,7 +2,6 @@ package org.patricknoir.kafka.examples.client
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
-import cats.data.Xor
 import org.patricknoir.kafka.reactive.client.KafkaReactiveClient
 import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
 import scala.concurrent.{ Await, Future }
@@ -22,7 +21,7 @@ object SimpleRSClient extends App {
   val client = new KafkaReactiveClient(KafkaRClientSettings.default)
 
   do {
-    val response: Future[Error Xor String] = client.request[String, String]("kafka:simple/echo", "hello world!")
+    val response: Future[String] = client.request[String, String]("kafka:simple/echo", "hello world!")
 
     response.onComplete { r =>
       println(r)

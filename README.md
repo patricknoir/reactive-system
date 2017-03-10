@@ -18,9 +18,9 @@ Add patricknoir bintray repository to your resolvers:
 resolvers += "patricknoir-bintray" at "https://dl.bintray.com/patricknoir/releases"
 ```
 
-Add to the dependencies the latest stable version (Scala 2.11):
+Add to the dependencies the latest stable version (Scala 2.12):
 ```scala
-"org.patricknoir.reactive.kafka" %% "kafka-reactive-service" % "0.2.0"
+"org.patricknoir.kafka" %% "kafka-reactive-service" % "0.3.0"
 ```
 
 Introduction
@@ -157,7 +157,7 @@ and can produce a result, because the input and output are delivered through mes
 
 ```scala
 
-case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out])
+case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](id: String)(f: In => Future[Error Either Out])
 
 ```
 
@@ -187,11 +187,11 @@ The Reactive Route DSL is built around the *request* object which exposes the fo
 
 ```scala
 object request {
-    def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out]): ReactiveRoute =
+    def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Either Out]): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(f))
-    def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out)): ReactiveRoute =
+    def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Either Out)): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future.successful(f(in))))
-    def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out))(implicit ec: ExecutionContext): ReactiveRoute =
+    def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Either Out))(implicit ec: ExecutionContext): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future(f(in))))
   }
 ```
@@ -206,7 +206,7 @@ So the DSL offers you the option to lift a function to a reactive service by lif
 ```scala
 
 //sync:
-def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out)): ReactiveRoute =
+def sync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Either Out)): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future.successful(f(in))))
 ```
 
@@ -215,7 +215,7 @@ In this scenario we will be using the same thread the router is running on.
 In the case of aSync:
 
 ```scala
-def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Xor Out))(implicit ec: ExecutionContext): ReactiveRoute =
+def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Either Out))(implicit ec: ExecutionContext): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future(f(in))))
 ```
 
@@ -226,7 +226,7 @@ the ReactiveService is using a Future on a new thread and an implicit execution 
 Last but not least if your function is already returning a Future you can simply use the *request.apply*:
 
 ```scala
-def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Xor Out]): ReactiveRoute =
+def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Either Out]): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(f))
 ```
 

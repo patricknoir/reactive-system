@@ -3,7 +3,6 @@ package org.patricknoir.reactive.http
 import akka.http.scaladsl.model.{ HttpResponse, HttpRequest }
 import akka.http.scaladsl.server._
 import akka.util.Timeout
-import cats.data.Xor
 import org.patricknoir.kafka.reactive.client.ReactiveClient
 
 import scala.concurrent.{ ExecutionContext, Future }
@@ -30,13 +29,13 @@ object KafkaHttpRoute {
 
     val pathString = context.request.getUri().path()
 
-    val response: Future[Error Xor String] = client.request[String, String](s"$kafkaHost/$pathString", extractPayload(context.request))
+    val response: Future[String] = client.request[String, String](s"$kafkaHost/$pathString", extractPayload(context.request))
 
     response.map(createRouteResult)
   }
 
   private def extractPayload(request: HttpRequest): String = ???
 
-  private def createRouteResult(result: Xor[Error, String]): RouteResult = ???
+  private def createRouteResult(result: String): RouteResult = ???
 
 }

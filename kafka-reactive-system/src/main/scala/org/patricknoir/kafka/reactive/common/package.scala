@@ -1,14 +1,12 @@
 package org.patricknoir.kafka.reactive
 
-import cats.data.Xor
-
 /**
  * Created by patrick on 26/07/2016.
  */
 package object common {
 
   object deserializer {
-    def deserialize[Out: ReactiveDeserializer](in: String): Xor[Error, Out] = implicitly[ReactiveDeserializer[Out]].deserialize(in.getBytes)
+    def deserialize[Out: ReactiveDeserializer](in: String): Either[Throwable, Out] = implicitly[ReactiveDeserializer[Out]].deserialize(in.getBytes)
   }
 
   object serializer {

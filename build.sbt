@@ -15,17 +15,18 @@ resolvers ++= Seq(
 )
 
 val Versions = new {
-  val Scala = "2.11.8"
-  val ScalaBinary = "2.11"
+  val Scala = "2.12.1"
+  val ScalaBinary = "2.12"
   val Slf4j = "1.7.21"
-  val Akka = "2.4.10"
-  val Circe = "0.5.1"
-  val Specs2 = "3.8.4"
-  val EmbeddedKafka = "0.7.1"
-  val Kafka = "0.10.0.1"
-  val KindProjector = "0.8.2"
-  val ScalaTest = "3.0.0"
-  val AkkaStreamKafka = "0.11-RC2"
+  val Akka = "2.4.17"
+  val AkkaHttp = "10.0.4"
+  val Circe = "0.7.0"
+  val Specs2 = "3.8.9"
+  val EmbeddedKafka = "0.12.0"
+  val Kafka = "0.10.2.0"
+  val KindProjector = "0.9.3"
+  val ScalaTest = "3.0.1"
+  val AkkaStreamKafka = "0.14"
 }
 
 // Dependencies
@@ -41,9 +42,7 @@ val rootDependencies = Seq(
   "com.typesafe.akka"              %% "akka-stream-kafka"      % Versions.AkkaStreamKafka,
   "io.circe"                       %% "circe-core"             % Versions.Circe,
   "io.circe"                       %% "circe-generic"          % Versions.Circe,
-  "io.circe"                       %% "circe-parser"           % Versions.Circe,
-  "io.circe"                       %% "circe-java8"            % Versions.Circe,
-  "io.circe"                       %% "circe-optics"           % Versions.Circe
+  "io.circe"                       %% "circe-parser"           % Versions.Circe
 )
 
 val embeddedKafkaDependencies = Seq(
@@ -52,13 +51,13 @@ val embeddedKafkaDependencies = Seq(
 )
 
 val httpInterfaceDependencies = Seq(
-  "com.typesafe.akka" %% "akka-http-experimental" % Versions.Akka
+  "com.typesafe.akka" %% "akka-http" % Versions.AkkaHttp
 )
 
 val testDependencies = Seq (
   "org.apache.kafka"               %% "kafka"                    % Versions.Kafka                 % "test",
   "com.typesafe.akka"              %% "akka-stream-testkit"      % Versions.Akka                  % "test",
-  "com.typesafe.akka"              %% "akka-http-testkit"        % Versions.Akka                  % "test",
+  "com.typesafe.akka"              %% "akka-http-testkit"        % Versions.AkkaHttp              % "test",
   "org.scalatest"                  %% "scalatest"                % Versions.ScalaTest             % "test",
   "org.specs2"                     %% "specs2-core"              % Versions.Specs2                % "test",
   "org.specs2"                     %% "specs2-scalacheck"        % Versions.Specs2                % "test",
@@ -80,7 +79,7 @@ val compileSettings = Seq(
   "-language:_",
   "-target:jvm-1.8",
   "-unchecked",
-  "-Ybackend:GenBCode",
+//  "-Ybackend:GenBCode",
   "-Ydelambdafy:method",
   "-Xfuture",
   "-Xlint",
@@ -140,8 +139,8 @@ val pluginsSettings =
 
 val commonSettings = Seq(
   organization := "org.patricknoir.kafka",
-  version := "0.2.1",
-  scalaVersion := "2.11.8",
+  version := "0.3.0",
+  scalaVersion := "2.12.1",
   fork in run := true,
   fork in Test := true,
   fork in testOnly := true,

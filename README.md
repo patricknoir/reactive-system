@@ -230,13 +230,13 @@ def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In =
       ReactiveRoute().add(ReactiveService[In, Out](id)(f))
 ```
 
-#### Route DSL: Handle Xor
+#### Route DSL: Handle Either
 
-As you could have noticed the ReactiveService combine the effect of a Future with a Xor\[Error, A\].
-If your function is not already returning a *Xor\[Error, A\]* then we will implicitly lift it:
+As you could have noticed the ReactiveService combine the effect of a Future with a Either\[Error, A\].
+If your function is not already returning a *Either\[Error, A\]* then we will implicitly lift it:
 
 ```scala
-implicit def unsafe[Out: ReactiveSerializer](out: => Out): (Error Xor Out) = Try(out).toEither.left.map(thr => new Error(thr))
+implicit def unsafe[Out: ReactiveSerializer](out: => Out): (Error Either Out) = Try(out).toEither.left.map(thr => new Error(thr))
 ```
 
 Reactive Sink

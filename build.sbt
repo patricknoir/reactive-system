@@ -96,7 +96,6 @@ val coverageSettings = Seq(
 )
 
 val dockerSettings = Seq(
-  dockerRepository := Some("10.210.201.187/pdiloreto"),
   defaultLinuxInstallLocation in Docker := "/opt/patricknoir",
   packageName in Docker := packageName.value,
   version in Docker := version.value,

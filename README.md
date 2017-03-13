@@ -215,7 +215,7 @@ In this scenario we will be using the same thread the router is running on.
 In the case of aSync:
 
 ```scala
-def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Error Either Out))(implicit ec: ExecutionContext): ReactiveRoute =
+def aSync[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => (Out))(implicit ec: ExecutionContext): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(in => Future(f(in))))
 ```
 
@@ -226,7 +226,7 @@ the ReactiveService is using a Future on a new thread and an implicit execution 
 Last but not least if your function is already returning a Future you can simply use the *request.apply*:
 
 ```scala
-def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Error Either Out]): ReactiveRoute =
+def apply[In: ReactiveDeserializer, Out: ReactiveSerializer](id: String)(f: In => Future[Out]): ReactiveRoute =
       ReactiveRoute().add(ReactiveService[In, Out](id)(f))
 ```
 
@@ -236,7 +236,7 @@ As you could have noticed the ReactiveService combine the effect of a Future wit
 If your function is not already returning a *Either\[Error, A\]* then we will implicitly lift it:
 
 ```scala
-implicit def unsafe[Out: ReactiveSerializer](out: => Out): (Error Either Out) = Try(out).toEither.left.map(thr => new Error(thr))
+implicit def unsafe[Out: ReactiveSerializer](out: => Out): (Throwable Either Out) = Try(out).toEither
 ```
 
 Reactive Sink

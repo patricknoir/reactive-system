@@ -21,8 +21,11 @@ class KafkaRClientActor(producerProps: Props, consumerProps: Props) extends Acto
   //TODO: add supervisor strategy to handle KafkaProducerException and KafkaConsumerException in order to restart
   // kafka consumer and producer
   override val supervisorStrategy = OneForOneStrategy(5, 60 seconds) {
-    case _: ProducerException | _: ConsumerException =>
-      println("producer or consumer failed: restarting actor!")
+    case pe: ProducerException =>
+      log.error(pe, "producer error")
+      Restart
+    case ce: ConsumerException =>
+      log.error(ce, "consumer error")
       Restart
 
   }

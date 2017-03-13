@@ -19,8 +19,7 @@ import KafkaResponseEnvelope._
 class KafkaConsumerActor(consumerSettings: Map[String, String], inboundQueue: String, pollTimeout: FiniteDuration) extends Actor with ActorLogging {
 
   var running = true
-
-  println("Starting Kafka Consumer")
+  log.debug(s"starting kafka consumer: ${self.path.name}")
 
   val consumer = new KafkaConsumer[String, String](consumerSettings)
   consumer.subscribe(List(inboundQueue))

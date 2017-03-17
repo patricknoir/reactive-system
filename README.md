@@ -26,7 +26,9 @@ Add to the dependencies the latest stable version (Scala 2.12):
 Introduction
 ------------
 
-A reactive system is a server which exposes services using message exchange pattern rather than synchronous IO communications (for example HTTP).
+Reactive System is a library which is aiming to make easy to publish and consume services using asynchronous message exchange pattern.
+With Reactive System create and consume services should be as easy as using HTTP/REST.
+
 Using message exchange rather than synchronous communication helps to build more decoupled systems, which gives us several advatages like:
 
 1. Isolation: if a reactive system fails it doesn't affect its client.
@@ -42,7 +44,11 @@ Using message exchange rather than synchronous communication helps to build more
 Reactive System
 ---------------
 
-In order to build a reactive system you need 3 elements:
+With Reactive System library you can easily create both: the server and the client applications.
+
+### Server - Service Publishing
+
+In order to create a reactive system server you need to put together 3 elements:
 
 1. A source of ReactiveRequest messages
 2. A router able to dispatch ReactiveRequest messages to the associated ReactiveService
@@ -86,16 +92,20 @@ Or alternatively the DSL exposes also:
 val reactiveSys: ReactiveSystem = source via route to sink
 ```
 
-Or more basic:
+Or:
 
 ```scala
 
 val reactiveSystem: ReactiveSystem = ReactiveSystem(source, route, sink)
 ```
+#### Message Delivery Semantic
 
+Reactive System provides implementation for the following message delivery semantics:
 
-Reactive Source
----------------
+* At-Most-Once: This approach doesn't guarantee the message is delivered, it favours the performance and avoid messages are duplicated.
+* At-Least-Once: This approach guarantees that a message is delivered to the destination, however it comes with a cost in performance and in case of failure messages can be duplicated.
+
+#### Reactive Source
 
 A reactive source is the inbound gateway from which request messages are processed by the reactive system.
 As part of the Kafka-Reactive-System there is a KafkaReactiveSource object which provides a method create to build
@@ -124,8 +134,7 @@ val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create(
 
 ```
 
-Reactive Route
---------------
+#### Reactive Route
 
 The reactive route is the component in charge to analise the KafkaRequestEnvelope message and dispatch the request to the relevant service.
 In order to accomplish to its task the reactive route must know all the reactive services we want to expose.
@@ -148,7 +157,7 @@ A reactive route can be though as a mapping between the Reactive Service URI and
                                       
 ```
 
-### Reactive Service
+#### Reactive Service
 
 The reactive service represents the entry point of your business logic. A reactive service is nothing more than a function which has an input 
 and can produce a result, because the input and output are delivered through messages the input type must be deserializable and the output serializable.
@@ -163,7 +172,7 @@ case class ReactiveService[-In: ReactiveDeserializer, +Out: ReactiveSerializer](
 
 From the Scala API you can notice that the service has a unique ID, the execution of the ReactiveService is "intrinsicly" asynchronous and eventually returns a business error.  
 
-### Reactive Route DSL
+##### Reactive Route DSL
 
 In order to make it easy to create a ReactiveRoute with all its services associated a specific dsl has been developed.
 
@@ -181,7 +190,7 @@ val route: ReactiveRoute = request.aSync[String, String]("echo") { in =>
 
 ```
 
-### Route DSL: The request object
+#### Route DSL: The request object
 
 The Reactive Route DSL is built around the *request* object which exposes the following functions:
 
@@ -239,8 +248,7 @@ If your function is not already returning a *Either\[Error, A\]* then we will im
 implicit def unsafe[Out: ReactiveSerializer](out: => Out): (Throwable Either Out) = Try(out).toEither
 ```
 
-Reactive Sink
--------------
+### Reactive Sink
 
 Once a ReactiveService has been executed by the ReactiveRoute a *Future\[Error Either A\]* will be returned where if you remember the signature of the ReactiveService
 the type *A* is a member of *ReactiveSerialzable*. What we need to do now is to send this Future to a Sink which can handle that type, once the Future completes we 

@@ -7,16 +7,17 @@ import akka.stream.{ ActorMaterializer, Materializer }
 import akka.testkit.TestKit
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import net.manub.embeddedkafka.{ EmbeddedKafkaConfig, EmbeddedKafka }
+import net.manub.embeddedkafka.{ EmbeddedKafka, EmbeddedKafkaConfig }
 import org.patricknoir.kafka.KafkaLocal
 import org.patricknoir.kafka.reactive.client.KafkaReactiveClient
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.KafkaResponseEnvelope
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
-import org.patricknoir.kafka.reactive.server.ReactiveSystem
+import org.patricknoir.kafka.reactive.server.{ ReactiveRoute, ReactiveSystem }
 import org.patricknoir.kafka.reactive.server.streams.{ ReactiveKafkaSink, ReactiveKafkaSource }
 import org.specs2.SpecificationLike
-import scala.concurrent.{ Future, Await }
+
+import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.concurrent.duration._
 import akka.stream.scaladsl._
 import org.patricknoir.kafka.reactive.server.dsl._
@@ -91,8 +92,7 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
   implicit val materializer = ActorMaterializer()
 
   def startServer() = {
-
-    val echoService = new KafkaEchoService()
+    val echoService = KafkaService.atMostOnce(ServiceCatalog.echo)
     echoService.run()
   }
 
@@ -121,21 +121,27 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
   }
 }
 
-class KafkaEchoService(implicit system: ActorSystem, materializer: Materializer) {
+object ServiceCatalog {
 
-  import system.dispatcher
-
-  val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create("echoInbound", Set("localhost:9092"), "client1", "group1")
-  val route = request.sync[String, String]("echo") { in =>
+  val echo = request.sync[String, String]("echo") { in =>
     println("received request: " + in)
     in
   }
 
-  //  (identity[String])
-  val sink: Sink[Future[KafkaResponseEnvelope], _] = ReactiveKafkaSink.create(Set("localhost:9092"))
+}
 
-  val rsys = source ~> route ~> sink
+object KafkaService {
+  def atMostOnce(route: ReactiveRoute)(implicit system: ActorSystem): ReactiveSystem = {
+    import system.dispatcher
+    val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create("echoInbound", Set("localhost:9092"), "client1", "group1")
+    val sink: Sink[Future[KafkaResponseEnvelope], _] = ReactiveKafkaSink.create(Set("localhost:9092"))
+    source ~> route ~> sink
+  }
 
-  def run() = rsys.run()
-
+  def atLeastOnce(route: ReactiveRoute)(implicit system: ActorSystem): ReactiveSystem = {
+    import system.dispatcher
+    val source = ReactiveKafkaSource.atLeastOnce("echoInbound", Set("localhost:9092"), "client1", "group1")
+    val sink = ReactiveKafkaSink.atLeastOnce(Set("localhost:9092"))
+    source ~> route ~> sink
+  }
 }

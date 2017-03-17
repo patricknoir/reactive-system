@@ -15,7 +15,7 @@ case class ReactiveRoute(services: Map[String, ReactiveService[_, _]] = Map.empt
 
   def ~(reactiveRoute: ReactiveRoute) = ReactiveRoute(this.services ++ reactiveRoute.services)
 
-  def to(sink: Sink[Future[KafkaResponseEnvelope], _]): ReactiveSinkShape = new ReactiveSinkShape(this, sink)
-  def ~>(sink: Sink[Future[KafkaResponseEnvelope], _]): ReactiveSinkShape = to(sink)
+  //  def to(sink: Sink[Future[KafkaResponseEnvelope], _]): ReactiveSinkShape = new ReactiveSinkShape(this, sink)
+  //  def ~>(sink: Sink[Future[KafkaResponseEnvelope], _]): ReactiveSinkShape = to(sink)
 }
 

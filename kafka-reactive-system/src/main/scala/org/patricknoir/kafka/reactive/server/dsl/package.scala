@@ -37,8 +37,8 @@ package object dsl {
     def via(route: ReactiveRoute): ReactiveSourceRouteAtLeastOnceShape = new ReactiveSourceRouteAtLeastOnceShape(source, route)
     def ~>(route: ReactiveRoute): ReactiveSourceRouteAtLeastOnceShape = via(route)
 
-    def to(sinkShape: ReactiveSinkAtLeastOnceSinkShape): ReactiveSystemAtLeastOnce = ReactiveSystemAtLeastOnce(source, sinkShape.route, sinkShape.sink)
-    def ~>(sinkShape: ReactiveSinkAtLeastOnceSinkShape): ReactiveSystemAtLeastOnce = to(sinkShape)
+    def to(sinkShape: ReactiveSinkAtLeastOnceSinkShape): ReactiveSystem = ReactiveSystem.atLeastOnce(source, sinkShape.route, sinkShape.sink)
+    def ~>(sinkShape: ReactiveSinkAtLeastOnceSinkShape): ReactiveSystem = to(sinkShape)
   }
 
   class ReactiveSourceRouteShape(source: Source[KafkaRequestEnvelope, _], route: ReactiveRoute)(implicit system: ActorSystem) {
@@ -47,8 +47,8 @@ package object dsl {
   }
 
   class ReactiveSourceRouteAtLeastOnceShape(source: Source[(CommittableMessage[String, String], KafkaRequestEnvelope), _], route: ReactiveRoute)(implicit system: ActorSystem) {
-    def to(sink: Sink[(CommittableMessage[String, String], Future[KafkaResponseEnvelope]), _]): ReactiveSystemAtLeastOnce = ReactiveSystemAtLeastOnce(source, route, sink)
-    def ~>(sink: Sink[(CommittableMessage[String, String], Future[KafkaResponseEnvelope]), _]): ReactiveSystemAtLeastOnce = to(sink)
+    def to(sink: Sink[(CommittableMessage[String, String], Future[KafkaResponseEnvelope]), _]): ReactiveSystem = ReactiveSystem.atLeastOnce(source, route, sink)
+    def ~>(sink: Sink[(CommittableMessage[String, String], Future[KafkaResponseEnvelope]), _]): ReactiveSystem = to(sink)
   }
 
   case class ReactiveSinkShape(route: ReactiveRoute, sink: Sink[Future[KafkaResponseEnvelope], _])

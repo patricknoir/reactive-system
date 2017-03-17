@@ -1,6 +1,7 @@
 package org.patricknoir.kafka.reactive.server
 
 import akka.actor.ActorSystem
+import akka.kafka.ConsumerMessage.CommittableMessage
 import akka.stream.scaladsl.{ Sink, Source }
 import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.KafkaResponseEnvelope
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
@@ -32,11 +33,25 @@ package object dsl {
     def ~>(sinkShape: ReactiveSinkShape): ReactiveSystem = to(sinkShape)
   }
 
+  implicit class ReactiveSourceAtLeastOnceShape(source: Source[(CommittableMessage[String, String], KafkaRequestEnvelope), _])(implicit system: ActorSystem) {
+    def via(route: ReactiveRoute): ReactiveSourceRouteAtLeastOnceShape = new ReactiveSourceRouteAtLeastOnceShape(source, route)
+    def ~>(route: ReactiveRoute): ReactiveSourceRouteAtLeastOnceShape = via(route)
+
+    def to(sinkShape: ReactiveSinkAtLeastOnceSinkShape): ReactiveSystemAtLeastOnce = ReactiveSystemAtLeastOnce(source, sinkShape.route, sinkShape.sink)
+    def ~>(sinkShape: ReactiveSinkAtLeastOnceSinkShape): ReactiveSystemAtLeastOnce = to(sinkShape)
+  }
+
   class ReactiveSourceRouteShape(source: Source[KafkaRequestEnvelope, _], route: ReactiveRoute)(implicit system: ActorSystem) {
     def to(sink: Sink[Future[KafkaResponseEnvelope], _]): ReactiveSystem = ReactiveSystem(source, route, sink)
     def ~>(sink: Sink[Future[KafkaResponseEnvelope], _]): ReactiveSystem = to(sink)
   }
 
+  class ReactiveSourceRouteAtLeastOnceShape(source: Source[(CommittableMessage[String, String], KafkaRequestEnvelope), _], route: ReactiveRoute)(implicit system: ActorSystem) {
+    def to(sink: Sink[(CommittableMessage[String, String], Future[KafkaResponseEnvelope]), _]): ReactiveSystemAtLeastOnce = ReactiveSystemAtLeastOnce(source, route, sink)
+    def ~>(sink: Sink[(CommittableMessage[String, String], Future[KafkaResponseEnvelope]), _]): ReactiveSystemAtLeastOnce = to(sink)
+  }
+
   case class ReactiveSinkShape(route: ReactiveRoute, sink: Sink[Future[KafkaResponseEnvelope], _])
+  case class ReactiveSinkAtLeastOnceSinkShape(route: ReactiveRoute, sink: Sink[(CommittableMessage[String, String], Future[KafkaResponseEnvelope]), _])
 
 }

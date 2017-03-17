@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.{ Actor, ActorLogging, Props }
 import akka.event.LoggingReceive
+import akka.kafka.ConsumerMessage.CommittableOffset
 import io.circe.Decoder
 import org.apache.kafka.clients.producer.{ KafkaProducer, ProducerRecord }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope

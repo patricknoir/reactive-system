@@ -137,6 +137,10 @@ val pluginsSettings =
   dockerSettings ++
   scalariformSettings
 
+lazy val publishSite = taskKey[Unit]("publish the site under /docs")
+
+val dest = (baseDirectory / "docs")
+
 val commonSettings = Seq(
   organization := "org.patricknoir.kafka",
   version := "0.3.0",
@@ -204,7 +208,7 @@ lazy val main =
     .in(file("."))
     .settings(name := "reactive-system")
     .settings(commonSettings:_*)
-    .aggregate(kafkaRS, httpInterface, examplesServer, examplesClient)
+    .aggregate(kafkaRS, httpInterface, examplesServer, examplesClient, documentation)
 
 lazy val kafkaRS =
   project
@@ -246,3 +250,18 @@ lazy val examplesClient =
     .settings(
       name := "examples-client"
     )
+
+lazy val documentation =
+  project
+    .in(file("documentation"))
+    .dependsOn(kafkaRS, examplesServer)
+    .settings(commonSettings:_*)
+    .settings(
+      name := "documentation",
+      paradoxTheme := Some(builtinParadoxTheme("generic")),
+      publishSite := Def.task {
+        println("Executing task publishSite!")
+        val siteDir = (paradox in Compile).value //** "*"
+        IO.copyDirectory(siteDir, dest.value, true)
+      }.value
+    ).enablePlugins(ParadoxPlugin)

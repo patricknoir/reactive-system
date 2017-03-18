@@ -14,12 +14,12 @@ Branch statuses:
 Import the Library
 ------------------
 Add patricknoir bintray repository to your resolvers:
-```scala
+```sbt
 resolvers += "patricknoir-bintray" at "https://dl.bintray.com/patricknoir/releases"
 ```
 
 Add to the dependencies the latest stable version (Scala 2.12):
-```scala
+```sbt
 "org.patricknoir.kafka" %% "kafka-reactive-service" % "0.3.0"
 ```
 

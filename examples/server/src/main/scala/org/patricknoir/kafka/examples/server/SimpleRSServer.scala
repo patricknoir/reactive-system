@@ -15,6 +15,7 @@ object SimpleRSServer extends App {
   implicit val config = EmbeddedKafkaConfig(zooKeeperPort = 2181, kafkaPort = 9092)
   EmbeddedKafka.start()
 
+  //#route-dsl-example
   implicit val system = ActorSystem("SimpleService")
   implicit val materializer = ActorMaterializer()
 
@@ -25,6 +26,7 @@ object SimpleRSServer extends App {
   } ~ request.aSync("size") { (in: String) =>
     in.length
   }
+  //#route-dsl-example
 
   val source = ReactiveKafkaSource.create("simple", Set("localhost:9092"), "simpleService")
   val sink = ReactiveKafkaSink.create(Set("localhost:9092"))

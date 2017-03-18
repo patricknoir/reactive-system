@@ -1,6 +1,6 @@
 # Reactive System
 
-@@toc{ depth=1 }
+@@toc{ depth=3 }
 
 @@@ index
 

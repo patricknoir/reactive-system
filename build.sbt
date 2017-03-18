@@ -262,6 +262,6 @@ lazy val documentation =
       publishSite := Def.task {
         println("Executing task publishSite!")
         val siteDir = (paradox in Compile).value //** "*"
-        IO.copyDirectory(siteDir, dest.value, true)
+        IO.copyDirectory(siteDir, (baseDirectory / "../docs").value, true)
       }.value
     ).enablePlugins(ParadoxPlugin)

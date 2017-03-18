@@ -1,7 +1,7 @@
 package org.patricknoir.kafka.reactive.ex
 
 /**
- * Created by patrick on 23/08/2016.
+ * Represents failures occurred in the [[org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor]]
  *
  * Thrown by the producer actor in case of failure and to be handled
  * by the supervisor.

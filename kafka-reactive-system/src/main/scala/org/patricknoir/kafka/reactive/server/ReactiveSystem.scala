@@ -12,12 +12,32 @@ import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequ
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Try
 
+/**
+ * A Runnable instance of a Reactive System Server
+ * Concrete instances should be created using the companion object methods:
+ * [[ReactiveSystem.atMostOnce]] and [[ReactiveSystem.atLeastOnce]]
+ */
 trait ReactiveSystem {
+  /**
+   * Used to start a server instance
+   * @param materializer used by the underlying implementation based on Akka Stream
+   * @return
+   */
   def run()(implicit materializer: Materializer): Any
 }
 
+/** Provides the methods to create concrete instances of `ReactiveSystem` */
 object ReactiveSystem {
 
+  /**
+   * Reactive System server using message delivery semantic at-most-once
+   *
+   * @param source a valid akka stream source created using [[org.patricknoir.kafka.reactive.server.streams.ReactiveKafkaSource]]
+   * @param route
+   * @param sink
+   * @param system
+   * @return
+   */
   def apply(source: Source[KafkaRequestEnvelope, _], route: ReactiveRoute, sink: Sink[Future[KafkaResponseEnvelope], _])(implicit system: ActorSystem) = atMostOnce(source, route, sink)
 
   def atMostOnce(source: Source[KafkaRequestEnvelope, _], route: ReactiveRoute, sink: Sink[Future[KafkaResponseEnvelope], _])(implicit system: ActorSystem) = new ReactiveSystem {

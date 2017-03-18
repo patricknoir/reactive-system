@@ -14,14 +14,41 @@ import akka.pattern.ask
 import scala.reflect.ClassTag
 
 /**
- * Created by patrick on 12/07/2016.
+ * Client interface to perform requests to a Reactive System Server
+ *
+ * Used to make requests to a service exposed by Reactive System Server
+ *
+ * ==Overview==
+ *
+ * {{{
+ *   val client: ReactiveClient = ...
+ *
+ *   val futureSize: Future[Int] = client.request[String, Int]("length")("hello world")
+ *
+ * }}}
+ *
  */
 trait ReactiveClient {
 
+  /**
+   * Used to perform requests to a Service exposed by a ReactiveSystem server instance.
+   * @param destination string representing a url made with format: 'protocol:topicName/serviceId'
+   * @param payload input parameter of the remote service we are invoking
+   * @param timeout how long the client has to wait before to expire the request and fail with a timeout error
+   * @param ct used by the compiler in order to deserialize the response
+   * @tparam In payload input type member of [[org.patricknoir.kafka.reactive.common.ReactiveSerializer]]
+   * @tparam Out result type member of [[org.patricknoir.kafka.reactive.common.ReactiveDeserializer]]
+   * @return a [[scala.concurrent.Future]] of an [[Out]] in case of success, otherwise a failed [[scala.concurrent.Future]]
+   */
   def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout, ct: ClassTag[Out]): Future[Out]
 
 }
 
+/**
+ * Concrete implementation of a [[ReactiveClient]] using Kafka broker.
+ * @param settings configuration for connecting to the kafka broker
+ * @param system actor system to be used by this instance
+ */
 class KafkaReactiveClient(settings: KafkaRClientSettings)(implicit system: ActorSystem) extends ReactiveClient {
 
   val producerProps = KafkaProducerActor.props(settings.producerSettings)
@@ -29,15 +56,6 @@ class KafkaReactiveClient(settings: KafkaRClientSettings)(implicit system: Actor
 
   val kafkaClientService = system.actorOf(KafkaRClientActor.props(producerProps, consumerProps), "clientService")
 
-  /**
-   *
-   * @param destination format is: kafka:destinationTopic/serviceId
-   * @param payload
-   * @param timeout
-   * @tparam In
-   * @tparam Out
-   * @return
-   */
   def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout, ct: ClassTag[Out]): Future[Out] = {
     destination match {
       case Destination(medium, topic, route) =>

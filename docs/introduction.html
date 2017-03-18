@@ -122,6 +122,8 @@ val route: ReactiveRoute = request.aSync[String, String](&quot;echo&quot;) {
   in =&gt; println(s&quot;received: $in&quot;); s&quot;echoing: $in&quot;
 } ~ request.aSync(&quot;size&quot;) { (in: String) =&gt;
   in.length
+} ~ request.aSync(&quot;reverse&quot;) { (in: String) =&gt;
+  in.reverse
 }</code></pre>
 <p>The above code snipped generate a route that declare 3 services:</p>
 <p><img src="images/reactive-route-example.png" alt="rroute-example" /></p>

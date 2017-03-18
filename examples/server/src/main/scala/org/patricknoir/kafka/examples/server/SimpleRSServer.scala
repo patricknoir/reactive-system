@@ -25,6 +25,8 @@ object SimpleRSServer extends App {
     in => println(s"received: $in"); s"echoing: $in"
   } ~ request.aSync("size") { (in: String) =>
     in.length
+  } ~ request.aSync("reverse") { (in: String) =>
+    in.reverse
   }
   //#route-dsl-example
 

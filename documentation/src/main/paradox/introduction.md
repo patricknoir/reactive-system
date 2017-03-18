@@ -27,17 +27,3 @@ In order to use the Reactive System libraries you need to declare the following 
 "org.patricknoir.kafka" %% "kafka-reactive-service" % "$project.version$"
 ```
 @@@
-
-## Routing DSL for Reactive System servers
-
-A Reactive System Route is in essence a map of services exposed by the server indexed against a service id.
-
-![rroute](images/reactive-route.png)
-
-Here is an example how you can create a route:
-
-@@snip [SimpleRSServer.scala](../../../../examples/server/src/main/scala/org/patricknoir/kafka/examples/server/SimpleRSServer.scala) { #route-dsl-example }
-
-The above code snipped generate a route that declare 3 services:
-
-![rroute-example](images/reactive-route-example.png)

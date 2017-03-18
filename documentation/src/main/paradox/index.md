@@ -4,6 +4,9 @@
 
 @@@ index
 
-* [introduction](introduction.md)
+* [Introduction](introduction.md)
+* [Server](server.md)
+* [Client](client.md)
+* [Design](design/index.md)
 
 @@@

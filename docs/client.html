@@ -2,7 +2,7 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>Introduction · Reactive System</title>
+<title>Reactive System Client · Reactive System</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content='documentation'/>
@@ -34,9 +34,9 @@
 </div>
 <div class="nav-toc">
 <ul>
-  <li><a href="introduction.html" class="active">Introduction</a></li>
+  <li><a href="introduction.html">Introduction</a></li>
   <li><a href="server.html">Reactive System Server</a></li>
-  <li><a href="client.html">Reactive System Client</a></li>
+  <li><a href="client.html" class="active">Reactive System Client</a></li>
   <li><a href="design/index.html">Reactive System Design</a></li>
 </ul>
 </div>
@@ -74,9 +74,9 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 </div>
 <div class="nav-toc">
 <ul>
-  <li><a href="introduction.html" class="active">Introduction</a></li>
+  <li><a href="introduction.html">Introduction</a></li>
   <li><a href="server.html">Reactive System Server</a></li>
-  <li><a href="client.html">Reactive System Client</a></li>
+  <li><a href="client.html" class="active">Reactive System Client</a></li>
   <li><a href="design/index.html">Reactive System Design</a></li>
 </ul>
 </div>
@@ -92,7 +92,7 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <div class="nav-breadcrumbs">
 <ul>
   <li><a href="index.html">Reactive System</a></li>
-  <li>Introduction</li>
+  <li>Reactive System Client</li>
 </ul>
 </div>
 </div>
@@ -100,40 +100,12 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 
 <div class="page-content row">
 <div class="small-12 large-9 column" id="docs">
-<h1><a href="#introduction" name="introduction" class="anchor"><span class="anchor-link"></span></a>Introduction</h1>
-<p>The Reactive System modules implement a full server and client service stack based on asynchronous message exchange implemented on top of the Kafka Broker.</p>
-<p>Reactive System has been designed with the clear focus on providing tools for building integration layers for systems B2B based on asynchronous message exchange pattern.</p>
-<h2><a href="#asynchronous-message-exchange" name="asynchronous-message-exchange" class="anchor"><span class="anchor-link"></span></a>Asynchronous Message Exchange</h2>
-<p>Using message exchange rather than synchronous communication helps to build more decoupled systems, which gives us several advatages like:</p>
-<ol>
-  <li>Isolation: if a reactive system fails it doesn&rsquo;t affect its client.</li>
-  <li>Location transparency: reactive systems they don&rsquo;t communicate directly but through messages sent to  an address (topic), that way is not necessary to know the location of the reactive system exposing the  service as long we can send a message to the topic address.</li>
-  <li>Elasticity: reactive services can implement scaling strategy on the way they consume the messages from a  topic allowing to add (scale out) and remove (scale down) more reactive systems depending on the current  demand.</li>
-  <li>DOS Immune: while a system which exposes APIs through a synchronous protocol is vulnerable to DOS attacks,  with Reactive System each service will consume the requests at each own speed.</li>
-</ol>
-<h2><a href="#using-reactive-system" name="using-reactive-system" class="anchor"><span class="anchor-link"></span></a>Using Reactive System</h2>
-<p>In order to use the Reactive System libraries you need to declare the following dependency on your sbt:</p>
-<pre class="prettyprint"><code class="language-sbt">&quot;org.patricknoir.kafka&quot; %% &quot;kafka-reactive-service&quot; % &quot;0.3.0&quot;
-</code></pre>
+<h1><a href="#reactive-system-client" name="reactive-system-client" class="anchor"><span class="anchor-link"></span></a>Reactive System Client</h1>
 <div class="nav-next">
-<p><strong>Next:</strong> <a href="server.html">Reactive System Server</a></p>
+<p><strong>Next:</strong> <a href="design/index.html">Reactive System Design</a></p>
 </div>
 </div>
 <div class="large-3 show-for-large column" data-sticky-container>
-<nav class="sidebar sticky" data-sticky data-anchor="docs" data-sticky-on="large">
-<div class="page-nav">
-<div class="nav-title">On this page:</div>
-<div class="nav-toc">
-<ul>
-  <li><a href="introduction.html#introduction">Introduction</a>
-  <ul>
-    <li><a href="introduction.html#asynchronous-message-exchange">Asynchronous Message Exchange</a></li>
-    <li><a href="introduction.html#using-reactive-system">Using Reactive System</a></li>
-  </ul></li>
-</ul>
-</div>
-</div>
-</nav>
 </div>
 </div>
 

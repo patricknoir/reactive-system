@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+<title>Reactive System Server · Reactive System</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content='documentation'/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:100normal,100italic,300normal,300italic,400normal,400italic,500normal,500italic,700normal,700italic,900normal,900italicc" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="js/page.js"></script>
+<link rel="stylesheet" type="text/css" href="lib/normalize.css/normalize.css"/>
+<link rel="stylesheet" type="text/css" href="lib/foundation/dist/foundation.min.css"/>
+<link rel="stylesheet" type="text/css" href="css/page.css"/>
+
+<!--
+<link rel="shortcut icon" href="images/favicon.ico" />
+-->
+</head>
+
+<body>
+<div class="off-canvas-wrapper">
+<div class="off-canvas-wrapper-inner" data-off-canvas-wrapper>
+
+<div class="off-canvas position-left" id="off-canvas-menu" data-off-canvas>
+<nav class="off-canvas-nav">
+<div class="nav-home">
+<a href="index.html" >
+<span class="home-icon">⌂</span>Reactive System
+</a>
+<div class="version-number">
+0.3.0
+</div>
+</div>
+<div class="nav-toc">
+<ul>
+  <li><a href="introduction.html">Introduction</a></li>
+  <li><a href="server.html" class="active">Reactive System Server</a></li>
+  <li><a href="client.html">Reactive System Client</a></li>
+  <li><a href="design/index.html">Reactive System Design</a></li>
+</ul>
+</div>
+
+</nav>
+</div>
+
+<div class="off-canvas-content" data-off-canvas-content>
+
+<header class="site-header expanded row">
+<div class="small-12 column">
+<a href="#" class="off-canvas-toggle hide-for-medium" data-toggle="off-canvas-menu"><svg class="svg-icon svg-icon-menu" version="1.1" id="Menu" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 20 20" enable-background="new 0 0 20 20" xml:space="preserve"> <path class="svg-icon-menu-path" fill="#53CDEC" d="M16.4,9H3.6C3.048,9,3,9.447,3,10c0,0.553,0.048,1,0.6,1H16.4c0.552,0,0.6-0.447,0.6-1C17,9.447,16.952,9,16.4,9z M16.4,13
+H3.6C3.048,13,3,13.447,3,14c0,0.553,0.048,1,0.6,1H16.4c0.552,0,0.6-0.447,0.6-1C17,13.447,16.952,13,16.4,13z M3.6,7H16.4
+C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.048,7,3.6,7z"/></svg>
+</a>
+<div class="title"><a href="index.html">Reactive System</a></div>
+
+<!--
+<a href="https://www.example.com" class="logo show-for-medium">logo</a>
+-->
+</div>
+</header>
+
+<div class="expanded row">
+
+<div class="medium-3 large-2 show-for-medium column">
+<nav class="site-nav">
+<div class="nav-home">
+<a href="index.html" >
+<span class="home-icon">⌂</span>Reactive System
+</a>
+<div class="version-number">
+0.3.0
+</div>
+</div>
+<div class="nav-toc">
+<ul>
+  <li><a href="introduction.html">Introduction</a></li>
+  <li><a href="server.html" class="active">Reactive System Server</a></li>
+  <li><a href="client.html">Reactive System Client</a></li>
+  <li><a href="design/index.html">Reactive System Design</a></li>
+</ul>
+</div>
+
+</nav>
+</div>
+
+<div class="small-12 medium-9 large-10 column">
+<section class="site-content">
+
+<div class="page-header row">
+<div class="medium-12 show-for-medium column">
+<div class="nav-breadcrumbs">
+<ul>
+  <li><a href="index.html">Reactive System</a></li>
+  <li>Reactive System Server</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="page-content row">
+<div class="small-12 large-9 column" id="docs">
+<h1><a href="#reactive-system-server" name="reactive-system-server" class="anchor"><span class="anchor-link"></span></a>Reactive System Server</h1>
+<p>The server is where you define the services which will be exposed by your application and that can be consumed using asynchronous message exchange. One of the strengths of Reactive System is that streaming data is at its heart (The server is build using Akka Stream) meaning that both requests and responses can be streamed through the server achieving constant memory usage even for very large requests or responses. Streaming responses will be backpressured against the kafka queue utilised by the server.</p>
+<h2><a href="#define-service-using-routing-dsl" name="define-service-using-routing-dsl" class="anchor"><span class="anchor-link"></span></a>Define Service using Routing DSL</h2>
+<p>A Reactive System Route is in essence a map of services exposed by the server indexed against a service id.</p>
+<p><img src="images/reactive-route.png" alt="rroute" /></p>
+<p>Here is an example how you can create a route:</p>
+<pre class="prettyprint"><code class="language-scala"><br/>import org.patricknoir.kafka.reactive.server.dsl._
+
+implicit val system = ActorSystem(&quot;SimpleService&quot;)
+implicit val materializer = ActorMaterializer()
+
+import system.dispatcher
+
+val route: ReactiveRoute = request.aSync[String, String](&quot;echo&quot;) {
+  in =&gt; println(s&quot;received: $in&quot;); s&quot;echoing: $in&quot;
+} ~ request.aSync(&quot;size&quot;) { (in: String) =&gt;
+  in.length
+} ~ request.aSync(&quot;reverse&quot;) { (in: String) =&gt;
+  in.reverse
+}</code></pre>
+<p>The above code snipped generate a route that declare 3 services:</p>
+<p><img src="images/reactive-route-example.png" alt="rroute-example" /></p>
+<h2><a href="#reactive-services" name="reactive-services" class="anchor"><span class="anchor-link"></span></a>Reactive Services</h2>
+<p>In order to create a service using a high level API the <code>request</code> object should be used. A service should be a simple function that given an <code>input</code> of type <code>In</code> should return an <code>output</code> of type <code>Out</code>. If you want this code to be executed asynchronously then the <code>request.aSync(serviceId: String)(f: In =&gt; Out)</code> should be used, otherwise we offer asynchronous execution by using <code>request.sync(serviceId: String)(f: In =&gt; Out)</code>. A last option is if your function is already returning a future having a signature like the following: <code>f: In =&gt; Future[Out]</code>, in that case you should be using the <code>request.apply(serviceId: String)(f: In =&gt; Future[Out])</code>.</p>
+<h3><a href="#examples" name="examples" class="anchor"><span class="anchor-link"></span></a>Examples</h3>
+<p>Here is an example how to execute a function asynchronously:</p>
+<pre class="prettyprint"><code class="language-scala"><br/>import org.patricknoir.kafka.reactive.server.dsl._
+
+implicit val system = ActorSystem(&quot;SimpleService&quot;)
+implicit val materializer = ActorMaterializer()
+
+import system.dispatcher
+
+var counter: Int = 0
+
+def getCounter(): Int = counter
+def incrementCounter(step: Int): Unit = counter += step
+
+val route: ReactiveRoute = request.aSync[Unit, Int](&quot;getCounter&quot;) { _ =&gt;
+  getCounter()
+}</code></pre>
+<p>In this case we will force the <code>incrementCounter</code> function to run synchronously to avoid raise conditions:</p>
+<pre class="prettyprint"><code class="language-scala"><br/>import org.patricknoir.kafka.reactive.server.dsl._
+
+implicit val system = ActorSystem(&quot;SimpleService&quot;)
+implicit val materializer = ActorMaterializer()
+
+import system.dispatcher
+
+var counter: Int = 0
+
+def getCounter(): Int = counter
+def incrementCounter(step: Int): Unit = counter += step
+
+val route: ReactiveRoute = request.aSync[Unit, Int](&quot;getCounter&quot;) { _ =&gt;
+  getCounter()
+} ~ request.sync[Int, Unit](&quot;incrementCounter&quot;) { step =&gt;
+  incrementCounter(step)
+}</code></pre>
+<p>In this last case the <code>getCounter</code> function is already returning a <code>Future[Int]</code> so we will use <code>request.apply</code>:</p>
+<pre class="prettyprint"><code class="language-scala"><br/>import org.patricknoir.kafka.reactive.server.dsl._
+
+implicit val system = ActorSystem(&quot;SimpleService&quot;)
+implicit val materializer = ActorMaterializer()
+
+import system.dispatcher
+
+var counter: Int = 0
+
+def getCounter(): Future[Int] = Future(counter)
+def incrementCounter(step: Int): Unit = counter += step
+
+val route: ReactiveRoute = request[Unit, Int](&quot;getCounter&quot;) { _ =&gt;
+  getCounter()
+}</code></pre>
+<h2><a href="#running-the-server" name="running-the-server" class="anchor"><span class="anchor-link"></span></a>Running the server</h2>
+<p>Once all the services to expose have been defined in the <code>route: ReactiveRoute</code> is time to create an instance of <code>ReactiveSystem</code> and run it.</p>
+<p>The simplest way to create and run a <code>ReactiveSystem</code> is the following:</p>
+<pre class="prettyprint"><code class="language-scala"><br/>val source = ReactiveKafkaSource.create(&quot;simple&quot;, Set(&quot;localhost:9092&quot;), &quot;simpleService&quot;)
+val sink = ReactiveKafkaSink.create(Set(&quot;localhost:9092&quot;))
+
+/**
+ * DSL:
+ *  val reactiveSys: ReactiveSystem = source via route to sink
+ *  val reactiveSys: ReactiveSystem = ReactiveSystem(source, route, sink)
+ */
+val reactiveSys: ReactiveSystem = source ~&gt; route ~&gt; sink
+
+reactiveSys.run()</code></pre>
+<div class="nav-next">
+<p><strong>Next:</strong> <a href="client.html">Reactive System Client</a></p>
+</div>
+</div>
+<div class="large-3 show-for-large column" data-sticky-container>
+<nav class="sidebar sticky" data-sticky data-anchor="docs" data-sticky-on="large">
+<div class="page-nav">
+<div class="nav-title">On this page:</div>
+<div class="nav-toc">
+<ul>
+  <li><a href="server.html#reactive-system-server">Reactive System Server</a>
+  <ul>
+    <li><a href="server.html#define-service-using-routing-dsl">Define Service using Routing DSL</a></li>
+    <li><a href="server.html#reactive-services">Reactive Services</a></li>
+    <li><a href="server.html#running-the-server">Running the server</a></li>
+  </ul></li>
+</ul>
+</div>
+</div>
+</nav>
+</div>
+</div>
+
+</section>
+</div>
+
+</div>
+
+<footer class="site-footer">
+
+<section class="site-footer-nav">
+<div class="expanded row">
+<div class="small-12 large-offset-2 large-10 column">
+<div class="row site-footer-content">
+
+<div class="small-12 medium-4 large-3 text-center column">
+<div class="nav-links">
+<ul>
+<!-- <li><a href="https://www.example.com/products/">Products</a> -->
+</ul>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</section>
+
+<section class="site-footer-base">
+<div class="expanded row">
+<div class="small-12 large-offset-2 large-10 column">
+<div class="row site-footer-content">
+
+<div class="small-12 text-center large-9 column">
+
+<!--
+<div class="copyright">
+<span class="text">&copy; 2017</span>
+<a href="https://www.example.com" class="logo">logo</a>
+</div>
+-->
+</div>
+
+</div>
+</div>
+</div>
+</section>
+</footer>
+
+</div>
+</div>
+</div>
+</body>
+
+<script type="text/javascript" src="lib/foundation/dist/foundation.min.js"></script>
+<script type="text/javascript">jQuery(document).foundation();</script>
+<script type="text/javascript" src="js/magellan.js"></script>
+
+<style type="text/css">@import "lib/prettify/prettify.css";</style>
+<script type="text/javascript" src="lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">jQuery(function(){window.prettyPrint && prettyPrint()});</script>
+
+</html>

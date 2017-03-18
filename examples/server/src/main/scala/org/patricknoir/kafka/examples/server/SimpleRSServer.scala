@@ -2,10 +2,11 @@ package org.patricknoir.kafka.examples.server
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import net.manub.embeddedkafka.{ EmbeddedKafkaConfig, EmbeddedKafka }
-import org.patricknoir.kafka.reactive.server.{ ReactiveSystem, ReactiveRoute }
-import org.patricknoir.kafka.reactive.server.dsl._
+import net.manub.embeddedkafka.{ EmbeddedKafka, EmbeddedKafkaConfig }
+import org.patricknoir.kafka.reactive.server.{ ReactiveRoute, ReactiveSystem }
 import org.patricknoir.kafka.reactive.server.streams.{ ReactiveKafkaSink, ReactiveKafkaSource }
+
+import scala.concurrent.Future
 
 /**
  * Created by patrick on 09/08/2016.
@@ -16,6 +17,9 @@ object SimpleRSServer extends App {
   EmbeddedKafka.start()
 
   //#route-dsl-example
+
+  import org.patricknoir.kafka.reactive.server.dsl._
+
   implicit val system = ActorSystem("SimpleService")
   implicit val materializer = ActorMaterializer()
 
@@ -30,6 +34,8 @@ object SimpleRSServer extends App {
   }
   //#route-dsl-example
 
+  //#run-reactive-system
+
   val source = ReactiveKafkaSource.create("simple", Set("localhost:9092"), "simpleService")
   val sink = ReactiveKafkaSink.create(Set("localhost:9092"))
 
@@ -41,4 +47,74 @@ object SimpleRSServer extends App {
   val reactiveSys: ReactiveSystem = source ~> route ~> sink
 
   reactiveSys.run()
+  //#run-reactive-system
+}
+
+object RServerExamples {
+
+  def executeFunctionAsyncExample() = {
+    //#route-example-make-async
+
+    import org.patricknoir.kafka.reactive.server.dsl._
+
+    implicit val system = ActorSystem("SimpleService")
+    implicit val materializer = ActorMaterializer()
+
+    import system.dispatcher
+
+    var counter: Int = 0
+
+    def getCounter(): Int = counter
+    def incrementCounter(step: Int): Unit = counter += step
+
+    val route: ReactiveRoute = request.aSync[Unit, Int]("getCounter") { _ =>
+      getCounter()
+    }
+    //#route-example-make-async
+  }
+
+  def executeFunctionSyncExample() = {
+    //#route-example-make-sync
+
+    import org.patricknoir.kafka.reactive.server.dsl._
+
+    implicit val system = ActorSystem("SimpleService")
+    implicit val materializer = ActorMaterializer()
+
+    import system.dispatcher
+
+    var counter: Int = 0
+
+    def getCounter(): Int = counter
+    def incrementCounter(step: Int): Unit = counter += step
+
+    val route: ReactiveRoute = request.aSync[Unit, Int]("getCounter") { _ =>
+      getCounter()
+    } ~ request.sync[Int, Unit]("incrementCounter") { step =>
+      incrementCounter(step)
+    }
+    //#route-example-make-sync
+  }
+
+  def executeFunctionExample() = {
+    //#route-example-wrap-async
+
+    import org.patricknoir.kafka.reactive.server.dsl._
+
+    implicit val system = ActorSystem("SimpleService")
+    implicit val materializer = ActorMaterializer()
+
+    import system.dispatcher
+
+    var counter: Int = 0
+
+    def getCounter(): Future[Int] = Future(counter)
+    def incrementCounter(step: Int): Unit = counter += step
+
+    val route: ReactiveRoute = request[Unit, Int]("getCounter") { _ =>
+      getCounter()
+    }
+    //#route-example-wrap-async
+  }
+
 }

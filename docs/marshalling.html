@@ -2,19 +2,19 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>Architecture · Reactive System</title>
+<title>Marshalling · Reactive System</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content='documentation'/>
 <link href="https://fonts.googleapis.com/css?family=Roboto:100normal,100italic,300normal,300italic,400normal,400italic,500normal,500italic,700normal,700italic,900normal,900italicc" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
-<script type="text/javascript" src="../js/page.js"></script>
-<link rel="stylesheet" type="text/css" href="../lib/normalize.css/normalize.css"/>
-<link rel="stylesheet" type="text/css" href="../lib/foundation/dist/foundation.min.css"/>
-<link rel="stylesheet" type="text/css" href="../css/page.css"/>
+<script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="js/page.js"></script>
+<link rel="stylesheet" type="text/css" href="lib/normalize.css/normalize.css"/>
+<link rel="stylesheet" type="text/css" href="lib/foundation/dist/foundation.min.css"/>
+<link rel="stylesheet" type="text/css" href="css/page.css"/>
 
 <!--
-<link rel="shortcut icon" href="../images/favicon.ico" />
+<link rel="shortcut icon" href="images/favicon.ico" />
 -->
 </head>
 
@@ -25,7 +25,7 @@
 <div class="off-canvas position-left" id="off-canvas-menu" data-off-canvas>
 <nav class="off-canvas-nav">
 <div class="nav-home">
-<a href="../index.html" >
+<a href="index.html" >
 <span class="home-icon">⌂</span>Reactive System
 </a>
 <div class="version-number">
@@ -34,15 +34,15 @@
 </div>
 <div class="nav-toc">
 <ul>
-  <li><a href="../introduction.html">Introduction</a></li>
-  <li><a href="../server.html">Server</a></li>
-  <li><a href="../client.html">Client</a></li>
-  <li><a href="../marshalling.html">Marshalling</a></li>
-  <li><a href="../design/index.html">Design</a>
+  <li><a href="introduction.html">Introduction</a></li>
+  <li><a href="server.html">Server</a></li>
+  <li><a href="client.html">Client</a></li>
+  <li><a href="marshalling.html" class="active">Marshalling</a></li>
+  <li><a href="design/index.html">Design</a>
   <ul>
-    <li><a href="../design/general.html" class="active">Architecture</a></li>
-    <li><a href="../design/server.html">Server Architecture</a></li>
-    <li><a href="../design/client.html">Client Architecture</a></li>
+    <li><a href="design/general.html">Architecture</a></li>
+    <li><a href="design/server.html">Server Architecture</a></li>
+    <li><a href="design/client.html">Client Architecture</a></li>
   </ul></li>
 </ul>
 </div>
@@ -58,7 +58,7 @@
 H3.6C3.048,13,3,13.447,3,14c0,0.553,0.048,1,0.6,1H16.4c0.552,0,0.6-0.447,0.6-1C17,13.447,16.952,13,16.4,13z M3.6,7H16.4
 C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.048,7,3.6,7z"/></svg>
 </a>
-<div class="title"><a href="../index.html">Reactive System</a></div>
+<div class="title"><a href="index.html">Reactive System</a></div>
 
 <!--
 <a href="https://www.example.com" class="logo show-for-medium">logo</a>
@@ -71,7 +71,7 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <div class="medium-3 large-2 show-for-medium column">
 <nav class="site-nav">
 <div class="nav-home">
-<a href="../index.html" >
+<a href="index.html" >
 <span class="home-icon">⌂</span>Reactive System
 </a>
 <div class="version-number">
@@ -80,15 +80,15 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 </div>
 <div class="nav-toc">
 <ul>
-  <li><a href="../introduction.html">Introduction</a></li>
-  <li><a href="../server.html">Server</a></li>
-  <li><a href="../client.html">Client</a></li>
-  <li><a href="../marshalling.html">Marshalling</a></li>
-  <li><a href="../design/index.html">Design</a>
+  <li><a href="introduction.html">Introduction</a></li>
+  <li><a href="server.html">Server</a></li>
+  <li><a href="client.html">Client</a></li>
+  <li><a href="marshalling.html" class="active">Marshalling</a></li>
+  <li><a href="design/index.html">Design</a>
   <ul>
-    <li><a href="../design/general.html" class="active">Architecture</a></li>
-    <li><a href="../design/server.html">Server Architecture</a></li>
-    <li><a href="../design/client.html">Client Architecture</a></li>
+    <li><a href="design/general.html">Architecture</a></li>
+    <li><a href="design/server.html">Server Architecture</a></li>
+    <li><a href="design/client.html">Client Architecture</a></li>
   </ul></li>
 </ul>
 </div>
@@ -103,9 +103,8 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <div class="medium-12 show-for-medium column">
 <div class="nav-breadcrumbs">
 <ul>
-  <li><a href="../index.html">Reactive System</a></li>
-  <li><a href="../design/index.html">Design</a></li>
-  <li>Architecture</li>
+  <li><a href="index.html">Reactive System</a></li>
+  <li>Marshalling</li>
 </ul>
 </div>
 </div>
@@ -113,12 +112,28 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 
 <div class="page-content row">
 <div class="small-12 large-9 column" id="docs">
-<h1><a href="#architecture" name="architecture" class="anchor"><span class="anchor-link"></span></a>Architecture</h1>
+<h1><a href="#marshalling" name="marshalling" class="anchor"><span class="anchor-link"></span></a>Marshalling</h1>
+<h2><a href="#reactive-serializer" name="reactive-serializer" class="anchor"><span class="anchor-link"></span></a>Reactive Serializer</h2>
+<h2><a href="#reactive-deserializer" name="reactive-deserializer" class="anchor"><span class="anchor-link"></span></a>Reactive Deserializer</h2>
 <div class="nav-next">
-<p><strong>Next:</strong> <a href="../design/server.html">Server Architecture</a></p>
+<p><strong>Next:</strong> <a href="design/index.html">Design</a></p>
 </div>
 </div>
 <div class="large-3 show-for-large column" data-sticky-container>
+<nav class="sidebar sticky" data-sticky data-anchor="docs" data-sticky-on="large">
+<div class="page-nav">
+<div class="nav-title">On this page:</div>
+<div class="nav-toc">
+<ul>
+  <li><a href="marshalling.html#marshalling">Marshalling</a>
+  <ul>
+    <li><a href="marshalling.html#reactive-serializer">Reactive Serializer</a></li>
+    <li><a href="marshalling.html#reactive-deserializer">Reactive Deserializer</a></li>
+  </ul></li>
+</ul>
+</div>
+</div>
+</nav>
 </div>
 </div>
 
@@ -173,13 +188,13 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 </div>
 </body>
 
-<script type="text/javascript" src="../lib/foundation/dist/foundation.min.js"></script>
+<script type="text/javascript" src="lib/foundation/dist/foundation.min.js"></script>
 <script type="text/javascript">jQuery(document).foundation();</script>
-<script type="text/javascript" src="../js/magellan.js"></script>
+<script type="text/javascript" src="js/magellan.js"></script>
 
-<style type="text/css">@import "../lib/prettify/prettify.css";</style>
-<script type="text/javascript" src="../lib/prettify/prettify.js"></script>
-<script type="text/javascript" src="../lib/prettify/lang-scala.js"></script>
+<style type="text/css">@import "lib/prettify/prettify.css";</style>
+<script type="text/javascript" src="lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="lib/prettify/lang-scala.js"></script>
 <script type="text/javascript">jQuery(function(){window.prettyPrint && prettyPrint()});</script>
 
 </html>

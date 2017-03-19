@@ -2,7 +2,7 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>Reactive System Server · Reactive System</title>
+<title>Server · Reactive System</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content='documentation'/>
@@ -35,9 +35,10 @@
 <div class="nav-toc">
 <ul>
   <li><a href="introduction.html">Introduction</a></li>
-  <li><a href="server.html" class="active">Reactive System Server</a></li>
-  <li><a href="client.html">Reactive System Client</a></li>
-  <li><a href="design/index.html">Reactive System Design</a>
+  <li><a href="server.html" class="active">Server</a></li>
+  <li><a href="client.html">Client</a></li>
+  <li><a href="marshalling.html">Marshalling</a></li>
+  <li><a href="design/index.html">Design</a>
   <ul>
     <li><a href="design/general.html">Architecture</a></li>
     <li><a href="design/server.html">Server Architecture</a></li>
@@ -80,9 +81,10 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <div class="nav-toc">
 <ul>
   <li><a href="introduction.html">Introduction</a></li>
-  <li><a href="server.html" class="active">Reactive System Server</a></li>
-  <li><a href="client.html">Reactive System Client</a></li>
-  <li><a href="design/index.html">Reactive System Design</a>
+  <li><a href="server.html" class="active">Server</a></li>
+  <li><a href="client.html">Client</a></li>
+  <li><a href="marshalling.html">Marshalling</a></li>
+  <li><a href="design/index.html">Design</a>
   <ul>
     <li><a href="design/general.html">Architecture</a></li>
     <li><a href="design/server.html">Server Architecture</a></li>
@@ -102,7 +104,7 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <div class="nav-breadcrumbs">
 <ul>
   <li><a href="index.html">Reactive System</a></li>
-  <li>Reactive System Server</li>
+  <li>Server</li>
 </ul>
 </div>
 </div>
@@ -110,7 +112,24 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 
 <div class="page-content row">
 <div class="small-12 large-9 column" id="docs">
-<h1><a href="#reactive-system-server" name="reactive-system-server" class="anchor"><span class="anchor-link"></span></a>Reactive System Server</h1>
+<h1><a href="#server" name="server" class="anchor"><span class="anchor-link"></span></a>Server</h1>
+<div class="toc ">
+<ul>
+  <li><a href="server.html#overview">Overview</a></li>
+  <li><a href="server.html#define-service-using-routing-dsl">Define Service using Routing DSL</a></li>
+  <li><a href="server.html#reactive-services">Reactive Services</a>
+  <ul>
+    <li><a href="server.html#examples">Examples</a></li>
+  </ul></li>
+  <li><a href="server.html#running-the-server">Running the server</a></li>
+  <li><a href="server.html#message-delivery-semantics">Message Delivery Semantics</a>
+  <ul>
+    <li><a href="server.html#at-most-once-semantic">At Most Once Semantic</a></li>
+    <li><a href="server.html#at-least-once-semantic">At Least Once Semantic</a></li>
+  </ul></li>
+</ul>
+</div>
+<h2><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h2>
 <p>The server is where you define the services which will be exposed by your application and that can be consumed using asynchronous message exchange. One of the strengths of Reactive System is that streaming data is at its heart (The server is build using Akka Stream) meaning that both requests and responses can be streamed through the server achieving constant memory usage even for very large requests or responses. Streaming responses will be backpressured against the kafka queue utilised by the server.</p>
 <h2><a href="#define-service-using-routing-dsl" name="define-service-using-routing-dsl" class="anchor"><span class="anchor-link"></span></a>Define Service using Routing DSL</h2>
 <p>A Reactive System Route is in essence a map of services exposed by the server indexed against a service id.</p>
@@ -130,10 +149,10 @@ val route: ReactiveRoute = request.aSync[String, String](&quot;echo&quot;) {
 } ~ request.aSync(&quot;reverse&quot;) { (in: String) =&gt;
   in.reverse
 }</code></pre>
-<p>The above code snipped generate a route that declare 3 services:</p>
+<p>The above code snipped generates a route that declares 3 services:</p>
 <p><img src="images/reactive-route-example.png" alt="rroute-example" /></p>
 <h2><a href="#reactive-services" name="reactive-services" class="anchor"><span class="anchor-link"></span></a>Reactive Services</h2>
-<p>In order to create a service using a high level API the <code>request</code> object should be used. A service should be a simple function that given an <code>input</code> of type <code>In</code> should return an <code>output</code> of type <code>Out</code>. If you want this code to be executed asynchronously then the <code>request.aSync(serviceId: String)(f: In =&gt; Out)</code> should be used, otherwise we offer asynchronous execution by using <code>request.sync(serviceId: String)(f: In =&gt; Out)</code>. A last option is if your function is already returning a future having a signature like the following: <code>f: In =&gt; Future[Out]</code>, in that case you should be using the <code>request.apply(serviceId: String)(f: In =&gt; Future[Out])</code>.</p>
+<p>In order to create a service using a high level API the <code>request</code> object should be used. A service should be a simple function that given an <code>input</code> of type <code>In</code> should return an <code>output</code> of type <code>Out</code>. If you want this code to be executed asynchronously then the <code>request.aSync(serviceId: String)(f: In =&gt; Out)</code> should be used, otherwise we offer synchronous execution by using <code>request.sync(serviceId: String)(f: In =&gt; Out)</code>. A last option is if your function is already returning a future having a signature like the following: <code>f: In =&gt; Future[Out]</code>, in that case you should be using the <code>request.apply(serviceId: String)(f: In =&gt; Future[Out])</code>.</p>
 <h3><a href="#examples" name="examples" class="anchor"><span class="anchor-link"></span></a>Examples</h3>
 <p>Here is an example how to execute a function asynchronously:</p>
 <pre class="prettyprint"><code class="language-scala"><br/>import org.patricknoir.kafka.reactive.server.dsl._
@@ -199,8 +218,60 @@ val sink = ReactiveKafkaSink.create(Set(&quot;localhost:9092&quot;))
 val reactiveSys: ReactiveSystem = source ~&gt; route ~&gt; sink
 
 reactiveSys.run()</code></pre>
+<h2><a href="#message-delivery-semantics" name="message-delivery-semantics" class="anchor"><span class="anchor-link"></span></a>Message Delivery Semantics</h2>
+<p>When creating a server 2 options are available based on the message delivery semantics to be applied:</p>
+<ul>
+  <li>At Most Once</li>
+  <li>At Least Once</li>
+</ul>
+<h3><a href="#at-most-once-semantic" name="at-most-once-semantic" class="anchor"><span class="anchor-link"></span></a>At Most Once Semantic</h3>
+<p>A Reactive System which implements <code>at-most-once</code> message delivery semantic favours the performance over the consistency. under this condition a Reactive System servers might be losing messages before they are delivered to the router or before a response is sent back to the client. This strategy should be adopted when performance (especially latency) is a key requirement, the system has to serve a huge number of requests/responses mainly read operations which don&rsquo;t cause side effects. Under these conditions losing a message don&rsquo;t compromise consistency and if a request message get lost is responsibility of the client to fire another request. An example of adoption of this strategy is the <code>Query</code> part of a CQRS/ES architecture.</p>
+<p>Here is an example on how to create a <code>ReactiveSystem</code> with semantic <code>at-most-once</code>:</p>
+<pre class="prettyprint"><code class="language-scala"><br/>val source = ReactiveKafkaSource.create(&quot;simple&quot;, Set(&quot;localhost:9092&quot;), &quot;simpleService&quot;)
+val sink = ReactiveKafkaSink.create(Set(&quot;localhost:9092&quot;))
+
+/**
+ * DSL:
+ *  val reactiveSys: ReactiveSystem = source via route to sink
+ *  val reactiveSys: ReactiveSystem = ReactiveSystem(source, route, sink)
+ */
+val reactiveSys: ReactiveSystem = source ~&gt; route ~&gt; sink
+
+reactiveSys.run()</code></pre>
+<h3><a href="#at-least-once-semantic" name="at-least-once-semantic" class="anchor"><span class="anchor-link"></span></a>At Least Once Semantic</h3>
+<p>A Reactive System which implements <code>at-least-once</code> message delivery semantic guarantees that all the requests will be processed by the services ()defined in the route), but in case of failures the messages can be duplicated and the order is not guaranteed if batching is used. Where semantic <code>exactly-once</code> is difficult to achieve or it comes with a huge overhead and can compromise the performance, a similar result can be obtained using <code>at-least-once</code> semantic with <code>Idempotent</code> services, in practice services capable to detect duplicated messages and not triggering side affects twice. This strategy should be adopted when for example implementing <code>Commands</code> in a CQRS/ES architecture making sure the services respect the <code>Idempotence</code>.</p>
+<p>Here is an example on how to create a <code>ReactiveSystem</code> with semantic <code>at-least-once</code>:</p>
+<pre class="prettyprint"><code class="language-scala"><br/>import org.patricknoir.kafka.reactive.server.dsl._
+
+implicit val system = ActorSystem(&quot;SimpleService&quot;)
+implicit val materializer = ActorMaterializer()
+
+import system.dispatcher
+
+var counter: Int = 0
+
+def getCounter(): Int = counter
+def incrementCounter(step: Int): Unit = counter += step
+
+val route: ReactiveRoute = request.aSync[Unit, Int](&quot;getCounter&quot;) { _ =&gt;
+  getCounter()
+} ~ request.sync[Int, Unit](&quot;incrementCounter&quot;) { step =&gt;
+  incrementCounter(step)
+}
+
+val atLeastOnceSource = ReactiveKafkaSource.atLeastOnce(
+  requestTopic = &quot;simple&quot;,
+  bootstrapServers = Set(&quot;localhost:9092&quot;),
+  clientId = &quot;simpleService&quot;
+)
+val atLeastOnceSink = ReactiveKafkaSink.atLeastOnce(bootstrapServers = Set(&quot;localhost:9092&quot;))
+
+val reactiveSystem = atLeastOnceSource ~&gt; route ~&gt; atLeastOnceSink
+
+reactiveSystem.run()
+</code></pre>
 <div class="nav-next">
-<p><strong>Next:</strong> <a href="client.html">Reactive System Client</a></p>
+<p><strong>Next:</strong> <a href="client.html">Client</a></p>
 </div>
 </div>
 <div class="large-3 show-for-large column" data-sticky-container>
@@ -209,11 +280,20 @@ reactiveSys.run()</code></pre>
 <div class="nav-title">On this page:</div>
 <div class="nav-toc">
 <ul>
-  <li><a href="server.html#reactive-system-server">Reactive System Server</a>
+  <li><a href="server.html#server">Server</a>
   <ul>
+    <li><a href="server.html#overview">Overview</a></li>
     <li><a href="server.html#define-service-using-routing-dsl">Define Service using Routing DSL</a></li>
-    <li><a href="server.html#reactive-services">Reactive Services</a></li>
+    <li><a href="server.html#reactive-services">Reactive Services</a>
+    <ul>
+      <li><a href="server.html#examples">Examples</a></li>
+    </ul></li>
     <li><a href="server.html#running-the-server">Running the server</a></li>
+    <li><a href="server.html#message-delivery-semantics">Message Delivery Semantics</a>
+    <ul>
+      <li><a href="server.html#at-most-once-semantic">At Most Once Semantic</a></li>
+      <li><a href="server.html#at-least-once-semantic">At Least Once Semantic</a></li>
+    </ul></li>
   </ul></li>
 </ul>
 </div>

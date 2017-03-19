@@ -117,4 +117,38 @@ object RServerExamples {
     //#route-example-wrap-async
   }
 
+  def createReactiveSystemAtLeastOnce(): Unit = {
+    //#reactive-system-at-least-once
+
+    import org.patricknoir.kafka.reactive.server.dsl._
+
+    implicit val system = ActorSystem("SimpleService")
+    implicit val materializer = ActorMaterializer()
+
+    import system.dispatcher
+
+    var counter: Int = 0
+
+    def getCounter(): Int = counter
+    def incrementCounter(step: Int): Unit = counter += step
+
+    val route: ReactiveRoute = request.aSync[Unit, Int]("getCounter") { _ =>
+      getCounter()
+    } ~ request.sync[Int, Unit]("incrementCounter") { step =>
+      incrementCounter(step)
+    }
+
+    val atLeastOnceSource = ReactiveKafkaSource.atLeastOnce(
+      requestTopic = "simple",
+      bootstrapServers = Set("localhost:9092"),
+      clientId = "simpleService"
+    )
+    val atLeastOnceSink = ReactiveKafkaSink.atLeastOnce(bootstrapServers = Set("localhost:9092"))
+
+    val reactiveSystem = atLeastOnceSource ~> route ~> atLeastOnceSink
+
+    reactiveSystem.run()
+
+    //#reactive-system-at-least-once
+  }
 }

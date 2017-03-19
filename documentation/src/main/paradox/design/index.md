@@ -1,4 +1,4 @@
-# Reactive System Design
+# Design
 
 @@toc{ depth=3 }
 

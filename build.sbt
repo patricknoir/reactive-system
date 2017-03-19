@@ -254,11 +254,12 @@ lazy val examplesClient =
 lazy val documentation =
   project
     .in(file("documentation"))
-    .dependsOn(kafkaRS, examplesServer)
+    .dependsOn(kafkaRS, examplesServer, examplesClient)
     .settings(commonSettings:_*)
     .settings(
       name := "documentation",
       paradoxTheme := Some(builtinParadoxTheme("generic")),
+      paradoxNavigationDepth := 3,
       publishSite := Def.task {
         println("Executing task publishSite!")
         val siteDir = (paradox in Compile).value //** "*"

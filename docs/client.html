@@ -2,7 +2,7 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>Reactive System Client · Reactive System</title>
+<title>Client · Reactive System</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content='documentation'/>
@@ -35,9 +35,10 @@
 <div class="nav-toc">
 <ul>
   <li><a href="introduction.html">Introduction</a></li>
-  <li><a href="server.html">Reactive System Server</a></li>
-  <li><a href="client.html" class="active">Reactive System Client</a></li>
-  <li><a href="design/index.html">Reactive System Design</a>
+  <li><a href="server.html">Server</a></li>
+  <li><a href="client.html" class="active">Client</a></li>
+  <li><a href="marshalling.html">Marshalling</a></li>
+  <li><a href="design/index.html">Design</a>
   <ul>
     <li><a href="design/general.html">Architecture</a></li>
     <li><a href="design/server.html">Server Architecture</a></li>
@@ -80,9 +81,10 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <div class="nav-toc">
 <ul>
   <li><a href="introduction.html">Introduction</a></li>
-  <li><a href="server.html">Reactive System Server</a></li>
-  <li><a href="client.html" class="active">Reactive System Client</a></li>
-  <li><a href="design/index.html">Reactive System Design</a>
+  <li><a href="server.html">Server</a></li>
+  <li><a href="client.html" class="active">Client</a></li>
+  <li><a href="marshalling.html">Marshalling</a></li>
+  <li><a href="design/index.html">Design</a>
   <ul>
     <li><a href="design/general.html">Architecture</a></li>
     <li><a href="design/server.html">Server Architecture</a></li>
@@ -102,7 +104,7 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <div class="nav-breadcrumbs">
 <ul>
   <li><a href="index.html">Reactive System</a></li>
-  <li>Reactive System Client</li>
+  <li>Client</li>
 </ul>
 </div>
 </div>
@@ -110,12 +112,96 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 
 <div class="page-content row">
 <div class="small-12 large-9 column" id="docs">
-<h1><a href="#reactive-system-client" name="reactive-system-client" class="anchor"><span class="anchor-link"></span></a>Reactive System Client</h1>
+<h1><a href="#client" name="client" class="anchor"><span class="anchor-link"></span></a>Client</h1>
+<div class="toc ">
+<ul>
+  <li><a href="client.html#overview">Overview</a></li>
+  <li><a href="client.html#simple-request">Simple Request</a></li>
+</ul>
+</div>
+<h2><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h2>
+<p>The Reactive System client allows applications to consume remote services using asynchronous message exchange pattern exposed by a Reactive System server.</p>
+<p>In order to consume a remote service all you need is an instance of <code>ReactiveClient</code>:</p>
+<pre class="prettyprint"><code class="language-scala">implicit val system = ActorSystem(&quot;ReactiveClient&quot;)
+implicit val timeout = Timeout(5 seconds)
+
+import system.dispatcher
+
+val client = new KafkaReactiveClient(KafkaRClientSettings.default)</code></pre>
+<h2><a href="#simple-request" name="simple-request" class="anchor"><span class="anchor-link"></span></a>Simple Request</h2>
+<p>We are now going to create a simple client which will call the Reactive System server we have created in the previous section.</p>
+<p>For clarity here is the code snipped for the <strong>server</strong> definition:</p>
+<pre class="prettyprint"><code class="language-scala"><br/>import org.patricknoir.kafka.reactive.server.dsl._
+
+implicit val system = ActorSystem(&quot;SimpleService&quot;)
+implicit val materializer = ActorMaterializer()
+
+import system.dispatcher
+
+var counter: Int = 0
+
+def getCounter(): Int = counter
+def incrementCounter(step: Int): Unit = counter += step
+
+val route: ReactiveRoute = request.aSync[Unit, Int](&quot;getCounter&quot;) { _ =&gt;
+  getCounter()
+} ~ request.sync[Int, Unit](&quot;incrementCounter&quot;) { step =&gt;
+  incrementCounter(step)
+}
+
+val atLeastOnceSource = ReactiveKafkaSource.atLeastOnce(
+  requestTopic = &quot;simple&quot;,
+  bootstrapServers = Set(&quot;localhost:9092&quot;),
+  clientId = &quot;simpleService&quot;
+)
+val atLeastOnceSink = ReactiveKafkaSink.atLeastOnce(bootstrapServers = Set(&quot;localhost:9092&quot;))
+
+val reactiveSystem = atLeastOnceSource ~&gt; route ~&gt; atLeastOnceSink
+
+reactiveSystem.run()
+</code></pre>
+<p>As we can see the <strong>server</strong> exposes 2 services:</p>
+<ul>
+  <li>incrementCounter - accepts a <code>step:Int</code> and returns <code>Unit</code></li>
+  <li>getCounter - doesn&rsquo;t accept any parameter and returns <code>Int</code></li>
+</ul>
+<p>The services are bound to the kafka topic: <code>simple</code> as defined by the Kafka Source used to create the <code>ReactiveSystem</code> instance.</p>
+<p>Here is the client code in order to invoke <code>incrementCounter</code>:</p>
+<pre class="prettyprint"><code class="language-scala">implicit val system = ActorSystem(&quot;ReactiveClient&quot;)
+implicit val timeout = Timeout(5 seconds)
+
+import system.dispatcher
+
+val client = new KafkaReactiveClient(KafkaRClientSettings.default)
+
+val result: Future[Unit] = client.request[Int, Unit](&quot;kafka:simple/incrementCounter&quot;, 1)
+
+result.onComplete {
+  case Success(_)   =&gt; println(&quot;incrementCounter request sent successfully&quot;)
+  case Failure(err) =&gt; println(s&quot;error sending incrementCounter request: ${err.getMessage}&quot;)
+}
+
+Await.ready(result, Duration.Inf)
+</code></pre>
 <div class="nav-next">
-<p><strong>Next:</strong> <a href="design/index.html">Reactive System Design</a></p>
+<p><strong>Next:</strong> <a href="marshalling.html">Marshalling</a></p>
 </div>
 </div>
 <div class="large-3 show-for-large column" data-sticky-container>
+<nav class="sidebar sticky" data-sticky data-anchor="docs" data-sticky-on="large">
+<div class="page-nav">
+<div class="nav-title">On this page:</div>
+<div class="nav-toc">
+<ul>
+  <li><a href="client.html#client">Client</a>
+  <ul>
+    <li><a href="client.html#overview">Overview</a></li>
+    <li><a href="client.html#simple-request">Simple Request</a></li>
+  </ul></li>
+</ul>
+</div>
+</div>
+</nav>
 </div>
 </div>
 

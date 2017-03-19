@@ -41,4 +41,9 @@ object ReactiveDeserializer {
   implicit val byteArrayDeserializer = new ReactiveDeserializer[Array[Byte]] {
     override def deserialize(input: Array[Byte]) = Right(input)
   }
+
+  implicit val unitDeserializer = new ReactiveDeserializer[Unit] {
+    override def deserialize(input: Array[Byte]) = Right(())
+  }
+
 }

@@ -18,7 +18,7 @@ sealed trait Committable[T] {
 
   val value: T
   val optionOffset: Option[Offset]
-  def commit(): Future[Unit]
+  def commit()(implicit committer: Committer): Future[Unit]
 
 }
 
@@ -45,19 +45,15 @@ trait Committer {
 
 object Committable {
   //make this private
-  case class CommittableImpl[T](value: T, optionOffset: Option[Offset], optionCommitter: Option[Committer]) extends Committable[T] {
-    override def commit() = {
-      val result: Option[Future[Unit]] = for {
-        offset <- optionOffset
-        committer <- optionCommitter
-      } yield committer.commit(offset)
-
+  case class CommittableImpl[T](value: T, optionOffset: Option[Offset]) extends Committable[T] {
+    override def commit()(implicit committer: Committer) = {
+      val result: Option[Future[Unit]] = optionOffset.map(committer.commit)
       result.getOrElse(Future.successful[Unit](()))
     }
   }
 
-  implicit def committableMonad(implicit optionCommitter: Option[Committer]) = new Monad[Committable] {
-    override def pure[A](a: A) = CommittableImpl(a, None, optionCommitter)
+  implicit def committableMonad = new Monad[Committable] {
+    override def pure[A](a: A) = CommittableImpl(a, None)
 
     override def flatMap[A, B](ca: Committable[A])(f: A => Committable[B]): Committable[B] = {
       val cb = f(ca.value)
@@ -65,15 +61,15 @@ object Committable {
         offsetA <- ca.optionOffset
         offsetB <- cb.optionOffset
       } yield (offsetA |+| offsetB)
-      CommittableImpl(cb.value, optionOffset = mergedOffset, optionCommitter)
+      CommittableImpl(cb.value, optionOffset = mergedOffset)
     }
 
     override def tailRecM[A, B](a: A)(f: (A) => Committable[Either[A, B]]): Committable[B] = {
 
       @tailrec
       def tailRecMUtil(x: A, optionOffset: Option[Offset]): Committable[B] = f(x) match {
-        case c @ CommittableImpl(Right(b), _, _) => c.copy(value = b)
-        case c @ CommittableImpl(Left(a), optOffset, _) =>
+        case c @ CommittableImpl(Right(b), _) => c.copy(value = b)
+        case c @ CommittableImpl(Left(a), optOffset) =>
           tailRecMUtil(a, optionOffset |+| optOffset)
       }
 
@@ -81,9 +77,9 @@ object Committable {
     }
   }
 
-  case class CommittableT[F[_]: Monad, A](run: F[Committable[A]])(implicit optionCommitter: Option[Committer]) {
+  case class CommittableT[F[_]: Monad, A](run: F[Committable[A]]) {
     def map[B](f: A => B): CommittableT[F, B] = CommittableT(run.map[Committable[B]] { ca =>
-      CommittableImpl(f(ca.value), ca.optionOffset, optionCommitter)
+      CommittableImpl(f(ca.value), ca.optionOffset)
     })
 
     def flatMap[B](f: A => CommittableT[F, B]): CommittableT[F, B] =
@@ -93,13 +89,13 @@ object Committable {
 
     def value: F[A] = run.map(_.value)
     def optionOffset: F[Option[Offset]] = run.map(_.optionOffset)
-    def commit(): F[Future[Unit]] = run.map(_.commit())
+    def commit()(implicit committer: Committer): F[Future[Unit]] = run.map(_.commit()(committer))
   }
 
   trait example[Credentials, Session, Account] {
 
     implicit val ec: ExecutionContext = ???
-    implicit val optionCommitter: Option[Committer] = ???
+    implicit val optionCommitter: Committer = ???
 
     def req[In, Out](id: String)(in: In): Future[Out] = ???
     def reqCommit[In, Out](id: String)(in: In): Future[Committable[Out]] = ???

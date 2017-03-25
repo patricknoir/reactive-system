@@ -1,9 +1,10 @@
 package org.patricknoir.kafka.reactive.client
 
-import cats.data.OptionT
+import cats.syntax.monoid._
+import cats.syntax.functor._
+import cats.syntax.flatMap._
 import cats.instances.all._
-import cats.syntax.all._
-import cats.{ Functor, Monad, Monoid }
+import cats.{ Monad, Monoid }
 
 import scala.annotation.tailrec
 import scala.concurrent.{ ExecutionContext, Future }
@@ -19,6 +20,9 @@ sealed trait Committable[T] {
   val value: T
   val optionOffset: Option[Offset]
   def commit()(implicit committer: Committer): Future[Unit]
+
+  def map[B](f: T => B): Committable[B]
+  def flatMap[B](f: T => Committable[B]): Committable[B]
 
 }
 
@@ -50,9 +54,12 @@ object Committable {
       val result: Option[Future[Unit]] = optionOffset.map(committer.commit)
       result.getOrElse(Future.successful[Unit](()))
     }
+
+    def map[B](f: T => B): Committable[B] = this.copy(value = f(value))
+    def flatMap[B](f: T => Committable[B]) = committableMonad.flatMap[T, B](this)(f)
   }
 
-  implicit def committableMonad = new Monad[Committable] {
+  implicit val committableMonad = new Monad[Committable] {
     override def pure[A](a: A) = CommittableImpl(a, None)
 
     override def flatMap[A, B](ca: Committable[A])(f: A => Committable[B]): Committable[B] = {

@@ -1,11 +1,13 @@
 package org.patricknoir.kafka.reactive.server.streams
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.kafka.ConsumerMessage.CommittableMessage
 import akka.kafka.ProducerMessage.Message
 import akka.kafka.scaladsl.{ Consumer, Producer }
 import akka.kafka._
-import akka.stream.scaladsl.{ Flow, Sink, Source }
+import akka.stream.javadsl.RunnableGraph
+import akka.stream.scaladsl.{ Flow, GraphDSL, Merge, Partition, Sink, Source }
 import io.circe.parser._
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -69,7 +71,7 @@ object ReactiveKafkaSink {
       fResp.map { resp =>
         new ProducerRecord[String, String](resp.replyTo, resp.asJson.noSpaces)
       }
-    }.to(Producer.plainSink(producerSettings))
+    }.filterNot(_.topic == "").to(Producer.plainSink(producerSettings))
   }
 
   def atLeastOnce(bootstrapServers: Set[String])(implicit system: ActorSystem, ec: ExecutionContext): Sink[(CommittableMessage[String, String], Future[KafkaResponseEnvelope]), _] = {
@@ -83,7 +85,7 @@ object ReactiveKafkaSink {
           ProducerMessage.Message(record, msg.committableOffset)
         }
     }
-    flow.to(Producer.commitableSink(producerSettings))
+    flow.map(msg => { if (msg.record.topic == "") msg.passThrough.commitScaladsl(); msg }).filterNot(_.record.topic == "").to(Producer.commitableSink(producerSettings))
   }
 
   def createSync(bootstrapServers: Set[String])(implicit system: ActorSystem): Sink[KafkaResponseEnvelope, _] = {

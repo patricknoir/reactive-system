@@ -1,5 +1,9 @@
 package org.patricknoir.kafka.reactive
 
+import io.circe.Decoder
+import io.circe.generic.auto._
+import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.Destination
+
 /**
  * Provides objects to help with serialization and deserialization of objects
  *
@@ -34,4 +38,33 @@ package object common {
     def serialize[In: ReactiveSerializer](in: In): String = new String(implicitly[ReactiveSerializer[In]].serialize(in))
   }
 
+  case class KafkaRequestEnvelope(correlationId: String, destination: Destination, payload: String, replyTo: String)
+  object KafkaRequestEnvelope {
+    implicit val kafkaRequestEnvelopeDecoder = Decoder.instance[KafkaRequestEnvelope] { c =>
+      for {
+        correlationId <- c.downField("correlationId").as[String]
+        destination <- c.downField("destination").as[Destination]
+        payload <- c.downField("payload").as[String]
+        replyTo <- c.downField("replyTo").as[String]
+      } yield KafkaRequestEnvelope(correlationId, destination, payload, replyTo)
+    }
+  }
+
+  object KafkaResponseStatusCode {
+    val Success = 200
+    val NotFound = 404
+    val BadRequest = 300
+    val InternalServerError = 500
+  }
+  case class KafkaResponseEnvelope(correlationId: String, replyTo: String, response: String, statusCode: Int)
+  object KafkaResponseEnvelope {
+    implicit val respEnvelopeDecoder = Decoder.instance[KafkaResponseEnvelope] { c =>
+      for {
+        correlationId <- c.downField("correlationId").as[String]
+        replyTo <- c.downField("replyTo").as[String]
+        response <- c.downField("response").as[String]
+        statusCode <- c.downField("statusCode").as[Int]
+      } yield KafkaResponseEnvelope(correlationId, replyTo, response, statusCode)
+    }
+  }
 }

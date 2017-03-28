@@ -5,8 +5,8 @@ import java.util.concurrent.{ ArrayBlockingQueue, BlockingQueue }
 import akka.actor.{ Actor, ActorSystem, Props }
 import akka.testkit.TestKit
 import akka.util.Timeout
-import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
-import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
+import org.patricknoir.kafka.reactive.common.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
+import org.patricknoir.kafka.reactive.common.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.{ Destination, KafkaRequest }
 import org.patricknoir.kafka.reactive.common.ReactiveDeserializer
 import org.specs2.SpecificationLike

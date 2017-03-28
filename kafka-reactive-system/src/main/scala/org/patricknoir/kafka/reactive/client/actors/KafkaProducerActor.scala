@@ -7,7 +7,7 @@ import akka.event.LoggingReceive
 import akka.kafka.ConsumerMessage.CommittableOffset
 import io.circe.Decoder
 import org.apache.kafka.clients.producer.{ KafkaProducer, ProducerRecord }
-import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
+import org.patricknoir.kafka.reactive.common.KafkaRequestEnvelope
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.Destination
@@ -54,17 +54,5 @@ class KafkaProducerActor(producerSettings: Map[String, String]) extends Actor wi
 }
 
 object KafkaProducerActor {
-  case class KafkaRequestEnvelope(correlationId: String, destination: Destination, payload: String, replyTo: String)
-  object KafkaRequestEnvelope {
-    implicit val kafkaRequestEnvelopeDecoder = Decoder.instance[KafkaRequestEnvelope] { c =>
-      for {
-        correlationId <- c.downField("correlationId").as[String]
-        destination <- c.downField("destination").as[Destination]
-        payload <- c.downField("payload").as[String]
-        replyTo <- c.downField("replyTo").as[String]
-      } yield KafkaRequestEnvelope(correlationId, destination, payload, replyTo)
-    }
-  }
-
   def props(producerSettings: Map[String, String]) = Props(new KafkaProducerActor(producerSettings))
 }

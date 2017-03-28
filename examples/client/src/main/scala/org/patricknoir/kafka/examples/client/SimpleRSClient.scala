@@ -1,9 +1,11 @@
 package org.patricknoir.kafka.examples.client
 
 import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import org.patricknoir.kafka.reactive.client.KafkaReactiveClient
 import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
+import org.patricknoir.kafka.reactive.client2.{ ReactiveClientStream, StreamClientConfig }
 
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
@@ -19,8 +21,9 @@ object SimpleRSClient extends App {
   implicit val timeout = Timeout(5 seconds)
 
   import system.dispatcher
-
-  val client = new KafkaReactiveClient(KafkaRClientSettings.default)
+  implicit val materializer = ActorMaterializer()
+  val client = new ReactiveClientStream(StreamClientConfig.default)
+  //  val client = new KafkaReactiveClient(KafkaRClientSettings.default)
 
   do {
     val response: Future[String] = client.request[String, String]("kafka:simple/echo", "hello world!")

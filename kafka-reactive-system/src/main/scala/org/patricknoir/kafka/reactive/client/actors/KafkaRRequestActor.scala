@@ -2,8 +2,8 @@ package org.patricknoir.kafka.reactive.client.actors
 
 import akka.actor._
 import akka.event.LoggingReceive
-import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
-import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
+import org.patricknoir.kafka.reactive.common.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
+import org.patricknoir.kafka.reactive.common.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.{ KafkaMessage, KafkaRequest }
 import org.patricknoir.kafka.reactive.common.ReactiveDeserializer
 import akka.pattern.ask

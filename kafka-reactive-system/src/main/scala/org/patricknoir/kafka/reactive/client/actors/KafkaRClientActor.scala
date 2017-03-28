@@ -11,7 +11,7 @@ import org.patricknoir.kafka.reactive.common.ReactiveDeserializer
 import org.patricknoir.kafka.reactive.ex.{ ConsumerException, ProducerException }
 
 import scala.concurrent.duration._
-import scala.util.Try
+import scala.util.{ Success, Try }
 
 /**
  * Created by patrick on 12/07/2016.
@@ -46,14 +46,17 @@ object KafkaRClientActor {
 
   case class Destination(medium: String, topic: String, serviceId: String)
   object Destination {
-    def unapply(destination: String): Option[(String, String, String)] = Try {
-      val mediumAndTopic = destination.split(":")
+    def unapply(destination: String): Option[(String, String, String)] =
+      fromString(destination).map(d => (d.medium, d.topic, d.serviceId)).toOption
+
+    def fromString(destinationString: String): Try[Destination] = Try {
+      val mediumAndTopic = destinationString.split(":")
       val medium = mediumAndTopic(0)
       val topicAndRoutes = mediumAndTopic(1).split("/")
       val topic = topicAndRoutes(0)
       val route = topicAndRoutes.drop(1).mkString("/")
-      (medium, topic, route)
-    }.toOption
+      Destination(medium, topic, route)
+    }
   }
 
   case class KafkaRequest(destination: Destination, payload: String, timeout: Timeout, replyTo: String, decoder: ReactiveDeserializer[_])

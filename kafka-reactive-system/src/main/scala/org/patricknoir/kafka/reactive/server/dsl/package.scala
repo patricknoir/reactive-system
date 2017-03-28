@@ -3,8 +3,8 @@ package org.patricknoir.kafka.reactive.server
 import akka.actor.ActorSystem
 import akka.kafka.ConsumerMessage.CommittableMessage
 import akka.stream.scaladsl.{ Sink, Source }
-import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.KafkaResponseEnvelope
-import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
+import org.patricknoir.kafka.reactive.common.KafkaResponseEnvelope
+import org.patricknoir.kafka.reactive.common.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.common.{ ReactiveDeserializer, ReactiveSerializer }
 
 import scala.concurrent.{ ExecutionContext, Future }

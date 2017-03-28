@@ -5,8 +5,8 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._
 import akka.testkit.TestKit
 import org.patricknoir.kafka.reactive.server.dsl._
-import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
-import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
+import org.patricknoir.kafka.reactive.common.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
+import org.patricknoir.kafka.reactive.common.KafkaRequestEnvelope
 import org.specs2.SpecificationLike
 import io.circe.syntax._
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.Destination

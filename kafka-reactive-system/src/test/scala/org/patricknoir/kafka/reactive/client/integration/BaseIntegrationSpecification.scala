@@ -3,15 +3,15 @@ package org.patricknoir.kafka.reactive.client.integration
 import java.util.Properties
 
 import akka.actor.ActorSystem
-import akka.stream.{ ActorMaterializer, Materializer }
+import akka.stream.{ ActorMaterializer }
 import akka.testkit.TestKit
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import net.manub.embeddedkafka.{ EmbeddedKafka, EmbeddedKafkaConfig }
 import org.patricknoir.kafka.KafkaLocal
 import org.patricknoir.kafka.reactive.client.KafkaReactiveClient
-import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.KafkaResponseEnvelope
-import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
+import org.patricknoir.kafka.reactive.common.KafkaResponseEnvelope
+import org.patricknoir.kafka.reactive.common.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
 import org.patricknoir.kafka.reactive.server.{ ReactiveRoute, ReactiveSystem }
 import org.patricknoir.kafka.reactive.server.streams.{ ReactiveKafkaSink, ReactiveKafkaSource }
@@ -31,8 +31,8 @@ abstract class BaseIntegrationSpecification extends TestKit(ActorSystem("TestKit
     |  log-config-on-start = off
     |
     |  loggers = ["akka.testkit.TestEventListener"]
-    |  loglevel = "DEBUG"
-    |  stdout-loglevel = "DEBUG"
+    |  loglevel = "INFO"
+    |  stdout-loglevel = "INFO"
     |
     |  logger-startup-timeout = 10s
     |  jvm-exit-on-fatal-error = off

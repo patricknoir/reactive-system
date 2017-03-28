@@ -3,7 +3,7 @@ package org.patricknoir.kafka.reactive.client.actors
 import akka.actor.{ Props, Actor, ActorLogging }
 import io.circe.Decoder
 import org.apache.kafka.clients.consumer.KafkaConsumer
-import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.KafkaResponseEnvelope
+import org.patricknoir.kafka.reactive.common.KafkaResponseEnvelope
 import org.patricknoir.kafka.reactive.ex.ConsumerException
 
 import scala.collection.JavaConversions._
@@ -52,23 +52,7 @@ class KafkaConsumerActor(consumerSettings: Map[String, String], inboundQueue: St
 }
 
 object KafkaConsumerActor {
-  object KafkaResponseStatusCode {
-    val Success = 200
-    val NotFound = 404
-    val BadRequest = 300
-    val InternalServerError = 500
-  }
-  case class KafkaResponseEnvelope(correlationId: String, replyTo: String, response: String, statusCode: Int)
-  object KafkaResponseEnvelope {
-    implicit val respEnvelopeDecoder = Decoder.instance[KafkaResponseEnvelope] { c =>
-      for {
-        correlationId <- c.downField("correlationId").as[String]
-        replyTo <- c.downField("replyTo").as[String]
-        response <- c.downField("response").as[String]
-        statusCode <- c.downField("statusCode").as[Int]
-      } yield KafkaResponseEnvelope(correlationId, replyTo, response, statusCode)
-    }
-  }
+
   def props(consumerSettings: Map[String, String], inboundQueue: String, pollTimeout: FiniteDuration) =
     Props(new KafkaConsumerActor(consumerSettings, inboundQueue, pollTimeout))
 }

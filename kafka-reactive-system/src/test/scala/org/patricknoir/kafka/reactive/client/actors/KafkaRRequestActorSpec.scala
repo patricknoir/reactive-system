@@ -3,8 +3,8 @@ package org.patricknoir.kafka.reactive.client.actors
 import akka.actor.{ Actor, ActorSystem, Props }
 import akka.testkit.TestKit
 import akka.util.Timeout
-import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
-import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
+import org.patricknoir.kafka.reactive.common.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
+import org.patricknoir.kafka.reactive.common.KafkaRequestEnvelope
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.{ Destination, KafkaRequest }
 import org.specs2.SpecificationLike
 import akka.pattern.ask

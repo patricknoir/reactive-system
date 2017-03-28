@@ -6,8 +6,8 @@ import akka.stream.Materializer
 import akka.stream.scaladsl._
 import cats.data.EitherT
 import cats.instances.all._
-import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
-import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
+import org.patricknoir.kafka.reactive.common.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
+import org.patricknoir.kafka.reactive.common.KafkaRequestEnvelope
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.Try

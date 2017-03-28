@@ -23,6 +23,7 @@ class SimpleAtLeastOnceISpec extends BaseISpec {
     startAtLeastOnceServer(ServiceCatalog.echo)
 
     implicit val timeout = Timeout(10 seconds)
+
     val client = new KafkaReactiveClient(KafkaRClientSettings.default)
 
     val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")

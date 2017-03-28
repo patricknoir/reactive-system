@@ -2,7 +2,7 @@ package org.patricknoir.kafka.reactive.client
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
-import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.{ Destination, KafkaRequest }
+import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.{ Destination, KafkaMessage, KafkaRequest }
 import org.patricknoir.kafka.reactive.client.actors.{ KafkaConsumerActor, KafkaProducerActor, KafkaRClientActor }
 import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
 import org.patricknoir.kafka.reactive.common.{ ReactiveDeserializer, ReactiveSerializer }
@@ -42,6 +42,8 @@ trait ReactiveClient {
    */
   def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout, ct: ClassTag[Out]): Future[Out]
 
+  def send[In: ReactiveSerializer](destination: String, payload: In, confirmSend: Boolean)(implicit timeout: Timeout): Future[Unit]
+
 }
 
 /**
@@ -67,6 +69,13 @@ class KafkaReactiveClient(settings: KafkaRClientSettings)(implicit system: Actor
           implicitly[ReactiveDeserializer[Out]]
         )).mapTo[Out]
       case _ => Future.failed[Out](new RuntimeException("unknown destination"))
+    }
+  }
+
+  def send[In: ReactiveSerializer](destination: String, payload: In, confirmSend: Boolean = true)(implicit timeout: Timeout): Future[Unit] = {
+    destination match {
+      case Destination(medium, topic, route) =>
+        (kafkaClientService ? KafkaMessage(Destination(medium, topic, route), serialize(payload), confirmSend)).mapTo[Unit]
     }
   }
 }

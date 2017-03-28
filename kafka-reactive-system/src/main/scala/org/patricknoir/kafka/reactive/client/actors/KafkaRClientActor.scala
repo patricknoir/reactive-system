@@ -6,7 +6,7 @@ import akka.actor.SupervisorStrategy._
 import akka.actor._
 import akka.event.LoggingReceive
 import akka.util.Timeout
-import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.KafkaRequest
+import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.{ KafkaMessage, KafkaRequest }
 import org.patricknoir.kafka.reactive.common.ReactiveDeserializer
 import org.patricknoir.kafka.reactive.ex.{ ConsumerException, ProducerException }
 
@@ -37,6 +37,7 @@ class KafkaRClientActor(producerProps: Props, consumerProps: Props) extends Acto
 
   def receive = LoggingReceive {
     case request: KafkaRequest => createRequestActor() forward request
+    case message: KafkaMessage => createRequestActor() forward message
   }
 
 }
@@ -56,6 +57,8 @@ object KafkaRClientActor {
   }
 
   case class KafkaRequest(destination: Destination, payload: String, timeout: Timeout, replyTo: String, decoder: ReactiveDeserializer[_])
+
+  case class KafkaMessage(destination: Destination, payload: String, confirmSend: Boolean)
 
   def props(producerProps: Props, consumerProps: Props) = Props(new KafkaRClientActor(producerProps, consumerProps))
 }

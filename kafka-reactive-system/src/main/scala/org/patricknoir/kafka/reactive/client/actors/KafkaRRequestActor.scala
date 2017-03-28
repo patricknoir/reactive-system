@@ -2,10 +2,12 @@ package org.patricknoir.kafka.reactive.client.actors
 
 import akka.actor._
 import akka.event.LoggingReceive
-import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseStatusCode, KafkaResponseEnvelope }
+import org.patricknoir.kafka.reactive.client.actors.KafkaConsumerActor.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
 import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequestEnvelope
-import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.KafkaRequest
+import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.{ KafkaMessage, KafkaRequest }
 import org.patricknoir.kafka.reactive.common.ReactiveDeserializer
+import akka.pattern.ask
+import org.patricknoir.kafka.reactive.client.actors.KafkaRRequestActor.KafkaProducerRequest
 
 /**
  * Created by patrick on 12/07/2016.
@@ -14,9 +16,12 @@ class KafkaRRequestActor(producer: ActorRef) extends Actor with ActorLogging {
 
   def receive = LoggingReceive {
     case r @ KafkaRequest(destination, payload, timeout, replyTo, decoder) =>
-      producer ! KafkaRequestEnvelope(self.path.toString, destination, payload, replyTo)
+      producer ! KafkaProducerRequest(KafkaRequestEnvelope(self.path.toString, destination, payload, replyTo))
       context.setReceiveTimeout(timeout.duration)
       context.become(waitingResponse(sender, decoder))
+    case m @ KafkaMessage(destination, payload, confirmSend) =>
+      producer forward KafkaProducerRequest(KafkaRequestEnvelope(self.path.toString, destination, payload, replyTo = ""), confirmSend)
+      context stop self
   }
 
   def waitingResponse(client: ActorRef, decoder: ReactiveDeserializer[_]): Receive = LoggingReceive {
@@ -33,4 +38,6 @@ class KafkaRRequestActor(producer: ActorRef) extends Actor with ActorLogging {
 
 object KafkaRRequestActor {
   def props(producer: ActorRef) = Props(new KafkaRRequestActor(producer))
+
+  case class KafkaProducerRequest(request: KafkaRequestEnvelope, confirmSend: Boolean = false)
 }

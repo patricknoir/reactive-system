@@ -34,6 +34,7 @@ class KafkaConsumerActor(consumerSettings: Map[String, String], inboundQueue: St
         }
       }
     }
+    consumer.close()
   }
 
   loop.onFailure {
@@ -46,7 +47,6 @@ class KafkaConsumerActor(consumerSettings: Map[String, String], inboundQueue: St
 
   override def postStop() = {
     running = false
-    consumer.close()
   }
 
 }

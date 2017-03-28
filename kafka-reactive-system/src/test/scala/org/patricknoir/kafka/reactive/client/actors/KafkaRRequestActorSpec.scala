@@ -8,6 +8,8 @@ import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequ
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.{ Destination, KafkaRequest }
 import org.specs2.SpecificationLike
 import akka.pattern.ask
+import org.patricknoir.kafka.reactive.client.actors.KafkaRRequestActor.KafkaProducerRequest
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import org.patricknoir.kafka.reactive.common.ReactiveDeserializer
@@ -64,7 +66,7 @@ class KafkaRRequestActorSpec extends TestKit(ActorSystem("TestKit")) with Specif
 
 class KafkaEchoMockActor extends Actor {
   def receive = {
-    case KafkaRequestEnvelope(correlationId, destination, payload, replyTo) =>
+    case KafkaProducerRequest(KafkaRequestEnvelope(correlationId, destination, payload, replyTo), _) =>
       sender ! KafkaResponseEnvelope(correlationId, replyTo, payload, KafkaResponseStatusCode.Success)
   }
 }

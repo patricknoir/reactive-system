@@ -16,6 +16,7 @@ import akka.pattern.ask
 
 import scala.concurrent.duration._
 import io.circe.syntax._
+import org.patricknoir.kafka.reactive.client.actors.KafkaRRequestActor.KafkaProducerRequest
 
 /**
  * Created by patrick on 14/07/2016.
@@ -58,7 +59,7 @@ class KafkaRClientActorSpec extends TestKit(ActorSystem("TestKit")) with Specifi
 
 class MockKafkaProducerActor(queue: BlockingQueue[KafkaRequestEnvelope]) extends Actor {
   def receive = {
-    case req: KafkaRequestEnvelope => queue.add(req); () //return Unit
+    case KafkaProducerRequest(req: KafkaRequestEnvelope, _) => queue.add(req); () //return Unit
   }
 }
 

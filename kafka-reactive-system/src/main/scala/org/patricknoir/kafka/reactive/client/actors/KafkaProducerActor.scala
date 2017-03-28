@@ -2,7 +2,7 @@ package org.patricknoir.kafka.reactive.client.actors
 
 import java.util.concurrent.TimeUnit
 
-import akka.actor.{ Actor, ActorLogging, Props }
+import akka.actor.{ Actor, ActorLogging, Props, Status }
 import akka.event.LoggingReceive
 import akka.kafka.ConsumerMessage.CommittableOffset
 import io.circe.Decoder
@@ -11,6 +11,7 @@ import org.patricknoir.kafka.reactive.client.actors.KafkaProducerActor.KafkaRequ
 import io.circe.generic.auto._
 import io.circe.syntax._
 import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.Destination
+import org.patricknoir.kafka.reactive.client.actors.KafkaRRequestActor.KafkaProducerRequest
 import org.patricknoir.kafka.reactive.ex.ProducerException
 
 import scala.collection.JavaConversions._
@@ -24,7 +25,7 @@ class KafkaProducerActor(producerSettings: Map[String, String]) extends Actor wi
   val producer = new KafkaProducer[String, String](producerSettings)
 
   def receive = LoggingReceive {
-    case envelope: KafkaRequestEnvelope =>
+    case KafkaProducerRequest(envelope: KafkaRequestEnvelope, confirm) =>
       //      val result = extractDestinationTopic(envelope.destination).map { destTopic =>
       val record = new ProducerRecord[String, String](envelope.destination.topic, envelope.asJson.noSpaces)
 
@@ -33,12 +34,13 @@ class KafkaProducerActor(producerSettings: Map[String, String]) extends Actor wi
       //      Risk to lose requests if I wrap in to a future and then I block! Design decision to be made.
       try {
         producer.send(record).get(100, TimeUnit.MILLISECONDS)
+        if (confirm) { sender ! (()) }
       } catch {
-        case err: Throwable => throw new ProducerException(err)
+        case err: Throwable =>
+          val producerError = new ProducerException(err)
+          if (confirm) { sender ! Status.Failure(producerError) }
+          throw producerError
       }
-      //      }
-      //      if (result.isEmpty) log.warning(s"Discarding message: $envelope, couldn't extract destination topic")
-      ()
   }
 
   private def extractDestinationTopic(destination: String): Option[String] = Try {

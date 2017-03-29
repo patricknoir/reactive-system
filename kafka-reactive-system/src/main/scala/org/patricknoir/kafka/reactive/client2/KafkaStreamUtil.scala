@@ -15,12 +15,12 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 object ReactiveKafkaStreamSource {
 
-  def atMostOnce(requestTopic: String, bootstrapServers: Set[String], clientId: String, groupId: String = "group1", maxConcurrency: Int = 1)(implicit system: ActorSystem, ec: ExecutionContext): Source[KafkaResponseEnvelope, _] = {
-    Consumer.atMostOnceSource(createConsumerSettings(bootstrapServers, clientId, groupId), Subscriptions.topics(Set(requestTopic)))
+  def atMostOnce(responseTopic: String, bootstrapServers: Set[String], clientId: String, groupId: String = "group1", maxConcurrency: Int = 1)(implicit system: ActorSystem, ec: ExecutionContext): Source[KafkaResponseEnvelope, _] = {
+    Consumer.atMostOnceSource(createConsumerSettings(bootstrapServers, clientId, groupId), Subscriptions.topics(Set(responseTopic)))
       .mapAsync(maxConcurrency) { record => //TODO:  use batching where possible (.groupedWithin())
         Future(decode[KafkaResponseEnvelope](record.value))
       }.filter(_.isRight).map { //TODO: improve with a flow and send the failures to a topic auditing.
-        case (Right(kkReqEnvelope)) => kkReqEnvelope
+        case (Right(kkRespEnvelope)) => kkRespEnvelope
       }
   }
 

@@ -44,8 +44,8 @@ object BaseISpec {
                        |  log-config-on-start = off
                        |
                        |  loggers = ["akka.testkit.TestEventListener"]
-                       |  loglevel = "DEBUG"
-                       |  stdout-loglevel = "DEBUG"
+                       |  loglevel = "INFO"
+                       |  stdout-loglevel = "INFO"
                        |
                        |  logger-startup-timeout = 10s
                        |  jvm-exit-on-fatal-error = off

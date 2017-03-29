@@ -1,4 +1,4 @@
-package org.patricknoir.kafka.reactive.client2
+package org.patricknoir.kafka.reactive.client
 
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.{ Consumer, Producer }
@@ -30,20 +30,4 @@ object ReactiveKafkaStreamSource {
       .withGroupId(groupId)
       .withClientId(clientId)
       .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
-}
-
-object ReactiveKafkaStreamSink {
-
-  import io.circe.syntax._
-
-  def atMostOnce(bootstrapServers: Set[String], maxConcurrency: Int = 1)(implicit system: ActorSystem, ec: ExecutionContext): Sink[Future[KafkaRequestEnvelope], _] = {
-    val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
-      .withBootstrapServers(bootstrapServers.mkString(","))
-
-    Flow[Future[KafkaRequestEnvelope]].mapAsync[ProducerRecord[String, String]](maxConcurrency) { fReq =>
-      fReq.map { req =>
-        new ProducerRecord[String, String](req.replyTo, req.asJson.noSpaces)
-      }
-    }.filterNot(_.topic == "").to(Producer.plainSink(producerSettings))
-  }
 }

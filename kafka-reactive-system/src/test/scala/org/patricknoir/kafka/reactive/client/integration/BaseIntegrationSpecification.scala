@@ -3,23 +3,23 @@ package org.patricknoir.kafka.reactive.client.integration
 import java.util.Properties
 
 import akka.actor.ActorSystem
-import akka.stream.{ ActorMaterializer }
+import akka.stream.ActorMaterializer
 import akka.testkit.TestKit
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import net.manub.embeddedkafka.{ EmbeddedKafka, EmbeddedKafkaConfig }
 import org.patricknoir.kafka.KafkaLocal
-import org.patricknoir.kafka.reactive.client.KafkaReactiveClient
 import org.patricknoir.kafka.reactive.common.KafkaResponseEnvelope
 import org.patricknoir.kafka.reactive.common.KafkaRequestEnvelope
-import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
 import org.patricknoir.kafka.reactive.server.{ ReactiveRoute, ReactiveSystem }
 import org.patricknoir.kafka.reactive.server.streams.{ ReactiveKafkaSink, ReactiveKafkaSource }
 import org.specs2.SpecificationLike
 
-import scala.concurrent.{ Await, ExecutionContext, Future }
+import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
 import akka.stream.scaladsl._
+import org.patricknoir.kafka.reactive.client.ReactiveClientStream
+import org.patricknoir.kafka.reactive.client.config.ReactiveClientStreamConfig
 import org.patricknoir.kafka.reactive.server.dsl._
 
 /**
@@ -105,7 +105,7 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
     before()
 
     implicit val timeout = Timeout(10 seconds)
-    val client = new KafkaReactiveClient(KafkaRClientSettings.default)
+    val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
 
     val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
 

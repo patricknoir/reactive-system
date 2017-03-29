@@ -1,6 +1,6 @@
 package org.patricknoir.reactive.http
 
-import akka.http.scaladsl.model.{ HttpResponse, HttpRequest }
+import akka.http.scaladsl.model.{ HttpRequest, HttpResponse }
 import akka.http.scaladsl.server._
 import akka.util.Timeout
 import org.patricknoir.kafka.reactive.client.ReactiveClient

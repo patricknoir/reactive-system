@@ -3,9 +3,8 @@ package org.patricknoir.kafka.examples.client
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import org.patricknoir.kafka.reactive.client.KafkaReactiveClient
-import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
-import org.patricknoir.kafka.reactive.client2.{ ReactiveClientStream, StreamClientConfig }
+import org.patricknoir.kafka.reactive.client.ReactiveClientStream
+import org.patricknoir.kafka.reactive.client.config.ReactiveClientStreamConfig
 
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
@@ -22,8 +21,7 @@ object SimpleRSClient extends App {
 
   import system.dispatcher
   implicit val materializer = ActorMaterializer()
-  val client = new ReactiveClientStream(StreamClientConfig.default)
-  //  val client = new KafkaReactiveClient(KafkaRClientSettings.default)
+  val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
 
   do {
     val response: Future[String] = client.request[String, String]("kafka:simple/echo", "hello world!")
@@ -45,22 +43,23 @@ object SimpleReactiveClientExamples {
   def simpleClient() = {
     //#reactive-client-create-client
     implicit val system = ActorSystem("ReactiveClient")
+    implicit val materializer = ActorMaterializer()
     implicit val timeout = Timeout(5 seconds)
 
     import system.dispatcher
 
-    val client = new KafkaReactiveClient(KafkaRClientSettings.default)
-    //#reactive-client-create-client
+    val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
   }
 
   def simpleClientCallRemoteService() = {
     //#reactive-client-call-get-counter
     implicit val system = ActorSystem("ReactiveClient")
+    implicit val materializer = ActorMaterializer()
     implicit val timeout = Timeout(5 seconds)
 
     import system.dispatcher
 
-    val client = new KafkaReactiveClient(KafkaRClientSettings.default)
+    val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
 
     val result: Future[Unit] = client.request[Int, Unit]("kafka:simple/incrementCounter", 1)
 

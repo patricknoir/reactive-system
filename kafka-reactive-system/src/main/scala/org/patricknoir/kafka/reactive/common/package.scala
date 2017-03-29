@@ -2,7 +2,8 @@ package org.patricknoir.kafka.reactive
 
 import io.circe.Decoder
 import io.circe.generic.auto._
-import org.patricknoir.kafka.reactive.client.actors.KafkaRClientActor.Destination
+
+import scala.util.Try
 
 /**
  * Provides objects to help with serialization and deserialization of objects
@@ -36,6 +37,22 @@ package object common {
      * @return a [[scala.util.Left]] of [[java.lang.Throwable]] if fails, [[scala.util.Right]] of an [[In]] in case of success
      */
     def serialize[In: ReactiveSerializer](in: In): String = new String(implicitly[ReactiveSerializer[In]].serialize(in))
+  }
+
+  case class Destination(medium: String, topic: String, serviceId: String) {
+    override def toString: String = {
+      s"$medium:$topic"
+    }
+  }
+  object Destination {
+    def unapply(destination: String): Option[(String, String, String)] = Try {
+      val mediumAndTopic = destination.split(":")
+      val medium = mediumAndTopic(0)
+      val topicAndRoutes = mediumAndTopic(1).split("/")
+      val topic = topicAndRoutes(0)
+      val route = topicAndRoutes.drop(1).mkString("/")
+      (medium, topic, route)
+    }.toOption
   }
 
   case class KafkaRequestEnvelope(correlationId: String, destination: Destination, payload: String, replyTo: String)

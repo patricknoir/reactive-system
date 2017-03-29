@@ -3,11 +3,8 @@ package org.patricknoir.kafka.reactive.client.integration
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.testkit.TestKit
-import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import net.manub.embeddedkafka.{ EmbeddedKafka, EmbeddedKafkaConfig }
-import org.patricknoir.kafka.reactive.client.KafkaReactiveClient
-import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
 import org.patricknoir.kafka.reactive.server.ReactiveRoute
 import org.specs2.SpecificationLike
 

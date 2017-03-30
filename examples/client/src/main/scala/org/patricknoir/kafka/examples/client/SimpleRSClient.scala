@@ -51,6 +51,7 @@ object SimpleReactiveClientExamples {
     import system.dispatcher
 
     val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
+    //#reactive-client-create-client
   }
 
   def simpleClientCallRemoteService() = {

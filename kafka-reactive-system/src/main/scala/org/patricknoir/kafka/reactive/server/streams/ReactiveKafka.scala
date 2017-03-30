@@ -1,24 +1,20 @@
 package org.patricknoir.kafka.reactive.server.streams
 
-import akka.Done
 import akka.actor.ActorSystem
 import akka.kafka.ConsumerMessage.CommittableMessage
 import akka.kafka.ProducerMessage.Message
-import akka.kafka.scaladsl.{ Consumer, Producer }
 import akka.kafka._
-import akka.stream.javadsl.RunnableGraph
-import akka.stream.scaladsl.{ Flow, GraphDSL, Merge, Partition, Sink, Source }
+import akka.kafka.scaladsl.{ Consumer, Producer }
+import akka.stream.scaladsl.{ Flow, Sink, Source }
+import io.circe.generic.auto._
 import io.circe.parser._
+import io.circe.syntax._
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.{ StringDeserializer, StringSerializer }
-import org.patricknoir.kafka.reactive.common.KafkaResponseEnvelope
-import org.patricknoir.kafka.reactive.common.KafkaRequestEnvelope
+import org.patricknoir.kafka.reactive.common.{ KafkaRequestEnvelope, KafkaResponseEnvelope }
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{ Await, ExecutionContext, Future }
-import io.circe.generic.auto._
-import io.circe.syntax._
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * This implementation is not using the back-pressure
@@ -31,7 +27,8 @@ object ReactiveKafkaSource {
     Consumer.atMostOnceSource(createConsumerSettings(bootstrapServers, clientId, groupId), Subscriptions.topics(Set(requestTopic)))
       .mapAsync(maxConcurrency) { record => //TODO:  use batching where possible (.groupedWithin())
         Future(decode[KafkaRequestEnvelope](record.value))
-      }.filter(_.isRight).map { //TODO: improve with a flow and send the failures to a topic auditing.
+      }.filter(_.isRight).map {
+        //TODO: improve with a flow and send the failures to a topic auditing.
         case (Right(kkReqEnvelope)) => kkReqEnvelope
       }
 
@@ -51,17 +48,6 @@ object ReactiveKafkaSource {
 }
 
 object ReactiveKafkaSink {
-  //  def create(bootstrapServers: Set[String])(implicit system: ActorSystem): Sink[Future[KafkaResponseEnvelope], _] = {
-  //    val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
-  //      .withBootstrapServers(bootstrapServers.mkString(","))
-  //
-  //    Flow[Future[KafkaResponseEnvelope]].map[ProducerRecord[String, String]] { fResp =>
-  //      //FIXME: I will create a source ad hoc to support Future[ProducerRecord], this is just to test the functionality
-  //      //TODO: replace this with KafkaProducerActor with consumerSettings.properties and map over the future in order to send the message
-  //      val resp = Await.result(fResp, Duration.Inf)
-  //      new ProducerRecord[String, String](resp.replyTo, resp.asJson.noSpaces)
-  //    }.to(Producer.plainSink(producerSettings))
-  //  }
 
   def create(bootstrapServers: Set[String])(implicit system: ActorSystem, ec: ExecutionContext): Sink[Future[KafkaResponseEnvelope], _] = {
     val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
@@ -85,7 +71,9 @@ object ReactiveKafkaSink {
           ProducerMessage.Message(record, msg.committableOffset)
         }
     }
-    flow.map(msg => { if (msg.record.topic == "") msg.passThrough.commitScaladsl(); msg }).filterNot(_.record.topic == "").to(Producer.commitableSink(producerSettings))
+    flow.map(msg => {
+      if (msg.record.topic == "") msg.passThrough.commitScaladsl(); msg
+    }).filterNot(_.record.topic == "").to(Producer.commitableSink(producerSettings))
   }
 
   def createSync(bootstrapServers: Set[String])(implicit system: ActorSystem): Sink[KafkaResponseEnvelope, _] = {

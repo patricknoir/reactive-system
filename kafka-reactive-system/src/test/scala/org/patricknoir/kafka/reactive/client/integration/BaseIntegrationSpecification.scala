@@ -9,8 +9,7 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import net.manub.embeddedkafka.{ EmbeddedKafka, EmbeddedKafkaConfig }
 import org.patricknoir.kafka.KafkaLocal
-import org.patricknoir.kafka.reactive.common.KafkaResponseEnvelope
-import org.patricknoir.kafka.reactive.common.KafkaRequestEnvelope
+import org.patricknoir.kafka.reactive.common.{ KafkaResponseEnvelope, KafkaRequestEnvelope }
 import org.patricknoir.kafka.reactive.server.{ ReactiveRoute, ReactiveSystem }
 import org.patricknoir.kafka.reactive.server.streams.{ ReactiveKafkaSink, ReactiveKafkaSource }
 import org.specs2.SpecificationLike
@@ -98,6 +97,8 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
 
   def before() = {
     EmbeddedKafka.start()
+    EmbeddedKafka.createCustomTopic("echoInbound")
+    EmbeddedKafka.createCustomTopic("responses")
     startServer()
   }
 

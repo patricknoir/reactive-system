@@ -4,31 +4,30 @@ import akka.Done
 import akka.actor.{ Actor, ActorSystem, Props }
 import akka.testkit.{ TestKit, TestProbe }
 import akka.util.Timeout
-import org.patricknoir.kafka.reactive.common._
-import org.specs2.SpecificationLike
-import akka.pattern.ask
-import org.patricknoir.kafka.reactive.client.actors.StreamCoordinatorActor
+import io.circe.generic.auto._
 import org.patricknoir.kafka.reactive.client.actors.protocol.{ ResponseInfo, SendMessageComplete, StreamRequest, StreamRequestWithSender }
-
-import scala.concurrent.Await
-import scala.concurrent.duration._
+import org.patricknoir.kafka.reactive.common._
 import org.patricknoir.kafka.reactive.common.serializer._
+import org.specs2.SpecificationLike
+
+import scala.concurrent.duration._
 
 /**
  * Created by patrick on 13/07/2016.
  */
 class StreamCoordinatorActorSpec extends TestKit(ActorSystem("TestKit")) with SpecificationLike {
 
-  def is = s2"""
+  val echoActor = system.actorOf(Props(new KafkaEchoMockActor), "echo")
+  val coordinatorActor = system.actorOf(StreamCoordinatorActor.props, "request-coord")
+
+  def is =
+    s2"""
 
     simple string request    $simpleStringRequest
     simple object request    $simpleObjectRequest
     one way request          $fireAndForgetRequest
 
   """
-
-  val echoActor = system.actorOf(Props(new KafkaEchoMockActor), "echo")
-  val coordinatorActor = system.actorOf(StreamCoordinatorActor.props, "request-coord")
 
   def simpleStringRequest = {
 
@@ -60,7 +59,6 @@ class StreamCoordinatorActorSpec extends TestKit(ActorSystem("TestKit")) with Sp
 
     case class Car(model: String, constructor: String, year: Int)
 
-    import io.circe.generic.auto._
     val car = Car("Carrera S 997", "Porsche", 2008)
 
     implicit val timeout = Timeout(10 seconds)

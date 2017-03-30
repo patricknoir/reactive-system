@@ -30,4 +30,5 @@ object ReactiveKafkaStreamSource {
       .withGroupId(groupId)
       .withClientId(clientId)
       .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+      .withProperty(ConsumerConfig.METADATA_MAX_AGE_CONFIG, "5000")
 }

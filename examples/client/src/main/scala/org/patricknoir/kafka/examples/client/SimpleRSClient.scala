@@ -23,7 +23,9 @@ object SimpleRSClient extends App {
   implicit val materializer = ActorMaterializer()
   val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
 
-  do {
+  println("press e + enter to exit, otherwise enter to send the request!")
+
+  while (StdIn.readLine() != "e") {
     val response: Future[String] = client.request[String, String]("kafka:simple/echo", "hello world!")
 
     response.onComplete { r =>
@@ -32,7 +34,7 @@ object SimpleRSClient extends App {
     }
 
     Await.ready(response, Duration.Inf)
-  } while (StdIn.readLine() != "e")
+  }
 
   Await.ready(system.terminate(), Duration.Inf)
   println("program terminated")

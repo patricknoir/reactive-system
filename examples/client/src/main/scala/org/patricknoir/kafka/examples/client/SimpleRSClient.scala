@@ -1,9 +1,10 @@
 package org.patricknoir.kafka.examples.client
 
 import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import org.patricknoir.kafka.reactive.client.KafkaReactiveClient
-import org.patricknoir.kafka.reactive.client.config.KafkaRClientSettings
+import org.patricknoir.kafka.reactive.client.ReactiveClientStream
+import org.patricknoir.kafka.reactive.client.config.ReactiveClientStreamConfig
 
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
@@ -19,10 +20,12 @@ object SimpleRSClient extends App {
   implicit val timeout = Timeout(5 seconds)
 
   import system.dispatcher
+  implicit val materializer = ActorMaterializer()
+  val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
 
-  val client = new KafkaReactiveClient(KafkaRClientSettings.default)
+  println("press e + enter to exit, otherwise enter to send the request!")
 
-  do {
+  while (StdIn.readLine() != "e") {
     val response: Future[String] = client.request[String, String]("kafka:simple/echo", "hello world!")
 
     response.onComplete { r =>
@@ -31,7 +34,7 @@ object SimpleRSClient extends App {
     }
 
     Await.ready(response, Duration.Inf)
-  } while (StdIn.readLine() != "e")
+  }
 
   Await.ready(system.terminate(), Duration.Inf)
   println("program terminated")
@@ -42,22 +45,24 @@ object SimpleReactiveClientExamples {
   def simpleClient() = {
     //#reactive-client-create-client
     implicit val system = ActorSystem("ReactiveClient")
+    implicit val materializer = ActorMaterializer()
     implicit val timeout = Timeout(5 seconds)
 
     import system.dispatcher
 
-    val client = new KafkaReactiveClient(KafkaRClientSettings.default)
+    val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
     //#reactive-client-create-client
   }
 
   def simpleClientCallRemoteService() = {
     //#reactive-client-call-get-counter
     implicit val system = ActorSystem("ReactiveClient")
+    implicit val materializer = ActorMaterializer()
     implicit val timeout = Timeout(5 seconds)
 
     import system.dispatcher
 
-    val client = new KafkaReactiveClient(KafkaRClientSettings.default)
+    val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
 
     val result: Future[Unit] = client.request[Int, Unit]("kafka:simple/incrementCounter", 1)
 

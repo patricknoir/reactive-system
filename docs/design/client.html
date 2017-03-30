@@ -114,8 +114,83 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <div class="page-content row">
 <div class="small-12 large-9 column" id="docs">
 <h1><a href="#client-architecture" name="client-architecture" class="anchor"><span class="anchor-link"></span></a>Client Architecture</h1>
+<div class="toc ">
+<ul>
+  <li><a href="../design/client.html#overview">Overview</a></li>
+  <li><a href="../design/client.html#stream-blueprint">Stream Blueprint</a>
+  <ul>
+    <li><a href="../design/client.html#left-to-right-flow">Left-To-Right Flow</a></li>
+    <li><a href="../design/client.html#right-to-left-flow">Right-To-Left Flow</a></li>
+  </ul></li>
+  <li><a href="../design/client.html#actor-per-request-pattern">Actor-Per-Request Pattern</a>
+  <ul>
+    <li><a href="../design/client.html#coordinator-actor">Coordinator Actor</a></li>
+    <li><a href="../design/client.html#request-actor">Request Actor</a></li>
+  </ul></li>
+</ul>
+</div>
+<h2><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h2>
+<p>The Reactive System client offers an interface <code>ReactiveClient</code> that encapsulates the implementation and makes simple to the final user to interact with a Reactive Service.</p>
+<p>The actual implementation of the client is based on Akka actors and streams.</p>
+<h2><a href="#stream-blueprint" name="stream-blueprint" class="anchor"><span class="anchor-link"></span></a>Stream Blueprint</h2>
+<p>The following diagram illustrates the Stream Blueprint for processing the incoming requests.</p>
+<p><img src="../images/reactive-client-stream-blueprint.png" alt="rcstream-blueprint" /></p>
+<h3><a href="#left-to-right-flow" name="left-to-right-flow" class="anchor"><span class="anchor-link"></span></a>Left-To-Right Flow</h3>
+<ul>
+  <li>Whenever a request comes in, the Reactive System client spawns an actor by using the <em>Ask pattern</em> which sends a message to the Stream&rsquo;s Publisher and awaits for a response.</li>
+  <li>The request will flow downstream to the <em>Actor-Per-Request</em> Coordinator-Actor via a <em>mapAsync</em> stage. It will then:
+    <ul>
+      <li>Hold a reference to the ask-pattern-actor that will be completed on the right-to-left flow.</li>
+      <li>Transforms the request in a <code>KafkaRequestEnvelope</code> to be sent downstream.</li>
+    </ul>
+  </li>
+  <li>Sends the request through a Kafka Producer stage.</li>
+</ul>
+<h3><a href="#right-to-left-flow" name="right-to-left-flow" class="anchor"><span class="anchor-link"></span></a>Right-To-Left Flow</h3>
+<ul>
+  <li>The flow starts from a Kafka Consumer stage.</li>
+  <li>The response flow downstream to the <em>Actor-Per-Request</em> Coordinator-Actor via a <em>map</em> stage.
+    <ul>
+      <li>Is responsibility of the <em>Actor-Per-Request</em> implementation to reply to the initial ask-pattern-actor.</li>
+    </ul>
+  </li>
+  <li>The sink just ignores what comes from the flow as the responsibility of completing the request has been leveraged to the <em>Actor-Per-Request</em>.</li>
+</ul>
+<h2><a href="#actor-per-request-pattern" name="actor-per-request-pattern" class="anchor"><span class="anchor-link"></span></a>Actor-Per-Request Pattern</h2>
+<p>In a nutshell, the client will use an actor-per-request pattern in order to deliver the request and await for its response.</p>
+<p>The actor-per-request approach is implemented using Akka actors and its hierarchy consists of a parent Coordinator-Actor which creates and supervise one or many Request-Actor&rsquo;s.</p>
+<h3><a href="#coordinator-actor" name="coordinator-actor" class="anchor"><span class="anchor-link"></span></a>Coordinator Actor</h3>
+<p>Apart from supervising its children, the coordinator actor have two differentiated set of responsibilities:</p>
+<p>When receiving <strong>requests</strong>: - Accepts the incoming requests. - Generates a unique <code>correlationId</code> for each request. - Spawn a child actor that will be in charge of a particular request. - Tranforms the incoming request into a <code>KafkaRequestEnvelope</code> ready to be sent to Kafka and sends it downstream.</p>
+<p>When receiving <strong>responses</strong>: - Accepts the responses. - Based on the <code>correlationId</code> of the response, it looks for a child Request-Actor awaiting for the response and forwards the response to it.</p>
+<h3><a href="#request-actor" name="request-actor" class="anchor"><span class="anchor-link"></span></a>Request Actor</h3>
+<p>The main responsibility of a Request-Actor is to complete or time-out the request-cycle. </p>
+<p>When created, it&rsquo;s passed the source <em>ask-pattern-actor</em> reference to complete the cycle upon response reception and schedules a timeout in case the response is not received in a timely manner. </p>
 </div>
 <div class="large-3 show-for-large column" data-sticky-container>
+<nav class="sidebar sticky" data-sticky data-anchor="docs" data-sticky-on="large">
+<div class="page-nav">
+<div class="nav-title">On this page:</div>
+<div class="nav-toc">
+<ul>
+  <li><a href="../design/client.html#client-architecture">Client Architecture</a>
+  <ul>
+    <li><a href="../design/client.html#overview">Overview</a></li>
+    <li><a href="../design/client.html#stream-blueprint">Stream Blueprint</a>
+    <ul>
+      <li><a href="../design/client.html#left-to-right-flow">Left-To-Right Flow</a></li>
+      <li><a href="../design/client.html#right-to-left-flow">Right-To-Left Flow</a></li>
+    </ul></li>
+    <li><a href="../design/client.html#actor-per-request-pattern">Actor-Per-Request Pattern</a>
+    <ul>
+      <li><a href="../design/client.html#coordinator-actor">Coordinator Actor</a></li>
+      <li><a href="../design/client.html#request-actor">Request Actor</a></li>
+    </ul></li>
+  </ul></li>
+</ul>
+</div>
+</div>
+</nav>
 </div>
 </div>
 

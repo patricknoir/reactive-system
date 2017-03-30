@@ -65,12 +65,9 @@ class ReactiveClientStream(config: ReactiveClientStreamConfig)(implicit system: 
       (coordinator ? reqWithSender).mapTo[KafkaRequestEnvelope].map(envelope => ProducerMessage.Message(new ProducerRecord[String, String](envelope.destination.topic, envelope.asJson.noSpaces), envelope))
     }
 
-    val responseFlow = Flow[KafkaResponseEnvelope].mapAsync(concurrency) { respEnv: KafkaResponseEnvelope =>
-      coordinator ! respEnv
-      Future.successful[Any](respEnv)
-    }
+    val responseFlow: Flow[KafkaResponseEnvelope, Unit, NotUsed] = Flow[KafkaResponseEnvelope].map(respEnv => coordinator ! respEnv)
 
-    val bidiFlow: BidiFlow[StreamRequestWithSender, ProducerMessage.Message[String, String, KafkaRequestEnvelope], KafkaResponseEnvelope, Any, NotUsed] =
+    val bidiFlow: BidiFlow[StreamRequestWithSender, ProducerMessage.Message[String, String, KafkaRequestEnvelope], KafkaResponseEnvelope, Unit, NotUsed] =
       BidiFlow.fromFlows(requestFlow, responseFlow)
 
     val requestKafkaSink: Sink[ProducerMessage.Message[String, String, KafkaRequestEnvelope], NotUsed] = Producer.flow[String, String, KafkaRequestEnvelope](producerSettings).map { result =>

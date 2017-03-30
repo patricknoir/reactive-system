@@ -123,11 +123,12 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <p>The Reactive System client allows applications to consume remote services using asynchronous message exchange pattern exposed by a Reactive System server.</p>
 <p>In order to consume a remote service all you need is an instance of <code>ReactiveClient</code>:</p>
 <pre class="prettyprint"><code class="language-scala">implicit val system = ActorSystem(&quot;ReactiveClient&quot;)
+implicit val materializer = ActorMaterializer()
 implicit val timeout = Timeout(5 seconds)
 
 import system.dispatcher
 
-val client = new KafkaReactiveClient(KafkaRClientSettings.default)</code></pre>
+val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)</code></pre>
 <h2><a href="#simple-request" name="simple-request" class="anchor"><span class="anchor-link"></span></a>Simple Request</h2>
 <p>We are now going to create a simple client which will call the Reactive System server we have created in the previous section.</p>
 <p>For clarity here is the code snipped for the <strong>server</strong> definition:</p>
@@ -168,11 +169,12 @@ reactiveSystem.run()
 <p>The services are bound to the kafka topic: <code>simple</code> as defined by the Kafka Source used to create the <code>ReactiveSystem</code> instance.</p>
 <p>Here is the client code in order to invoke <code>incrementCounter</code>:</p>
 <pre class="prettyprint"><code class="language-scala">implicit val system = ActorSystem(&quot;ReactiveClient&quot;)
+implicit val materializer = ActorMaterializer()
 implicit val timeout = Timeout(5 seconds)
 
 import system.dispatcher
 
-val client = new KafkaReactiveClient(KafkaRClientSettings.default)
+val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
 
 val result: Future[Unit] = client.request[Int, Unit](&quot;kafka:simple/incrementCounter&quot;, 1)
 

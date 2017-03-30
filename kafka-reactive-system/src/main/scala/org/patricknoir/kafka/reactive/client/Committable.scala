@@ -1,9 +1,9 @@
 package org.patricknoir.kafka.reactive.client
 
-import cats.syntax.monoid._
-import cats.syntax.functor._
-import cats.syntax.flatMap._
 import cats.instances.all._
+import cats.syntax.flatMap._
+import cats.syntax.functor._
+import cats.syntax.monoid._
 import cats.{ Monad, Monoid }
 
 import scala.annotation.tailrec

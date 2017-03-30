@@ -1,5 +1,6 @@
 package org.patricknoir.kafka.reactive.client
 
+import org.patricknoir.kafka.reactive.client.{ Committable, Offset }
 import org.patricknoir.kafka.reactive.client.Committable.CommittableImpl
 import org.specs2.Specification
 

@@ -9,7 +9,7 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import net.manub.embeddedkafka.{ EmbeddedKafka, EmbeddedKafkaConfig }
 import org.patricknoir.kafka.KafkaLocal
-import org.patricknoir.kafka.reactive.common.{ KafkaResponseEnvelope, KafkaRequestEnvelope }
+import org.patricknoir.kafka.reactive.common.{ KafkaRequestEnvelope, KafkaResponseEnvelope }
 import org.patricknoir.kafka.reactive.server.{ ReactiveRoute, ReactiveSystem }
 import org.patricknoir.kafka.reactive.server.streams.{ ReactiveKafkaSink, ReactiveKafkaSource }
 import org.specs2.SpecificationLike
@@ -20,6 +20,8 @@ import akka.stream.scaladsl._
 import org.patricknoir.kafka.reactive.client.ReactiveClientStream
 import org.patricknoir.kafka.reactive.client.config.ReactiveClientStreamConfig
 import org.patricknoir.kafka.reactive.server.dsl._
+
+import scala.util.Try
 
 /**
  * Created by patrick on 16/07/2016.
@@ -97,8 +99,8 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
 
   def before() = {
     EmbeddedKafka.start()
-    EmbeddedKafka.createCustomTopic("echoInbound")
-    EmbeddedKafka.createCustomTopic("responses")
+    Try { EmbeddedKafka.createCustomTopic("echoInbound") }
+    Try { EmbeddedKafka.createCustomTopic("responses") }
     startServer()
   }
 

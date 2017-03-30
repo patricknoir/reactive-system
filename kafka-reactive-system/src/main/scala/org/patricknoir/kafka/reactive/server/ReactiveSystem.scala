@@ -1,15 +1,12 @@
 package org.patricknoir.kafka.reactive.server
 
 import akka.actor.ActorSystem
-import akka.kafka.ConsumerMessage.{ CommittableMessage, CommittableOffset }
+import akka.kafka.ConsumerMessage.CommittableMessage
 import akka.stream.Materializer
 import akka.stream.scaladsl._
-import cats.data.EitherT
-import cats.instances.all._
-import org.patricknoir.kafka.reactive.common.{ KafkaResponseEnvelope, KafkaResponseStatusCode }
-import org.patricknoir.kafka.reactive.common.KafkaRequestEnvelope
+import org.patricknoir.kafka.reactive.common.{ KafkaRequestEnvelope, KafkaResponseEnvelope, KafkaResponseStatusCode }
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.Future
 import scala.util.Try
 
 /**
@@ -20,6 +17,7 @@ import scala.util.Try
 trait ReactiveSystem {
   /**
    * Used to start a server instance
+   *
    * @param materializer used by the underlying implementation based on Akka Stream
    * @return
    */
@@ -41,6 +39,7 @@ object ReactiveSystem {
   def apply(source: Source[KafkaRequestEnvelope, _], route: ReactiveRoute, sink: Sink[Future[KafkaResponseEnvelope], _])(implicit system: ActorSystem) = atMostOnce(source, route, sink)
 
   def atMostOnce(source: Source[KafkaRequestEnvelope, _], route: ReactiveRoute, sink: Sink[Future[KafkaResponseEnvelope], _])(implicit system: ActorSystem) = new ReactiveSystem {
+
     import system.dispatcher
 
     def extractServiceId(request: KafkaRequestEnvelope): String = request.destination.serviceId
@@ -62,6 +61,7 @@ object ReactiveSystem {
   }
 
   def atLeastOnce(source: Source[(CommittableMessage[String, String], KafkaRequestEnvelope), _], route: ReactiveRoute, sink: Sink[(CommittableMessage[String, String], Future[KafkaResponseEnvelope]), _])(implicit system: ActorSystem) = new ReactiveSystem {
+
     import system.dispatcher
 
     val g = {

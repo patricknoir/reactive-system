@@ -67,12 +67,33 @@ object SimpleReactiveClientExamples {
     val result: Future[Unit] = client.request[Int, Unit]("kafka:simple/incrementCounter", 1)
 
     result.onComplete {
-      case Success(_)   => println("incrementCounter request sent successfully")
-      case Failure(err) => println(s"error sending incrementCounter request: ${err.getMessage}")
+      case Success(_)   => println("incrementCounter request successfully completed")
+      case Failure(err) => println(s"error requesting incrementCounter: ${err.getMessage}")
     }
 
     Await.ready(result, Duration.Inf)
 
     //#reactive-client-call-get-counter
+  }
+
+  def simpleClientOneWayMessageToService() = {
+    implicit val system = ActorSystem("ReactiveClient")
+    implicit val materializer = ActorMaterializer()
+    implicit val timeout = Timeout(5 seconds)
+
+    import system.dispatcher
+
+    val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
+
+    //#reactive-client-one-way-message
+    val result: Future[Unit] = client.send[Int]("kafka:simple/incrementCounter", 1, confirmSend = true)
+
+    result.onComplete {
+      case Success(_)   => println("incrementCounter request successfully sent")
+      case Failure(err) => println(s"error sending incrementCounter request: ${err.getMessage}")
+    }
+
+    Await.ready(result, Duration.Inf)
+    //#reactive-client-one-way-message
   }
 }

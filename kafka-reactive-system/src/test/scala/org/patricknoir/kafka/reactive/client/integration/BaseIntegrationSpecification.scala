@@ -62,6 +62,17 @@ abstract class BaseIntegrationSpecification extends TestKit(ActorSystem("TestKit
     |    }
     |  }
     |}
+    |
+    |reactive.system.client.kafka {
+    |  response-topic = "responses"
+    |  consumer {
+    |    bootstrap-servers = ["localhost:9092"]
+    |    group-id = "test-group-id"
+    |  }
+    |  producer {
+    |    bootstrap-servers = ["localhost:9092"]
+    |  }
+    |}
   """.stripMargin
 ))) with SpecificationLike {
 
@@ -121,6 +132,7 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
   def after() = {
     materializer.shutdown()
     EmbeddedKafka.stop()
+    TestKit.shutdownActorSystem(system)
   }
 }
 

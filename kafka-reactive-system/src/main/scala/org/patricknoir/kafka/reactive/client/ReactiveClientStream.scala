@@ -57,10 +57,9 @@ class ReactiveClientStream(config: ReactiveClientStreamConfig)(implicit system: 
    */
 
   private def createStream(): ActorRef = {
-    val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
-      .withBootstrapServers(bootstrapServers.mkString(","))
+    val producerSettings = config.producerConfig
 
-    val requestFlow: Flow[StreamRequestWithSender, ProducerMessage.Message[String, String, KafkaRequestEnvelope], NotUsed] = Flow[StreamRequestWithSender].mapAsync(concurrency) { reqWithSender: StreamRequestWithSender =>
+    val requestFlow: Flow[StreamRequestWithSender, ProducerMessage.Message[String, String, KafkaRequestEnvelope], NotUsed] = Flow[StreamRequestWithSender].mapAsync(parallelism) { reqWithSender: StreamRequestWithSender =>
       implicit val timeout = reqWithSender.request.timeout
       (coordinator ? reqWithSender).mapTo[KafkaRequestEnvelope].map(envelope => ProducerMessage.Message(new ProducerRecord[String, String](envelope.destination.topic, envelope.asJson.noSpaces), envelope))
     }
@@ -78,7 +77,7 @@ class ReactiveClientStream(config: ReactiveClientStreamConfig)(implicit system: 
 
     val kafkaFlow: Flow[ProducerMessage.Message[String, String, KafkaRequestEnvelope], KafkaResponseEnvelope, NotUsed] = Flow.fromSinkAndSource(
       sink = requestKafkaSink,
-      source = ReactiveKafkaStreamSource.atMostOnce(responseTopic, bootstrapServers, consumerClientId, consumerGroupId, concurrency)
+      source = ReactiveKafkaStreamSource.atMostOnce(responseTopic, consumerConfig, parallelism)
     )
 
     val stream: RunnableGraph[ActorRef] = Source.actorPublisher(StreamPublisherActor.props).via(bidiFlow.join(kafkaFlow)).to(Sink.ignore)

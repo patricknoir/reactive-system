@@ -218,6 +218,15 @@ lazy val kafkaRS =
     .settings(
        pluginsSettings ++ kafkaRSSettings ++ settings:_*
     )
+    .settings(
+      publishSite := Def.task {
+        println("Executing task publishSite!")
+        val apidocsDir = (baseDirectory / "../apidocs").value
+        IO.delete(apidocsDir)
+        IO.createDirectory(apidocsDir)
+        IO.copyDirectory((doc in Compile).value, apidocsDir, true)
+      }.value
+    )
     .enablePlugins(AshScriptPlugin,JavaServerAppPackaging, UniversalDeployPlugin)
 
 lazy val httpInterface =
@@ -261,10 +270,19 @@ lazy val documentation =
     .settings(
       name := "documentation",
       paradoxTheme := Some(builtinParadoxTheme("generic")),
+      paradoxProperties in Compile ++= Map(
+        "scaladoc.rfc.base_url" -> s"https://patricknoir.github.io/reactive-system/api/%s.html"
+      ),
       paradoxNavigationDepth := 3,
       publishSite := Def.task {
         println("Executing task publishSite!")
+        val docsDir = (baseDirectory / "../docs").value
+        val internalApiDir = (baseDirectory / "../docs/api").value
+        val apidocsDir = (baseDirectory / "../apidocs").value
         val siteDir = (paradox in Compile).value //** "*"
-        IO.copyDirectory(siteDir, (baseDirectory / "../docs").value, true)
+        IO.delete(docsDir)
+        IO.createDirectory(docsDir)
+        IO.copyDirectory(siteDir, docsDir, true)
+        IO.copyDirectory(apidocsDir, internalApiDir, true)
       }.value
     ).enablePlugins(ParadoxPlugin)

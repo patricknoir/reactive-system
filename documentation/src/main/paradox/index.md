@@ -9,5 +9,6 @@
 * [Client](client.md)
 * [Marshalling](marshalling.md)
 * [Design](design/index.md)
+* @extref[API](rfc:index)
 
 @@@

@@ -10,7 +10,7 @@ import scala.annotation.tailrec
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
- * A Committable[T] type represents the
+ * A [[Committable]] type represents the
  * response from a Service which adopts message delivery at least once
  * as its semantic.
  * Created by patrick on 23/03/2017.

@@ -5,8 +5,11 @@ import akka.util.Timeout
 import org.patricknoir.kafka.reactive.common.{ KafkaResponseEnvelope, ReactiveDeserializer }
 
 /**
- * Created by josee on 29/03/2017.
- */
+  * This actor handles the requests for the `request-response-message`.
+  * It waits for the response message or it times out managing the Ask
+  * Promise from the requestor.
+  * Created by josee on 29/03/2017.
+  */
 class StreamRequestActor(origin: ActorRef, timeout: Timeout, deserializer: ReactiveDeserializer[_]) extends Actor {
 
   context.setReceiveTimeout(timeout.duration)

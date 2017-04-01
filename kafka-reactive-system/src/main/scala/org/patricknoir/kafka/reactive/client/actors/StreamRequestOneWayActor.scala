@@ -6,6 +6,10 @@ import akka.util.Timeout
 import org.patricknoir.kafka.reactive.client.actors.protocol.SendMessageComplete
 
 /**
+  * This Actor is used to handle request of type `one-way-message`.
+  * Is spawn by the [[StreamCoordinatorActor]] and handles the completion
+  * of the Ask Promise with the confirmation of commit of the message into
+  * the destination queue by the producer.
  * Created by josee on 29/03/2017.
  */
 class StreamRequestOneWayActor(origin: ActorRef, timeout: Timeout) extends Actor {

@@ -1,10 +1,11 @@
 package org.patricknoir.kafka.reactive.server
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.kafka.ConsumerMessage.CommittableMessage
 import akka.stream.Materializer
 import akka.stream.scaladsl._
-import org.patricknoir.kafka.reactive.common.{ KafkaRequestEnvelope, KafkaResponseEnvelope, KafkaResponseStatusCode }
+import org.patricknoir.kafka.reactive.common.{KafkaRequestEnvelope, KafkaResponseEnvelope, KafkaResponseStatusCode}
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -31,13 +32,22 @@ object ReactiveSystem {
    * Reactive System server using message delivery semantic at-most-once
    *
    * @param source a valid akka stream source created using [[org.patricknoir.kafka.reactive.server.streams.ReactiveKafkaSource]]
-   * @param route
-   * @param sink
-   * @param system
-   * @return
+   * @param route an instance of [[ReactiveRoute]] in order to dispetch the requests to the services
+   * @param sink a valid akka stream sink created using [[org.patricknoir.kafka.reactive.server.streams.ReactiveKafkaSink]]
+   * @param system actor system to be used to materialize the stream
+   * @return an instance of ReactiveSystem with semantic `at-most-once`
    */
   def apply(source: Source[KafkaRequestEnvelope, _], route: ReactiveRoute, sink: Sink[Future[KafkaResponseEnvelope], _])(implicit system: ActorSystem) = atMostOnce(source, route, sink)
 
+  /**
+    * Reactive System server using message delivery semantic `at-most-once`
+    *
+    * @param source a valid akka stream source created using [[org.patricknoir.kafka.reactive.server.streams.ReactiveKafkaSource]]
+    * @param route an instance of [[ReactiveRoute]] in order to dispetch the requests to the services
+    * @param sink a valid akka stream sink created using [[org.patricknoir.kafka.reactive.server.streams.ReactiveKafkaSink]]
+    * @param system actor system to be used to materialize the stream
+    * @return an instance of ReactiveSystem with semantic `at-most-once`
+    */
   def atMostOnce(source: Source[KafkaRequestEnvelope, _], route: ReactiveRoute, sink: Sink[Future[KafkaResponseEnvelope], _])(implicit system: ActorSystem) = new ReactiveSystem {
 
     import system.dispatcher
@@ -55,11 +65,20 @@ object ReactiveSystem {
         .recover {
           case err: Throwable => KafkaResponseEnvelope(request.correlationId, request.replyTo, err.getMessage, KafkaResponseStatusCode.InternalServerError)
         }
-    }.toMat(sink)(Keep.right)
+    }.toMat(sink)(Keep.none)
 
-    override def run()(implicit materializer: Materializer) = g.run()(materializer)
+    override def run()(implicit materializer: Materializer): Unit = g.run()(materializer)
   }
 
+  /**
+    * Reactive System server using message delivery semantic `at-least-once`
+    *
+    * @param source a valid akka stream source created using [[org.patricknoir.kafka.reactive.server.streams.ReactiveKafkaSource]]
+    * @param route an instance of [[ReactiveRoute]] in order to dispetch the requests to the services
+    * @param sink a valid akka stream sink created using [[org.patricknoir.kafka.reactive.server.streams.ReactiveKafkaSink]]
+    * @param system actor system to be used to materialize the stream
+    * @return an instance of ReactiveSystem with semantic `at-least-once`
+    */
   def atLeastOnce(source: Source[(CommittableMessage[String, String], KafkaRequestEnvelope), _], route: ReactiveRoute, sink: Sink[(CommittableMessage[String, String], Future[KafkaResponseEnvelope]), _])(implicit system: ActorSystem) = new ReactiveSystem {
 
     import system.dispatcher

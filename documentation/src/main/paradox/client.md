@@ -31,3 +31,13 @@ the `ReactiveSystem` instance.
 Here is the client code in order to invoke `incrementCounter`:
 
 @@snip [SimpleRSClient.scala](../../../../examples/client/src/main/scala/org/patricknoir/kafka/examples/client/SimpleRSClient.scala) { #reactive-client-call-get-counter }
+
+## One-Way Simple Request
+
+The Reactive System client also allows to send a message to a remote service without awaiting for a reply from the target service.
+
+The following snippet shows how to invoke the API in order to send a message to the `incrementCounter` service without awaiting for a response:
+
+@@snip [SimpleRSClient.scala](../../../../examples/client/src/main/scala/org/patricknoir/kafka/examples/client/SimpleRSClient.scala) { #reactive-client-one-way-message }
+
+Please note even though this is a fire-and-forget way of sending a message, the API allows to be confirmed whether the message being successfully sent by setting the `confirmSend` flag.

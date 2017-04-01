@@ -1,7 +1,7 @@
 package org.patricknoir.kafka.reactive.server.streams
 
 import akka.actor.ActorSystem
-import akka.kafka.ConsumerMessage.CommittableMessage
+import akka.kafka.ConsumerMessage.{ CommittableMessage, CommittableOffset, CommittableOffsetBatch }
 import akka.kafka.ProducerMessage.Message
 import akka.kafka._
 import akka.kafka.scaladsl.{ Consumer, Producer }
@@ -16,6 +16,7 @@ import org.apache.kafka.common.serialization.{ StringDeserializer, StringSeriali
 import org.patricknoir.kafka.reactive.common.{ KafkaRequestEnvelope, KafkaResponseEnvelope }
 
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.duration._
 
 object ReactiveKafkaSource extends LazyLogging {
 
@@ -89,7 +90,7 @@ object ReactiveKafkaSink {
     }.filterNot(_.topic == "").to(Producer.plainSink(producerSettings))
   }
 
-  def atLeastOnce(bootstrapServers: Set[String], concurrency: Int)(implicit system: ActorSystem, ec: ExecutionContext): Sink[(CommittableMessage[String, String], Future[KafkaResponseEnvelope]), _] = {
+  def atLeastOnce(bootstrapServers: Set[String], concurrency: Int, commitMaxBatchSize: Int, commitTimeWindow: FiniteDuration)(implicit system: ActorSystem, ec: ExecutionContext): Sink[(CommittableMessage[String, String], Future[KafkaResponseEnvelope]), _] = {
     val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
       .withBootstrapServers(bootstrapServers.mkString(","))
 
@@ -97,12 +98,15 @@ object ReactiveKafkaSink {
       case (msg, fResp) =>
         fResp.map { resp =>
           val record = new ProducerRecord[String, String](resp.replyTo, resp.asJson.noSpaces)
-          ProducerMessage.Message(record, msg.committableOffset)
+          ProducerMessage.Message[String, String, CommittableOffset](record, msg.committableOffset)
         }
     }
     flow.map(msg => {
       if (msg.record.topic == "") msg.passThrough.commitScaladsl(); msg
-    }).filterNot(_.record.topic == "").to(Producer.commitableSink(producerSettings))
+    }).filterNot(_.record.topic == "").via(Producer.flow(producerSettings))
+      .map(_.message.passThrough)
+      .groupedWithin(commitMaxBatchSize, commitTimeWindow)
+      .map(group => group.foldLeft(CommittableOffsetBatch.empty) { (batch, elem) => batch.updated(elem.asInstanceOf[CommittableOffset]) }).to(Sink.ignore)
   }
 
   def createSync(bootstrapServers: Set[String])(implicit system: ActorSystem): Sink[KafkaResponseEnvelope, _] = {

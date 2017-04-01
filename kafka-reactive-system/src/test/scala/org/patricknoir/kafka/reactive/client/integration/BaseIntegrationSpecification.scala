@@ -144,7 +144,7 @@ object KafkaService {
   def atLeastOnce(route: ReactiveRoute)(implicit system: ActorSystem): ReactiveSystem = {
     import system.dispatcher
     val source = ReactiveKafkaSource.atLeastOnce("echoInbound", Set("localhost:9092"), "client1", "group1")
-    val sink = ReactiveKafkaSink.atLeastOnce(Set("localhost:9092"), 8)
+    val sink = ReactiveKafkaSink.atLeastOnce(Set("localhost:9092"), 8, 10, 5 seconds)
     source ~> route ~> sink
   }
 }

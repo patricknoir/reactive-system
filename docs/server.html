@@ -207,8 +207,8 @@ val route: ReactiveRoute = request[Unit, Int](&quot;getCounter&quot;) { _ =&gt;
 <h2><a href="#running-the-server" name="running-the-server" class="anchor"><span class="anchor-link"></span></a>Running the server</h2>
 <p>Once all the services to expose have been defined in the <code>route: ReactiveRoute</code> is time to create an instance of <code>ReactiveSystem</code> and run it.</p>
 <p>The simplest way to create and run a <code>ReactiveSystem</code> is the following:</p>
-<pre class="prettyprint"><code class="language-scala"><br/>val source = ReactiveKafkaSource.create(&quot;simple&quot;, Set(&quot;localhost:9092&quot;), &quot;simpleService&quot;)
-val sink = ReactiveKafkaSink.create(Set(&quot;localhost:9092&quot;))
+<pre class="prettyprint"><code class="language-scala"><br/>val source = ReactiveKafkaSource.create(&quot;simple&quot;, Set(&quot;localhost:9092&quot;), &quot;simpleService&quot;, &quot;serviceGroup&quot;, 8)
+val sink = ReactiveKafkaSink.create(Set(&quot;localhost:9092&quot;), 8)
 
 /**
  * DSL:
@@ -227,8 +227,8 @@ reactiveSys.run()</code></pre>
 <h3><a href="#at-most-once-semantic" name="at-most-once-semantic" class="anchor"><span class="anchor-link"></span></a>At Most Once Semantic</h3>
 <p>A Reactive System which implements <code>at-most-once</code> message delivery semantic favours the performance over the consistency. under this condition a Reactive System servers might be losing messages before they are delivered to the router or before a response is sent back to the client. This strategy should be adopted when performance (especially latency) is a key requirement, the system has to serve a huge number of requests/responses mainly read operations which don&rsquo;t cause side effects. Under these conditions losing a message don&rsquo;t compromise consistency and if a request message get lost is responsibility of the client to fire another request. An example of adoption of this strategy is the <code>Query</code> part of a CQRS/ES architecture.</p>
 <p>Here is an example on how to create a <code>ReactiveSystem</code> with semantic <code>at-most-once</code>:</p>
-<pre class="prettyprint"><code class="language-scala"><br/>val source = ReactiveKafkaSource.create(&quot;simple&quot;, Set(&quot;localhost:9092&quot;), &quot;simpleService&quot;)
-val sink = ReactiveKafkaSink.create(Set(&quot;localhost:9092&quot;))
+<pre class="prettyprint"><code class="language-scala"><br/>val source = ReactiveKafkaSource.create(&quot;simple&quot;, Set(&quot;localhost:9092&quot;), &quot;simpleService&quot;, &quot;serviceGroup&quot;, 8)
+val sink = ReactiveKafkaSink.create(Set(&quot;localhost:9092&quot;), 8)
 
 /**
  * DSL:
@@ -264,7 +264,12 @@ val atLeastOnceSource = ReactiveKafkaSource.atLeastOnce(
   bootstrapServers = Set(&quot;localhost:9092&quot;),
   clientId = &quot;simpleService&quot;
 )
-val atLeastOnceSink = ReactiveKafkaSink.atLeastOnce(bootstrapServers = Set(&quot;localhost:9092&quot;))
+val atLeastOnceSink = ReactiveKafkaSink.atLeastOnce(
+  bootstrapServers = Set(&quot;localhost:9092&quot;),
+  concurrency = 8,
+  commitMaxBatchSize = 10,
+  commitTimeWindow = 5 seconds
+)
 
 val reactiveSystem = atLeastOnceSource ~&gt; route ~&gt; atLeastOnceSink
 

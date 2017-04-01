@@ -13,7 +13,7 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 import org.patricknoir.kafka.reactive.client.actors.protocol.{ ResponseInfo, SendMessageComplete, StreamRequest, StreamRequestWithSender }
 import org.patricknoir.kafka.reactive.client.actors.{ StreamCoordinatorActor, StreamPublisherActor }
-import org.patricknoir.kafka.reactive.client.config.ReactiveClientStreamConfig
+import org.patricknoir.kafka.reactive.client.config.ClientConfig
 import org.patricknoir.kafka.reactive.common._
 
 import scala.concurrent.Future
@@ -25,7 +25,7 @@ import io.circe.syntax._
  * @param config configuration for setting up the reactive stream
  * @param system actor system to be used by this instance
  */
-class ReactiveClientStream(config: ReactiveClientStreamConfig)(implicit system: ActorSystem, materializer: Materializer) extends ReactiveClient {
+class ReactiveClientStream(config: ClientConfig)(implicit system: ActorSystem, materializer: Materializer) extends ReactiveClient {
 
   import config._
   import system.dispatcher
@@ -78,7 +78,7 @@ class ReactiveClientStream(config: ReactiveClientStreamConfig)(implicit system: 
 
     val kafkaFlow: Flow[ProducerMessage.Message[String, String, KafkaRequestEnvelope], KafkaResponseEnvelope, NotUsed] = Flow.fromSinkAndSource(
       sink = requestKafkaSink,
-      source = ReactiveKafkaStreamSource.atMostOnce(responseTopic, bootstrapServers, consumerClientId, consumerGroupId, concurrency)
+      source = ReactiveKafkaStreamSource.atMostOnce(responseTopic, bootstrapServers, clientId, groupId, concurrency)
     )
 
     val stream: RunnableGraph[ActorRef] = Source.actorPublisher(StreamPublisherActor.props).via(bidiFlow.join(kafkaFlow)).to(Sink.ignore)

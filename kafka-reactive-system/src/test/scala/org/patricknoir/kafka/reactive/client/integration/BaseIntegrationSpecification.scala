@@ -18,7 +18,7 @@ import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
 import akka.stream.scaladsl._
 import org.patricknoir.kafka.reactive.client.ReactiveClientStream
-import org.patricknoir.kafka.reactive.client.config.ReactiveClientStreamConfig
+import org.patricknoir.kafka.reactive.client.config.ClientConfig
 import org.patricknoir.kafka.reactive.server.dsl._
 
 import scala.util.Try
@@ -108,7 +108,7 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
     before()
 
     implicit val timeout = Timeout(10 seconds)
-    val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
+    val client = new ReactiveClientStream(ClientConfig.default)
 
     val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
 
@@ -136,15 +136,15 @@ object ServiceCatalog {
 object KafkaService {
   def atMostOnce(route: ReactiveRoute)(implicit system: ActorSystem): ReactiveSystem = {
     import system.dispatcher
-    val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create("echoInbound", Set("localhost:9092"), "client1", "group1")
-    val sink: Sink[Future[KafkaResponseEnvelope], _] = ReactiveKafkaSink.create(Set("localhost:9092"))
+    val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create("echoInbound", Set("localhost:9092"), "client1", "group1", 8)
+    val sink: Sink[Future[KafkaResponseEnvelope], _] = ReactiveKafkaSink.create(Set("localhost:9092"), 8)
     source ~> route ~> sink
   }
 
   def atLeastOnce(route: ReactiveRoute)(implicit system: ActorSystem): ReactiveSystem = {
     import system.dispatcher
     val source = ReactiveKafkaSource.atLeastOnce("echoInbound", Set("localhost:9092"), "client1", "group1")
-    val sink = ReactiveKafkaSink.atLeastOnce(Set("localhost:9092"))
+    val sink = ReactiveKafkaSink.atLeastOnce(Set("localhost:9092"), 8, 10, 5 seconds)
     source ~> route ~> sink
   }
 }

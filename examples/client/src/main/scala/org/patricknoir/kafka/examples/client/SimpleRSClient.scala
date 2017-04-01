@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import org.patricknoir.kafka.reactive.client.ReactiveClientStream
-import org.patricknoir.kafka.reactive.client.config.ReactiveClientStreamConfig
+import org.patricknoir.kafka.reactive.client.config.ClientConfig
 
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
@@ -21,7 +21,7 @@ object SimpleRSClient extends App {
 
   import system.dispatcher
   implicit val materializer = ActorMaterializer()
-  val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
+  val client = new ReactiveClientStream(ClientConfig.default)
 
   println("press e + enter to exit, otherwise enter to send the request!")
 
@@ -50,7 +50,7 @@ object SimpleReactiveClientExamples {
 
     import system.dispatcher
 
-    val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
+    val client = new ReactiveClientStream(ClientConfig.default)
     //#reactive-client-create-client
   }
 
@@ -62,7 +62,7 @@ object SimpleReactiveClientExamples {
 
     import system.dispatcher
 
-    val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
+    val client = new ReactiveClientStream(ClientConfig.default)
 
     val result: Future[Unit] = client.request[Int, Unit]("kafka:simple/incrementCounter", 1)
 

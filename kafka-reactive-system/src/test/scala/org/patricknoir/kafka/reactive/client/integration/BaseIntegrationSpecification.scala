@@ -18,7 +18,7 @@ import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
 import akka.stream.scaladsl._
 import org.patricknoir.kafka.reactive.client.ReactiveClientStream
-import org.patricknoir.kafka.reactive.client.config.ReactiveClientStreamConfig
+import org.patricknoir.kafka.reactive.client.config.ClientConfig
 import org.patricknoir.kafka.reactive.server.dsl._
 
 import scala.util.Try
@@ -108,7 +108,7 @@ class SimpleIntegrationSpecification extends BaseIntegrationSpecification {
     before()
 
     implicit val timeout = Timeout(10 seconds)
-    val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
+    val client = new ReactiveClientStream(ClientConfig.default)
 
     val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
 

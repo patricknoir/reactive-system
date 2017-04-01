@@ -136,15 +136,15 @@ object ServiceCatalog {
 object KafkaService {
   def atMostOnce(route: ReactiveRoute)(implicit system: ActorSystem): ReactiveSystem = {
     import system.dispatcher
-    val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create("echoInbound", Set("localhost:9092"), "client1", "group1")
-    val sink: Sink[Future[KafkaResponseEnvelope], _] = ReactiveKafkaSink.create(Set("localhost:9092"))
+    val source: Source[KafkaRequestEnvelope, _] = ReactiveKafkaSource.create("echoInbound", Set("localhost:9092"), "client1", "group1", 8)
+    val sink: Sink[Future[KafkaResponseEnvelope], _] = ReactiveKafkaSink.create(Set("localhost:9092"), 8)
     source ~> route ~> sink
   }
 
   def atLeastOnce(route: ReactiveRoute)(implicit system: ActorSystem): ReactiveSystem = {
     import system.dispatcher
     val source = ReactiveKafkaSource.atLeastOnce("echoInbound", Set("localhost:9092"), "client1", "group1")
-    val sink = ReactiveKafkaSink.atLeastOnce(Set("localhost:9092"))
+    val sink = ReactiveKafkaSink.atLeastOnce(Set("localhost:9092"), 8)
     source ~> route ~> sink
   }
 }

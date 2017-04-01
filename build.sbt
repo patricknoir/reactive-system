@@ -18,6 +18,7 @@ val Versions = new {
   val Scala = "2.12.1"
   val ScalaBinary = "2.12"
   val Slf4j = "1.7.21"
+  val ScalaLogging = "3.5.0"
   val Akka = "2.4.17"
   val AkkaHttp = "10.0.4"
   val Circe = "0.7.0"
@@ -38,6 +39,7 @@ val rootDependencies = Seq(
 //  "org.slf4j"                      % "slf4j-api"               % Versions.Slf4j,
 //  "org.slf4j"                      % "slf4j-log4j12"           % Versions.Slf4j,
   //"com.iheart"                     %% "ficus"                  % "1.2.6",
+  "com.typesafe.scala-logging"     %% "scala-logging"          % Versions.ScalaLogging,
   "com.typesafe.akka"              %% "akka-slf4j"             % Versions.Akka,
   "com.typesafe.akka"              %% "akka-stream-kafka"      % Versions.AkkaStreamKafka,
   "io.circe"                       %% "circe-core"             % Versions.Circe,

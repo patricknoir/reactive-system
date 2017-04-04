@@ -8,6 +8,8 @@ import org.patricknoir.kafka.reactive.client.actors.protocol._
 import scala.collection.mutable
 
 /**
+ * Represents the entry point for the client requests into
+ * the client stream.
  * Created by josee on 29/03/2017.
  */
 class StreamPublisherActor() extends ActorPublisher[StreamRequestWithSender] with ActorLogging {

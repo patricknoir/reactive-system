@@ -18,6 +18,7 @@ val Versions = new {
   val Scala = "2.12.1"
   val ScalaBinary = "2.12"
   val Slf4j = "1.7.21"
+  val ScalaLogging = "3.5.0"
   val Akka = "2.4.17"
   val AkkaHttp = "10.0.4"
   val Circe = "0.7.0"
@@ -38,6 +39,7 @@ val rootDependencies = Seq(
 //  "org.slf4j"                      % "slf4j-api"               % Versions.Slf4j,
 //  "org.slf4j"                      % "slf4j-log4j12"           % Versions.Slf4j,
   //"com.iheart"                     %% "ficus"                  % "1.2.6",
+  "com.typesafe.scala-logging"     %% "scala-logging"          % Versions.ScalaLogging,
   "com.typesafe.akka"              %% "akka-slf4j"             % Versions.Akka,
   "com.typesafe.akka"              %% "akka-stream-kafka"      % Versions.AkkaStreamKafka,
   "io.circe"                       %% "circe-core"             % Versions.Circe,
@@ -216,6 +218,15 @@ lazy val kafkaRS =
     .settings(
        pluginsSettings ++ kafkaRSSettings ++ settings:_*
     )
+    .settings(
+      publishSite := Def.task {
+        println("Executing task publishSite!")
+        val apidocsDir = (baseDirectory / "../apidocs").value
+        IO.delete(apidocsDir)
+        IO.createDirectory(apidocsDir)
+        IO.copyDirectory((doc in Compile).value, apidocsDir, true)
+      }.value
+    )
     .enablePlugins(AshScriptPlugin,JavaServerAppPackaging, UniversalDeployPlugin)
 
 lazy val httpInterface =
@@ -259,10 +270,19 @@ lazy val documentation =
     .settings(
       name := "documentation",
       paradoxTheme := Some(builtinParadoxTheme("generic")),
+      paradoxProperties in Compile ++= Map(
+        "scaladoc.rfc.base_url" -> s"https://patricknoir.github.io/reactive-system/api/%s.html"
+      ),
       paradoxNavigationDepth := 3,
       publishSite := Def.task {
         println("Executing task publishSite!")
+        val docsDir = (baseDirectory / "../docs").value
+        val internalApiDir = (baseDirectory / "../docs/api").value
+        val apidocsDir = (baseDirectory / "../apidocs").value
         val siteDir = (paradox in Compile).value //** "*"
-        IO.copyDirectory(siteDir, (baseDirectory / "../docs").value, true)
+        IO.delete(docsDir)
+        IO.createDirectory(docsDir)
+        IO.copyDirectory(siteDir, docsDir, true)
+        IO.copyDirectory(apidocsDir, internalApiDir, true)
       }.value
     ).enablePlugins(ParadoxPlugin)

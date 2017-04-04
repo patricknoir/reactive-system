@@ -129,7 +129,7 @@ implicit val timeout = Timeout(5 seconds)
 
 import system.dispatcher
 
-val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)</code></pre>
+val client = new ReactiveClientStream(ClientConfig.default)</code></pre>
 <h2><a href="#simple-request" name="simple-request" class="anchor"><span class="anchor-link"></span></a>Simple Request</h2>
 <p>We are now going to create a simple client which will call the Reactive System server we have created in the previous section.</p>
 <p>For clarity here is the code snipped for the <strong>server</strong> definition:</p>
@@ -156,7 +156,12 @@ val atLeastOnceSource = ReactiveKafkaSource.atLeastOnce(
   bootstrapServers = Set(&quot;localhost:9092&quot;),
   clientId = &quot;simpleService&quot;
 )
-val atLeastOnceSink = ReactiveKafkaSink.atLeastOnce(bootstrapServers = Set(&quot;localhost:9092&quot;))
+val atLeastOnceSink = ReactiveKafkaSink.atLeastOnce(
+  bootstrapServers = Set(&quot;localhost:9092&quot;),
+  concurrency = 8,
+  commitMaxBatchSize = 10,
+  commitTimeWindow = 5 seconds
+)
 
 val reactiveSystem = atLeastOnceSource ~&gt; route ~&gt; atLeastOnceSink
 
@@ -175,7 +180,7 @@ implicit val timeout = Timeout(5 seconds)
 
 import system.dispatcher
 
-val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
+val client = new ReactiveClientStream(ClientConfig.default)
 
 val result: Future[Unit] = client.request[Int, Unit](&quot;kafka:simple/incrementCounter&quot;, 1)
 

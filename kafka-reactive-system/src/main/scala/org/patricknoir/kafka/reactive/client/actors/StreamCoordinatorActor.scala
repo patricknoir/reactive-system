@@ -9,6 +9,11 @@ import org.patricknoir.kafka.reactive.common.{ KafkaRequestEnvelope, KafkaRespon
 import scala.annotation.tailrec
 
 /**
+ * Coordinates the requests both: `request-response-message` and
+ * `one-way-message`. It holds a reference for all requests pending
+ * response or confirmation by spawning the appropriate instance of
+ * actor [[StreamRequestActor]] or [[StreamRequestOneWayActor]]
+ * respectively.
  * Created by josee on 29/03/2017.
  */
 class StreamCoordinatorActor() extends Actor with ActorLogging {

@@ -2,8 +2,8 @@ package org.patricknoir.kafka.reactive.client.integration
 
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import org.patricknoir.kafka.reactive.client.ReactiveClientStream
-import org.patricknoir.kafka.reactive.client.config.ReactiveClientStreamConfig
+import org.patricknoir.kafka.reactive.client.ReactiveKafkaClient
+import org.patricknoir.kafka.reactive.client.config.KafkaReactiveClientConfig
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -25,7 +25,7 @@ class SimpleAtLeastOnceISpec extends BaseISpec {
 
     implicit val timeout = Timeout(10 seconds)
 
-    val client = new ReactiveClientStream(ReactiveClientStreamConfig.default)
+    val client = new ReactiveKafkaClient(KafkaReactiveClientConfig.default)
 
     val fResponse = client.request[String, String]("kafka:echoInbound/echo", "patrick")
 

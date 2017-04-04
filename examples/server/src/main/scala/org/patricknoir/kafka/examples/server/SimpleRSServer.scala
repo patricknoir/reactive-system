@@ -5,6 +5,7 @@ import akka.stream.ActorMaterializer
 import net.manub.embeddedkafka.{ EmbeddedKafka, EmbeddedKafkaConfig }
 import org.patricknoir.kafka.reactive.server.{ ReactiveRoute, ReactiveSystem }
 import org.patricknoir.kafka.reactive.server.streams.{ ReactiveKafkaSink, ReactiveKafkaSource }
+import scala.concurrent.duration._
 
 import scala.concurrent.Future
 
@@ -36,8 +37,8 @@ object SimpleRSServer extends App {
 
   //#run-reactive-system
 
-  val source = ReactiveKafkaSource.create("simple", Set("localhost:9092"), "simpleService")
-  val sink = ReactiveKafkaSink.create(Set("localhost:9092"))
+  val source = ReactiveKafkaSource.create("simple", Set("localhost:9092"), "simpleService", "serviceGroup", 8)
+  val sink = ReactiveKafkaSink.create(Set("localhost:9092"), 8)
 
   /**
    * DSL:
@@ -143,7 +144,12 @@ object RServerExamples {
       bootstrapServers = Set("localhost:9092"),
       clientId = "simpleService"
     )
-    val atLeastOnceSink = ReactiveKafkaSink.atLeastOnce(bootstrapServers = Set("localhost:9092"))
+    val atLeastOnceSink = ReactiveKafkaSink.atLeastOnce(
+      bootstrapServers = Set("localhost:9092"),
+      concurrency = 8,
+      commitMaxBatchSize = 10,
+      commitTimeWindow = 5 seconds
+    )
 
     val reactiveSystem = atLeastOnceSource ~> route ~> atLeastOnceSink
 

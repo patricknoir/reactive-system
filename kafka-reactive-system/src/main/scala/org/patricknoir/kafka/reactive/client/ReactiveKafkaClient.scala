@@ -64,9 +64,9 @@ class ReactiveKafkaClient(config: KafkaReactiveClientConfig)(implicit system: Ac
       (coordinator ? reqWithSender).mapTo[KafkaRequestEnvelope].map(envelope => ProducerMessage.Message(new ProducerRecord[String, String](envelope.destination.topic, envelope.asJson.noSpaces), envelope))
     }
 
-    val responseFlow: Flow[KafkaResponseEnvelope, Unit, NotUsed] = Flow[KafkaResponseEnvelope].map(respEnv => coordinator ! respEnv)
+    val responseFlow: Flow[KafkaResponseEnvelope, KafkaResponseEnvelope, NotUsed] = Flow[KafkaResponseEnvelope] // Response go straight to the Sink
 
-    val bidiFlow: BidiFlow[StreamRequestWithSender, ProducerMessage.Message[String, String, KafkaRequestEnvelope], KafkaResponseEnvelope, Unit, NotUsed] =
+    val bidiFlow: BidiFlow[StreamRequestWithSender, ProducerMessage.Message[String, String, KafkaRequestEnvelope], KafkaResponseEnvelope, KafkaResponseEnvelope, NotUsed] =
       BidiFlow.fromFlows(requestFlow, responseFlow)
 
     val requestKafkaSink: Sink[ProducerMessage.Message[String, String, KafkaRequestEnvelope], NotUsed] = Producer.flow[String, String, KafkaRequestEnvelope](producerSettings).map { result =>
@@ -80,7 +80,13 @@ class ReactiveKafkaClient(config: KafkaReactiveClientConfig)(implicit system: Ac
       source = ReactiveKafkaStreamSource.atMostOnce(responseTopic, consumerConfig, parallelism)
     )
 
-    val stream: RunnableGraph[ActorRef] = Source.actorPublisher(StreamPublisherActor.props).via(bidiFlow.join(kafkaFlow)).to(Sink.ignore)
+    val actorSink: Sink[KafkaResponseEnvelope, Future[Done]] =
+      Sink.foreach(respEnv => coordinator ! respEnv)
+
+    //    val streamSink: Sink[KafkaResponseEnvelope, NotUsed] =
+    //      MergeHub.source[KafkaResponseEnvelope](perProducerBufferSize = 16).to(actorSink).run() // TODO: Tune perProducerBufferSize appropriately
+
+    val stream: RunnableGraph[ActorRef] = Source.actorPublisher(StreamPublisherActor.props).via(bidiFlow.join(kafkaFlow)).to(actorSink)
 
     stream.run()
   }

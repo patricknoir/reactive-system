@@ -117,6 +117,7 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <ul>
   <li><a href="client.html#overview">Overview</a></li>
   <li><a href="client.html#simple-request">Simple Request</a></li>
+  <li><a href="client.html#one-way-simple-request">One-Way Simple Request</a></li>
 </ul>
 </div>
 <h2><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h2>
@@ -184,12 +185,24 @@ val client = new ReactiveClientStream(ClientConfig.default)
 val result: Future[Unit] = client.request[Int, Unit](&quot;kafka:simple/incrementCounter&quot;, 1)
 
 result.onComplete {
-  case Success(_)   =&gt; println(&quot;incrementCounter request sent successfully&quot;)
-  case Failure(err) =&gt; println(s&quot;error sending incrementCounter request: ${err.getMessage}&quot;)
+  case Success(_)   =&gt; println(&quot;incrementCounter request successfully completed&quot;)
+  case Failure(err) =&gt; println(s&quot;error requesting incrementCounter: ${err.getMessage}&quot;)
 }
 
 Await.ready(result, Duration.Inf)
 </code></pre>
+<h2><a href="#one-way-simple-request" name="one-way-simple-request" class="anchor"><span class="anchor-link"></span></a>One-Way Simple Request</h2>
+<p>The Reactive System client also allows to send a message to a remote service without awaiting for a reply from the target service.</p>
+<p>The following snippet shows how to invoke the API in order to send a message to the <code>incrementCounter</code> service without awaiting for a response:</p>
+<pre class="prettyprint"><code class="language-scala">val result: Future[Unit] = client.send[Int](&quot;kafka:simple/incrementCounter&quot;, 1, confirmSend = true)
+
+result.onComplete {
+  case Success(_)   =&gt; println(&quot;incrementCounter request successfully sent&quot;)
+  case Failure(err) =&gt; println(s&quot;error sending incrementCounter request: ${err.getMessage}&quot;)
+}
+
+Await.ready(result, Duration.Inf)</code></pre>
+<p>Please note even though this is a fire-and-forget way of sending a message, the API allows to be confirmed whether the message being successfully sent by setting the <code>confirmSend</code> flag.</p>
 <div class="nav-next">
 <p><strong>Next:</strong> <a href="marshalling.html">Marshalling</a></p>
 </div>
@@ -204,6 +217,7 @@ Await.ready(result, Duration.Inf)
   <ul>
     <li><a href="client.html#overview">Overview</a></li>
     <li><a href="client.html#simple-request">Simple Request</a></li>
+    <li><a href="client.html#one-way-simple-request">One-Way Simple Request</a></li>
   </ul></li>
 </ul>
 </div>

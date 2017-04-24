@@ -15,8 +15,8 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 object ReactiveKafkaStreamSource {
 
-  def atMostOnce(responseTopic: String, bootstrapServers: Set[String], clientId: String, groupId: String = "group1", maxConcurrency: Int)(implicit system: ActorSystem, ec: ExecutionContext): Source[KafkaResponseEnvelope, _] = {
-    Consumer.atMostOnceSource(createConsumerSettings(bootstrapServers, clientId, groupId), Subscriptions.topics(Set(responseTopic)))
+  def atMostOnce(responseTopic: String, consumerSettings: ConsumerSettings[String, String], maxConcurrency: Int = 1)(implicit system: ActorSystem, ec: ExecutionContext): Source[KafkaResponseEnvelope, _] = {
+    Consumer.atMostOnceSource(consumerSettings, Subscriptions.topics(Set(responseTopic)))
       .mapAsync(maxConcurrency) { record => //TODO:  use batching where possible (.groupedWithin())
         Future(decode[KafkaResponseEnvelope](record.value))
       }.filter(_.isRight).map { //TODO: improve with a flow and send the failures to a topic auditing.
@@ -24,11 +24,4 @@ object ReactiveKafkaStreamSource {
       }
   }
 
-  def createConsumerSettings(servers: Set[String], clientId: String, groupId: String)(implicit system: ActorSystem) =
-    ConsumerSettings(system, new StringDeserializer, new StringDeserializer)
-      .withBootstrapServers(servers.mkString(","))
-      .withGroupId(groupId)
-      .withClientId(clientId)
-      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
-      .withProperty(ConsumerConfig.METADATA_MAX_AGE_CONFIG, "5000")
 }

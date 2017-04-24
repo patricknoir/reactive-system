@@ -3,8 +3,8 @@ package org.patricknoir.kafka.examples.client
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import org.patricknoir.kafka.reactive.client.ReactiveClientStream
-import org.patricknoir.kafka.reactive.client.config.ClientConfig
+import org.patricknoir.kafka.reactive.client.ReactiveKafkaClient
+import org.patricknoir.kafka.reactive.client.config.KafkaReactiveClientConfig
 
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
@@ -21,7 +21,7 @@ object SimpleRSClient extends App {
 
   import system.dispatcher
   implicit val materializer = ActorMaterializer()
-  val client = new ReactiveClientStream(ClientConfig.default)
+  val client = new ReactiveKafkaClient(KafkaReactiveClientConfig.default)
 
   println("press e + enter to exit, otherwise enter to send the request!")
 
@@ -50,7 +50,7 @@ object SimpleReactiveClientExamples {
 
     import system.dispatcher
 
-    val client = new ReactiveClientStream(ClientConfig.default)
+    val client = new ReactiveKafkaClient(KafkaReactiveClientConfig.default)
     //#reactive-client-create-client
   }
 
@@ -62,17 +62,38 @@ object SimpleReactiveClientExamples {
 
     import system.dispatcher
 
-    val client = new ReactiveClientStream(ClientConfig.default)
+    val client = new ReactiveKafkaClient(KafkaReactiveClientConfig.default)
 
     val result: Future[Unit] = client.request[Int, Unit]("kafka:simple/incrementCounter", 1)
 
     result.onComplete {
-      case Success(_)   => println("incrementCounter request sent successfully")
-      case Failure(err) => println(s"error sending incrementCounter request: ${err.getMessage}")
+      case Success(_)   => println("incrementCounter request successfully completed")
+      case Failure(err) => println(s"error requesting incrementCounter: ${err.getMessage}")
     }
 
     Await.ready(result, Duration.Inf)
 
     //#reactive-client-call-get-counter
+  }
+
+  def simpleClientOneWayMessageToService() = {
+    implicit val system = ActorSystem("ReactiveClient")
+    implicit val materializer = ActorMaterializer()
+    implicit val timeout = Timeout(5 seconds)
+
+    import system.dispatcher
+
+    val client = new ReactiveKafkaClient(KafkaReactiveClientConfig.default)
+
+    //#reactive-client-one-way-message
+    val result: Future[Unit] = client.send[Int]("kafka:simple/incrementCounter", 1, confirmSend = true)
+
+    result.onComplete {
+      case Success(_)   => println("incrementCounter request successfully sent")
+      case Failure(err) => println(s"error sending incrementCounter request: ${err.getMessage}")
+    }
+
+    Await.ready(result, Duration.Inf)
+    //#reactive-client-one-way-message
   }
 }

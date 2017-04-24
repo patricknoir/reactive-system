@@ -16,11 +16,8 @@ import scala.concurrent.duration._
  */
 abstract class BaseISpec extends TestKit(ActorSystem("TestKit", ConfigFactory.parseString(BaseISpec.configString))) with SpecificationLike {
 
-  def getKafkaPort() = 9092
-  def getZooKeeperPort() = 2181
-
   implicit val materializer = ActorMaterializer()
-  implicit val kafkaConfig = EmbeddedKafkaConfig(kafkaPort = getKafkaPort(), zooKeeperPort = getZooKeeperPort())
+  implicit val kafkaConfig = EmbeddedKafkaConfig(kafkaPort = BaseISpec.kafkaPort, zooKeeperPort = BaseISpec.zooKeeperPort)
 
   def startKafka(): Unit = {
     EmbeddedKafka.start()
@@ -36,7 +33,9 @@ abstract class BaseISpec extends TestKit(ActorSystem("TestKit", ConfigFactory.pa
 }
 
 object BaseISpec {
-  val configString = """
+  val kafkaPort = 9092
+  val zooKeeperPort = 2181
+  val configString = s"""
                        |akka {
                        |  log-config-on-start = off
                        |
@@ -69,6 +68,16 @@ object BaseISpec {
                        |        }
                        |      }
                        |    }
+                       |  }
+                       |}
+                       |reactive.system.client.kafka {
+                       |  response-topic = "responses"
+                       |  consumer {
+                       |    bootstrap-servers = ["localhost:${kafkaPort}"]
+                       |    group-id = "test-group-id"
+                       |  }
+                       |  producer {
+                       |    bootstrap-servers = ["localhost:${kafkaPort}"]
                        |  }
                        |}
                      """.stripMargin

@@ -119,8 +119,8 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
   <li><a href="../design/client.html#overview">Overview</a></li>
   <li><a href="../design/client.html#stream-blueprint">Stream Blueprint</a>
   <ul>
-    <li><a href="../design/client.html#left-to-right-flow">Left-To-Right Flow</a></li>
-    <li><a href="../design/client.html#right-to-left-flow">Right-To-Left Flow</a></li>
+    <li><a href="../design/client.html#request-flow-left-to-right-">Request Flow (Left-To-Right)</a></li>
+    <li><a href="../design/client.html#response-flow-right-to-left-">Response Flow (Right-To-Left)</a></li>
   </ul></li>
   <li><a href="../design/client.html#actor-per-request-pattern">Actor-Per-Request Pattern</a>
   <ul>
@@ -135,34 +135,39 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <h2><a href="#stream-blueprint" name="stream-blueprint" class="anchor"><span class="anchor-link"></span></a>Stream Blueprint</h2>
 <p>The following diagram illustrates the Stream Blueprint for processing the incoming requests.</p>
 <p><img src="../images/reactive-client-stream-blueprint.png" alt="rcstream-blueprint" /></p>
-<h3><a href="#left-to-right-flow" name="left-to-right-flow" class="anchor"><span class="anchor-link"></span></a>Left-To-Right Flow</h3>
+<h3><a href="#request-flow-left-to-right-" name="request-flow-left-to-right-" class="anchor"><span class="anchor-link"></span></a>Request Flow (Left-To-Right)</h3>
 <ul>
-  <li>Whenever a request comes in, the Reactive System client spawns an actor by using the <em>Ask pattern</em> which sends a message to the Stream&rsquo;s Publisher and awaits for a response.</li>
-  <li>The request will flow downstream to the <em>Actor-Per-Request</em> Coordinator-Actor via a <em>mapAsync</em> stage. It will then:
+  <li>[ 1 ] Whenever a request comes in, the Reactive System client spawns an actor by using the <em>Ask pattern</em> which sends a message to the Stream&rsquo;s Publisher and awaits for a response.</li>
+  <li>[ 2 ]. The Publisher wraps the request together with the reference to the <em>ask-pattern-actor</em> as a <code>StreamRequestWithSender</code> and emits it downstream.</li>
+  <li>[ 3 ] The request will get into a <em>mapAsync</em> stage which is the integration point with the <em>Actor-Per-Request</em>, which will:
     <ul>
-      <li>Hold a reference to the ask-pattern-actor that will be completed on the right-to-left flow.</li>
-      <li>Transforms the request in a <code>KafkaRequestEnvelope</code> to be sent downstream.</li>
+      <li>Unwrap the <code>StreamRequestWithSender</code> message to hold the reference to the original <em>ask-pattern-actor</em>, which will be completed on the right-to-left flow.</li>
+      <li>Forge a <code>KafkaRequestEnvelope</code> for the request and sends it back to the <em>mapAsync</em> stage to be sent downstream.</li>
     </ul>
   </li>
-  <li>Sends the request through a Kafka Producer stage.</li>
+  <li>
+  <p>[ 4 ] Sends the request through a Kafka Producer stage.</p>
+  <blockquote>
+    <p>[ 4.1 ] When a <em>one-way-message</em> is sent to Kafka, this stage will send a <code>SendMessageComplete</code> to the <em>Actor-Per-Request</em> once the message is confirmed to be written in Kafka. That way the reply to the initial <em>ask-pattern-actor</em> can be sent straight away.</p>
+  </blockquote></li>
 </ul>
-<h3><a href="#right-to-left-flow" name="right-to-left-flow" class="anchor"><span class="anchor-link"></span></a>Right-To-Left Flow</h3>
+<h3><a href="#response-flow-right-to-left-" name="response-flow-right-to-left-" class="anchor"><span class="anchor-link"></span></a>Response Flow (Right-To-Left)</h3>
 <ul>
-  <li>The flow starts from a Kafka Consumer stage.</li>
-  <li>The response flow downstream to the <em>Actor-Per-Request</em> Coordinator-Actor via a <em>map</em> stage.
-    <ul>
-      <li>Is responsibility of the <em>Actor-Per-Request</em> implementation to reply to the initial ask-pattern-actor.</li>
-    </ul>
-  </li>
-  <li>The sink just ignores what comes from the flow as the responsibility of completing the request has been leveraged to the <em>Actor-Per-Request</em>.</li>
+  <li>[ 5 ] The flow starts from a Kafka Consumer stage when a response is received and decoded as a <code>KafkaResponseEnvelope</code> and emits it downstream.</li>
+  <li>
+  <p>[ 6 ] The response gets into a <em>map</em> stage which will send it to the <em>Actor-Per-Request</em> and emits <code>Unit</code> downstream.</p>
+  <blockquote>
+    <p>Is responsibility of the <em>Actor-Per-Request</em> to reply to the initial <em>ask-pattern-actor</em> in order to complete the original request.</p>
+  </blockquote></li>
+  <li>[ 7 ] The sink just ignores what comes from the flow as the responsibility of completing the request has been leveraged to the <em>Actor-Per-Request</em>.</li>
 </ul>
 <h2><a href="#actor-per-request-pattern" name="actor-per-request-pattern" class="anchor"><span class="anchor-link"></span></a>Actor-Per-Request Pattern</h2>
 <p>In a nutshell, the client will use an actor-per-request pattern in order to deliver the request and await for its response.</p>
 <p>The actor-per-request approach is implemented using Akka actors and its hierarchy consists of a parent Coordinator-Actor which creates and supervise one or many Request-Actor&rsquo;s.</p>
 <h3><a href="#coordinator-actor" name="coordinator-actor" class="anchor"><span class="anchor-link"></span></a>Coordinator Actor</h3>
 <p>Apart from supervising its children, the coordinator actor have two differentiated set of responsibilities:</p>
-<p>When receiving <strong>requests</strong>: - Accepts the incoming requests. - Generates a unique <code>correlationId</code> for each request. - Spawn a child actor that will be in charge of a particular request. - Tranforms the incoming request into a <code>KafkaRequestEnvelope</code> ready to be sent to Kafka and sends it downstream.</p>
-<p>When receiving <strong>responses</strong>: - Accepts the responses. - Based on the <code>correlationId</code> of the response, it looks for a child Request-Actor awaiting for the response and forwards the response to it.</p>
+<p>When receiving <strong>requests</strong>: * Accepts the incoming requests. * Generates a unique <code>correlationId</code> for each request. * Spawns a child actor that will be in charge of a particular request. * Tranforms the incoming request into a <code>KafkaRequestEnvelope</code> ready to be sent to Kafka and sends it downstream.</p>
+<p>When receiving <strong>responses</strong>: * Accepts the responses. * Based on the <code>correlationId</code> of the response, it looks for a child Request-Actor awaiting for the response and forwards the response to it.</p>
 <h3><a href="#request-actor" name="request-actor" class="anchor"><span class="anchor-link"></span></a>Request Actor</h3>
 <p>The main responsibility of a Request-Actor is to complete or time-out the request-cycle. </p>
 <p>When created, it&rsquo;s passed the source <em>ask-pattern-actor</em> reference to complete the cycle upon response reception and schedules a timeout in case the response is not received in a timely manner. </p>
@@ -178,8 +183,8 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
     <li><a href="../design/client.html#overview">Overview</a></li>
     <li><a href="../design/client.html#stream-blueprint">Stream Blueprint</a>
     <ul>
-      <li><a href="../design/client.html#left-to-right-flow">Left-To-Right Flow</a></li>
-      <li><a href="../design/client.html#right-to-left-flow">Right-To-Left Flow</a></li>
+      <li><a href="../design/client.html#request-flow-left-to-right-">Request Flow (Left-To-Right)</a></li>
+      <li><a href="../design/client.html#response-flow-right-to-left-">Response Flow (Right-To-Left)</a></li>
     </ul></li>
     <li><a href="../design/client.html#actor-per-request-pattern">Actor-Per-Request Pattern</a>
     <ul>

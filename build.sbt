@@ -19,7 +19,7 @@ val Versions = new {
   val ScalaBinary = "2.12"
   val Slf4j = "1.7.21"
   val ScalaLogging = "3.5.0"
-  val Akka = "2.4.17"
+  val Akka = "2.5.0"
   val AkkaHttp = "10.0.4"
   val Circe = "0.7.0"
   val Specs2 = "3.8.9"
@@ -145,7 +145,7 @@ val dest = (baseDirectory / "docs")
 
 val commonSettings = Seq(
   organization := "org.patricknoir.kafka",
-  version := "0.3.0",
+  version := "0.3.2",
   scalaVersion := "2.12.1",
   fork in run := true,
   fork in Test := true,

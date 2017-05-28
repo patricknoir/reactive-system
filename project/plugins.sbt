@@ -30,4 +30,4 @@ addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.0")
 //
 addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
 
-addSbtPlugin("com.lightbend.paradox" % "sbt-paradox" % "0.2.9")
+addSbtPlugin("com.lightbend.paradox" % "sbt-paradox" % "0.2.12")

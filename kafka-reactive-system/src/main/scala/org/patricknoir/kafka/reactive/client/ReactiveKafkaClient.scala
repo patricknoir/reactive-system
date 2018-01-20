@@ -36,18 +36,18 @@ class ReactiveKafkaClient(config: KafkaReactiveClientConfig)(implicit system: Ac
 
   private val publisher = createStream()
 
-  override def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout, ct: ClassTag[Out]): Future[Out] =
+  override def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In, headers: Map[String, String])(implicit timeout: Timeout, ct: ClassTag[Out]): Future[Out] =
     destination match {
       case Destination(medium, topic, serviceId) =>
-        (publisher ? StreamRequest(Destination(medium, topic, serviceId), new String(implicitly[ReactiveSerializer[In]].serialize(payload)), timeout, Some(ResponseInfo(responseTopic, implicitly[ReactiveDeserializer[Out]])))).mapTo[Out]
+        (publisher ? StreamRequest(Destination(medium, topic, serviceId), new String(implicitly[ReactiveSerializer[In]].serialize(payload)), timeout, Some(ResponseInfo(responseTopic, implicitly[ReactiveDeserializer[Out]])), headers)).mapTo[Out]
       case other =>
         Future.failed[Out](new RuntimeException(s"invalid destination: $destination"))
     }
 
-  override def send[In: ReactiveSerializer](destination: String, payload: In, confirmSend: Boolean)(implicit timeout: Timeout): Future[Unit] =
+  override def send[In: ReactiveSerializer](destination: String, payload: In, confirmSend: Boolean, headers: Map[String, String])(implicit timeout: Timeout): Future[Unit] =
     destination match {
       case Destination(medium, topic, serviceId) =>
-        (publisher ? StreamRequest(Destination(medium, topic, serviceId), new String(implicitly[ReactiveSerializer[In]].serialize(payload)), timeout, None)).mapTo[Done].map(_ => ())
+        (publisher ? StreamRequest(Destination(medium, topic, serviceId), new String(implicitly[ReactiveSerializer[In]].serialize(payload)), timeout, None, headers)).mapTo[Done].map(_ => ())
       case other =>
         Future.failed[Unit](new RuntimeException(s"invalid destination: $destination"))
     }

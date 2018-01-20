@@ -57,7 +57,7 @@ object ReactiveSystem {
     val g = source.map { request =>
       val result: Future[String] = for {
         serviceId <- Future.successful(extractServiceId(request))
-        service <- Try(route.services(serviceId)).fold(Future.failed[ReactiveService[_, _]](_), Future.successful(_))
+        service <- Future.fromTry(Try(route.services(serviceId))) // Try(route.services(serviceId)).fold(Future.failed[ReactiveService[_, _]](_), Future.successful(_))
         response <- service.unsafeApply(request.payload)
       } yield response
       result

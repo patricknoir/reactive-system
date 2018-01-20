@@ -8,7 +8,7 @@ package object actors {
   object protocol {
     case class ResponseInfo(replyTo: String, deserializer: ReactiveDeserializer[_])
 
-    case class StreamRequest(destination: Destination, payload: String, timeout: Timeout, responseInfo: Option[ResponseInfo])
+    case class StreamRequest(destination: Destination, payload: String, timeout: Timeout, responseInfo: Option[ResponseInfo], headers: Map[String, String])
     case class StreamRequestWithSender(origin: ActorRef, request: StreamRequest)
 
     case class SendMessageComplete(correlationId: String)

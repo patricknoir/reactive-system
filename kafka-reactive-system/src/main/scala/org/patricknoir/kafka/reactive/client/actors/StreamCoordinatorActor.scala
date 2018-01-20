@@ -21,7 +21,7 @@ class StreamCoordinatorActor() extends Actor with ActorLogging {
   def receive = {
     case reqWithSender: StreamRequestWithSender =>
       handleRequest(reqWithSender)
-    case respEnv @ KafkaResponseEnvelope(correlationId, _, _, _) =>
+    case respEnv @ KafkaResponseEnvelope(correlationId, _, _, _, _) =>
       forwardToChild(correlationId, respEnv)
     case msgSent @ SendMessageComplete(correlationId) =>
       forwardToChild(correlationId, msgSent)

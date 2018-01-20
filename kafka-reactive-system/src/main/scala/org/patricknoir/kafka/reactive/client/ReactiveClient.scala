@@ -33,7 +33,7 @@ trait ReactiveClient {
    * @tparam Out result type member of [[org.patricknoir.kafka.reactive.common.ReactiveDeserializer]]
    * @return a [[scala.concurrent.Future]] of an [[Out]] in case of success, otherwise a failed [[scala.concurrent.Future]]
    */
-  def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In)(implicit timeout: Timeout, ct: ClassTag[Out]): Future[Out]
+  def request[In: ReactiveSerializer, Out: ReactiveDeserializer](destination: String, payload: In, headers: Map[String, String] = Map.empty[String, String])(implicit timeout: Timeout, ct: ClassTag[Out]): Future[Out]
 
   /**
    * Used to send a unidirectional message to a specific service without expecting any response.
@@ -44,6 +44,6 @@ trait ReactiveClient {
    * @tparam In payload input type member of [[org.patricknoir.kafka.reactive.common.ReactiveSerializer]]
    * @return successful future if the message has been delivered to the broker otherwise it fails.
    */
-  def send[In: ReactiveSerializer](destination: String, payload: In, confirmSend: Boolean)(implicit timeout: Timeout): Future[Unit]
+  def send[In: ReactiveSerializer](destination: String, payload: In, confirmSend: Boolean, headers: Map[String, String] = Map.empty[String, String])(implicit timeout: Timeout): Future[Unit]
 
 }

@@ -19,15 +19,15 @@ val Versions = new {
   val ScalaBinary = "2.12"
   val Slf4j = "1.7.21"
   val ScalaLogging = "3.5.0"
-  val Akka = "2.5.2"
-  val AkkaHttp = "10.0.7"
-  val Circe = "0.7.0"
+  val Akka = "2.5.9"
+  val AkkaHttp = "10.0.11"
+  val Circe = "0.9.1"
   val Specs2 = "3.8.9"
-  val EmbeddedKafka = "0.12.0"
-  val Kafka = "0.10.2.0"
+  val EmbeddedKafka = "0.16.0"
+  val Kafka = "1.0.0"
   val KindProjector = "0.9.3"
   val ScalaTest = "3.0.1"
-  val AkkaStreamKafka = "0.14"
+  val AkkaStreamKafka = "0.18"
 }
 
 // Dependencies

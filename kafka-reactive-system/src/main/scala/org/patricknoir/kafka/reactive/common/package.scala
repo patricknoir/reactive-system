@@ -55,7 +55,7 @@ package object common {
     }.toOption
   }
 
-  case class KafkaRequestEnvelope(correlationId: String, destination: Destination, payload: String, replyTo: String)
+  case class KafkaRequestEnvelope(correlationId: String, destination: Destination, payload: String, replyTo: String, headers: Map[String, String] = Map.empty[String, String])
   object KafkaRequestEnvelope {
     implicit val kafkaRequestEnvelopeDecoder = Decoder.instance[KafkaRequestEnvelope] { c =>
       for {
@@ -63,6 +63,7 @@ package object common {
         destination <- c.downField("destination").as[Destination]
         payload <- c.downField("payload").as[String]
         replyTo <- c.downField("replyTo").as[String]
+        headers <- c.downField("headers").as[Map[String, String]]
       } yield KafkaRequestEnvelope(correlationId, destination, payload, replyTo)
     }
   }
@@ -73,7 +74,7 @@ package object common {
     val BadRequest = 300
     val InternalServerError = 500
   }
-  case class KafkaResponseEnvelope(correlationId: String, replyTo: String, response: String, statusCode: Int)
+  case class KafkaResponseEnvelope(correlationId: String, replyTo: String, response: String, statusCode: Int, headers: Map[String, String] = Map.empty[String, String])
   object KafkaResponseEnvelope {
     implicit val respEnvelopeDecoder = Decoder.instance[KafkaResponseEnvelope] { c =>
       for {
@@ -81,6 +82,7 @@ package object common {
         replyTo <- c.downField("replyTo").as[String]
         response <- c.downField("response").as[String]
         statusCode <- c.downField("statusCode").as[Int]
+        headers <- c.downField("headers").as[Map[String, String]]
       } yield KafkaResponseEnvelope(correlationId, replyTo, response, statusCode)
     }
   }

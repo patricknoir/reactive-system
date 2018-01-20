@@ -45,7 +45,8 @@ class StreamCoordinatorActorSpec extends TestKit(ActorSystem("TestKit")) with Sp
           responseInfo = Option(ResponseInfo(
             replyTo = "replyTopic",
             deserializer = implicitly[ReactiveDeserializer[String]]
-          ))
+          )),
+          Map.empty[String, String]
         )
       ),
       sender = echoActor
@@ -75,7 +76,8 @@ class StreamCoordinatorActorSpec extends TestKit(ActorSystem("TestKit")) with Sp
           responseInfo = Option(ResponseInfo(
             replyTo = "replyTopic",
             deserializer = implicitly[ReactiveDeserializer[Car]]
-          ))
+          )),
+          headers = Map.empty[String, String]
         )
       ),
       sender = echoActor
@@ -97,7 +99,8 @@ class StreamCoordinatorActorSpec extends TestKit(ActorSystem("TestKit")) with Sp
           destination = destination,
           payload = new String(serialize("simple message".getBytes)),
           timeout = timeout,
-          responseInfo = None
+          responseInfo = None,
+          headers = Map.empty[String, String]
         )
       ),
       sender = echoActor
@@ -111,9 +114,9 @@ class StreamCoordinatorActorSpec extends TestKit(ActorSystem("TestKit")) with Sp
 
 class KafkaEchoMockActor extends Actor {
   def receive = {
-    case KafkaRequestEnvelope(correlationId, _, _, replyTo) if replyTo.isEmpty =>
+    case KafkaRequestEnvelope(correlationId, _, _, replyTo, _) if replyTo.isEmpty =>
       sender ! SendMessageComplete(correlationId)
-    case KafkaRequestEnvelope(correlationId, destination, payload, replyTo) if replyTo.nonEmpty =>
+    case KafkaRequestEnvelope(correlationId, destination, payload, replyTo, _) if replyTo.nonEmpty =>
       sender ! KafkaResponseEnvelope(correlationId, replyTo, payload, KafkaResponseStatusCode.Success)
   }
 }

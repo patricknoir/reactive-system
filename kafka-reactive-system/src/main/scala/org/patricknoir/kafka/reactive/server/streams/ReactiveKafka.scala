@@ -44,7 +44,7 @@ object ReactiveKafkaSource extends LazyLogging {
         parsedMsg
       }.filter(_.isRight).map {
         case (Right(kkReqEnvelope)) => kkReqEnvelope
-        case msg                    => logger.warn(s"Unexpected parsed message received: $msg"); throw new RuntimeException(s"Unexpected parsed message received: $msg")
+        case msg => logger.warn(s"Unexpected parsed message received: $msg"); throw new RuntimeException(s"Unexpected parsed message received: $msg")
       }
 
   /**
@@ -73,7 +73,7 @@ object ReactiveKafkaSource extends LazyLogging {
       msg
     }.filter(_._2.isRight).map {
       case (msg, Right(kkReqEnvelope)) => (msg, kkReqEnvelope)
-      case msg                         => logger.warn(s"Unexpected parsed message received: $msg"); throw new RuntimeException(s"Unexpected parsed message received: $msg")
+      case msg => logger.warn(s"Unexpected parsed message received: $msg"); throw new RuntimeException(s"Unexpected parsed message received: $msg")
     }
 }
 

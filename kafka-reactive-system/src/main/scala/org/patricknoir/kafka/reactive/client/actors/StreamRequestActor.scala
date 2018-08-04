@@ -19,7 +19,7 @@ class StreamRequestActor(origin: ActorRef, timeout: Timeout, deserializer: React
       val eitherResult = deserializer.deserialize(responseEvenlope.response.getBytes)
       eitherResult match {
         case Right(response) => origin ! response
-        case Left(err)       => origin ! Status.Failure(err)
+        case Left(err) => origin ! Status.Failure(err)
       }
       context stop self
     case Timeout =>

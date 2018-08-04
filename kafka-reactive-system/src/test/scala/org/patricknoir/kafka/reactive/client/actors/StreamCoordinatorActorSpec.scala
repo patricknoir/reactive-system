@@ -44,13 +44,9 @@ class StreamCoordinatorActorSpec extends TestKit(ActorSystem("TestKit")) with Sp
           timeout = timeout,
           responseInfo = Option(ResponseInfo(
             replyTo = "replyTopic",
-            deserializer = implicitly[ReactiveDeserializer[String]]
-          )),
-          Map.empty[String, String]
-        )
-      ),
-      sender = echoActor
-    )
+            deserializer = implicitly[ReactiveDeserializer[String]])),
+          Map.empty[String, String])),
+      sender = echoActor)
 
     val expectedMsg = "simple message"
     probe.expectMsg(timeout.duration, expectedMsg) must be_==(expectedMsg)
@@ -75,13 +71,9 @@ class StreamCoordinatorActorSpec extends TestKit(ActorSystem("TestKit")) with Sp
           timeout = timeout,
           responseInfo = Option(ResponseInfo(
             replyTo = "replyTopic",
-            deserializer = implicitly[ReactiveDeserializer[Car]]
-          )),
-          headers = Map.empty[String, String]
-        )
-      ),
-      sender = echoActor
-    )
+            deserializer = implicitly[ReactiveDeserializer[Car]])),
+          headers = Map.empty[String, String])),
+      sender = echoActor)
 
     val expectedMsg = car
     probe.expectMsg(timeout.duration, expectedMsg) must be_==(car)
@@ -100,11 +92,8 @@ class StreamCoordinatorActorSpec extends TestKit(ActorSystem("TestKit")) with Sp
           payload = new String(serialize("simple message".getBytes)),
           timeout = timeout,
           responseInfo = None,
-          headers = Map.empty[String, String]
-        )
-      ),
-      sender = echoActor
-    )
+          headers = Map.empty[String, String])),
+      sender = echoActor)
 
     val expectedMsg = Done
     probe.expectMsg(timeout.duration, expectedMsg) must be_==(expectedMsg)

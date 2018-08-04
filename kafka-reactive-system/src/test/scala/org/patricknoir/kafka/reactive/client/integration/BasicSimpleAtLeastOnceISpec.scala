@@ -1,6 +1,5 @@
 package org.patricknoir.kafka.reactive.client.integration
 
-import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import org.patricknoir.kafka.reactive.client.ReactiveKafkaClient
 import org.patricknoir.kafka.reactive.client.config.KafkaReactiveClientConfig

@@ -32,7 +32,7 @@ class StreamCoordinatorActor() extends Actor with ActorLogging {
   private def generateUUID(): String = {
     val candidate = UUID.randomUUID().toString()
     context.child(candidate) match {
-      case None    => candidate
+      case None => candidate
       case Some(_) => generateUUID()
     }
   }
@@ -46,15 +46,13 @@ class StreamCoordinatorActor() extends Actor with ActorLogging {
 
   private def createActorPerRequest(correlationId: String, reqWithSender: StreamRequestWithSender) = {
     reqWithSender.request.responseInfo.fold(
-      context.actorOf(StreamRequestOneWayActor.props(reqWithSender.origin, reqWithSender.request.timeout), correlationId)
-    )(respInfo =>
+      context.actorOf(StreamRequestOneWayActor.props(reqWithSender.origin, reqWithSender.request.timeout), correlationId))(respInfo =>
         context.actorOf(StreamRequestActor.props(reqWithSender.origin, reqWithSender.request.timeout, respInfo.deserializer), correlationId))
   }
 
   private def forwardToChild(correlationId: String, msg: Any) = {
     context.child(correlationId).fold(
-      log.warning(s"Unexpected reponse received for: ${correlationId}")
-    )(child =>
+      log.warning(s"Unexpected reponse received for: ${correlationId}"))(child =>
         child ! msg)
   }
 }

@@ -10,11 +10,10 @@ import collection.JavaConverters._
  * Created by josee on 29/03/2017.
  */
 case class KafkaReactiveClientConfig(
-  parallelism:    Int,
-  responseTopic:  String,
+  parallelism: Int,
+  responseTopic: String,
   consumerConfig: ConsumerSettings[String, String],
-  producerConfig: ProducerSettings[String, String]
-)
+  producerConfig: ProducerSettings[String, String])
 
 object KafkaReactiveClientConfig {
   def apply(config: Config): KafkaReactiveClientConfig = KafkaReactiveClientConfig(
@@ -24,8 +23,7 @@ object KafkaReactiveClientConfig {
       .withBootstrapServers(config.getStringList("consumer.bootstrap-servers").asScala.mkString(","))
       .withGroupId(config.getString("consumer.group-id")),
     producerConfig = ProducerSettings(config.getConfig("producer"), new StringSerializer, new StringSerializer)
-      .withBootstrapServers(config.getStringList("producer.bootstrap-servers").asScala.mkString(","))
-  )
+      .withBootstrapServers(config.getStringList("producer.bootstrap-servers").asScala.mkString(",")))
 
   def default()(implicit system: ActorSystem) = apply(system.settings.config.getConfig("reactive.system.client.kafka"))
 }

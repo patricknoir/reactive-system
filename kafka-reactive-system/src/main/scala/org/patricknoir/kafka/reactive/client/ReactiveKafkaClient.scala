@@ -77,8 +77,7 @@ class ReactiveKafkaClient(config: KafkaReactiveClientConfig)(implicit system: Ac
 
     val kafkaFlow: Flow[ProducerMessage.Message[String, String, KafkaRequestEnvelope], KafkaResponseEnvelope, NotUsed] = Flow.fromSinkAndSource(
       sink = requestKafkaSink,
-      source = ReactiveKafkaStreamSource.atMostOnce(responseTopic, consumerConfig, parallelism)
-    )
+      source = ReactiveKafkaStreamSource.atMostOnce(responseTopic, consumerConfig, parallelism))
 
     val actorSink: Sink[KafkaResponseEnvelope, Future[Done]] =
       Sink.foreach(respEnv => coordinator ! respEnv)

@@ -142,14 +142,12 @@ object RServerExamples {
     val atLeastOnceSource = ReactiveKafkaSource.atLeastOnce(
       requestTopic = "simple",
       bootstrapServers = Set("localhost:9092"),
-      clientId = "simpleService"
-    )
+      clientId = "simpleService")
     val atLeastOnceSink = ReactiveKafkaSink.atLeastOnce(
       bootstrapServers = Set("localhost:9092"),
       concurrency = 8,
       commitMaxBatchSize = 10,
-      commitTimeWindow = 5 seconds
-    )
+      commitTimeWindow = 5 seconds)
 
     val reactiveSystem = atLeastOnceSource ~> route ~> atLeastOnceSink
 

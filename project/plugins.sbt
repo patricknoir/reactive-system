@@ -8,26 +8,26 @@ resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositori
 
 // Dependency graph
 //
-addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.8.2")
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.9.1")
 
 // Native packager
 //
-addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.1.5")
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.3.6")
 
 // Scalariform
 //
-addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.6.0")
+addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
 
 // Scoverage
 //
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.0-M3")
 
 // Update plugin
 //
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.0")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.4")
 
 // Bintray plugin
 //
-addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
+addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.4")
 
-addSbtPlugin("com.lightbend.paradox" % "sbt-paradox" % "0.2.12")
+addSbtPlugin("com.lightbend.paradox" % "sbt-paradox" % "0.3.5")

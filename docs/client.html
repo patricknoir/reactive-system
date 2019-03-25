@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css?family=Roboto:100normal,100italic,300normal,300italic,400normal,400italic,500normal,500italic,700normal,700italic,900normal,900italicc" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="js/page.js"></script>
+<script type="text/javascript" src="js/groups.js"></script>
 <link rel="stylesheet" type="text/css" href="lib/normalize.css/normalize.css"/>
 <link rel="stylesheet" type="text/css" href="lib/foundation/dist/foundation.min.css"/>
 <link rel="stylesheet" type="text/css" href="css/page.css"/>
@@ -29,20 +30,20 @@
 <span class="home-icon">⌂</span>Reactive System
 </a>
 <div class="version-number">
-0.3.0
+0.4.0*
 </div>
 </div>
 <div class="nav-toc">
 <ul>
-  <li><a href="introduction.html">Introduction</a></li>
-  <li><a href="server.html">Server</a></li>
-  <li><a href="client.html" class="active">Client</a></li>
-  <li><a href="marshalling.html">Marshalling</a></li>
-  <li><a href="design/index.html">Design</a>
+  <li><a href="introduction.html" class="page">Introduction</a></li>
+  <li><a href="server.html" class="page">Server</a></li>
+  <li><a href="client.html" class="active page">Client</a></li>
+  <li><a href="marshalling.html" class="page">Marshalling</a></li>
+  <li><a href="design/index.html" class="page">Design</a>
   <ul>
-    <li><a href="design/general.html">Architecture</a></li>
-    <li><a href="design/server.html">Server Architecture</a></li>
-    <li><a href="design/client.html">Client Architecture</a></li>
+    <li><a href="design/general.html" class="page">Architecture</a></li>
+    <li><a href="design/server.html" class="page">Server Architecture</a></li>
+    <li><a href="design/client.html" class="page">Client Architecture</a></li>
   </ul></li>
 </ul>
 </div>
@@ -75,20 +76,20 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <span class="home-icon">⌂</span>Reactive System
 </a>
 <div class="version-number">
-0.3.0
+0.4.0*
 </div>
 </div>
 <div class="nav-toc">
 <ul>
-  <li><a href="introduction.html">Introduction</a></li>
-  <li><a href="server.html">Server</a></li>
-  <li><a href="client.html" class="active">Client</a></li>
-  <li><a href="marshalling.html">Marshalling</a></li>
-  <li><a href="design/index.html">Design</a>
+  <li><a href="introduction.html" class="page">Introduction</a></li>
+  <li><a href="server.html" class="page">Server</a></li>
+  <li><a href="client.html" class="active page">Client</a></li>
+  <li><a href="marshalling.html" class="page">Marshalling</a></li>
+  <li><a href="design/index.html" class="page">Design</a>
   <ul>
-    <li><a href="design/general.html">Architecture</a></li>
-    <li><a href="design/server.html">Server Architecture</a></li>
-    <li><a href="design/client.html">Client Architecture</a></li>
+    <li><a href="design/general.html" class="page">Architecture</a></li>
+    <li><a href="design/server.html" class="page">Server Architecture</a></li>
+    <li><a href="design/client.html" class="page">Client Architecture</a></li>
   </ul></li>
 </ul>
 </div>
@@ -115,9 +116,9 @@ C16.952,7,17,6.553,17,6c0-0.553-0.048-1-0.6-1H3.6C3.048,5,3,5.447,3,6C3,6.553,3.
 <h1><a href="#client" name="client" class="anchor"><span class="anchor-link"></span></a>Client</h1>
 <div class="toc ">
 <ul>
-  <li><a href="client.html#overview">Overview</a></li>
-  <li><a href="client.html#simple-request">Simple Request</a></li>
-  <li><a href="client.html#one-way-simple-request">One-Way Simple Request</a></li>
+  <li><a href="client.html#overview" class="header">Overview</a></li>
+  <li><a href="client.html#simple-request" class="header">Simple Request</a></li>
+  <li><a href="client.html#one-way-simple-request" class="header">One-Way Simple Request</a></li>
 </ul>
 </div>
 <h2><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h2>
@@ -129,7 +130,7 @@ implicit val timeout = Timeout(5 seconds)
 
 import system.dispatcher
 
-val client = new ReactiveClientStream(ClientConfig.default)</code></pre>
+val client = new ReactiveKafkaClient(KafkaReactiveClientConfig.default)</code></pre>
 <h2><a href="#simple-request" name="simple-request" class="anchor"><span class="anchor-link"></span></a>Simple Request</h2>
 <p>We are now going to create a simple client which will call the Reactive System server we have created in the previous section.</p>
 <p>For clarity here is the code snipped for the <strong>server</strong> definition:</p>
@@ -180,7 +181,7 @@ implicit val timeout = Timeout(5 seconds)
 
 import system.dispatcher
 
-val client = new ReactiveClientStream(ClientConfig.default)
+val client = new ReactiveKafkaClient(KafkaReactiveClientConfig.default)
 
 val result: Future[Unit] = client.request[Int, Unit](&quot;kafka:simple/incrementCounter&quot;, 1)
 
@@ -213,11 +214,11 @@ Await.ready(result, Duration.Inf)</code></pre>
 <div class="nav-title">On this page:</div>
 <div class="nav-toc">
 <ul>
-  <li><a href="client.html#client">Client</a>
+  <li><a href="client.html#client" class="header">Client</a>
   <ul>
-    <li><a href="client.html#overview">Overview</a></li>
-    <li><a href="client.html#simple-request">Simple Request</a></li>
-    <li><a href="client.html#one-way-simple-request">One-Way Simple Request</a></li>
+    <li><a href="client.html#overview" class="header">Overview</a></li>
+    <li><a href="client.html#simple-request" class="header">Simple Request</a></li>
+    <li><a href="client.html#one-way-simple-request" class="header">One-Way Simple Request</a></li>
   </ul></li>
 </ul>
 </div>
@@ -260,7 +261,7 @@ Await.ready(result, Duration.Inf)</code></pre>
 
 <!--
 <div class="copyright">
-<span class="text">&copy; 2017</span>
+<span class="text">&copy; 2018</span>
 <a href="https://www.example.com" class="logo">logo</a>
 </div>
 -->

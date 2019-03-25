@@ -27,7 +27,6 @@ class StreamCoordinatorActor() extends Actor with ActorLogging {
       forwardToChild(correlationId, msgSent)
   }
 
-  //FIXME: check it doesn't exists already
   @tailrec
   private def generateUUID(): String = {
     val candidate = UUID.randomUUID().toString()

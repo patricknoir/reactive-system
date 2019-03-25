@@ -244,7 +244,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">StreamRequest</span><span class="params">(<span name="destination">destination: <a href="../../common/package$$Destination.html" class="extype" name="org.patricknoir.kafka.reactive.common.Destination">Destination</a></span>, <span name="payload">payload: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="timeout">timeout: <span class="extype" name="akka.util.Timeout">Timeout</span></span>, <span name="responseInfo">responseInfo: <span class="extype" name="scala.Option">Option</span>[<a href="package$$protocol$$ResponseInfo.html" class="extype" name="org.patricknoir.kafka.reactive.client.actors.protocol.ResponseInfo">ResponseInfo</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">StreamRequest</span><span class="params">(<span name="destination">destination: <a href="../../common/package$$Destination.html" class="extype" name="org.patricknoir.kafka.reactive.common.Destination">Destination</a></span>, <span name="payload">payload: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="timeout">timeout: <span class="extype" name="akka.util.Timeout">Timeout</span></span>, <span name="responseInfo">responseInfo: <span class="extype" name="scala.Option">Option</span>[<a href="package$$protocol$$ResponseInfo.html" class="extype" name="org.patricknoir.kafka.reactive.client.actors.protocol.ResponseInfo">ResponseInfo</a>]</span>, <span name="headers">headers: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -300,9 +300,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="org.patricknoir.kafka.reactive.client.actors.protocol.StreamRequest#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(destination:org.patricknoir.kafka.reactive.common.Destination,payload:String,timeout:akka.util.Timeout,responseInfo:Option[org.patricknoir.kafka.reactive.client.actors.protocol.ResponseInfo]):org.patricknoir.kafka.reactive.client.actors.protocol.StreamRequest"></a><a id="&lt;init&gt;:StreamRequest"></a>
+      <a id="&lt;init&gt;(destination:org.patricknoir.kafka.reactive.common.Destination,payload:String,timeout:akka.util.Timeout,responseInfo:Option[org.patricknoir.kafka.reactive.client.actors.protocol.ResponseInfo],headers:Map[String,String]):org.patricknoir.kafka.reactive.client.actors.protocol.StreamRequest"></a><a id="&lt;init&gt;:StreamRequest"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/actors/package$$protocol$$StreamRequest.html#&lt;init&gt;(destination:org.patricknoir.kafka.reactive.common.Destination,payload:String,timeout:akka.util.Timeout,responseInfo:Option[org.patricknoir.kafka.reactive.client.actors.protocol.ResponseInfo]):org.patricknoir.kafka.reactive.client.actors.protocol.StreamRequest" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/actors/package$$protocol$$StreamRequest.html#&lt;init&gt;(destination:org.patricknoir.kafka.reactive.common.Destination,payload:String,timeout:akka.util.Timeout,responseInfo:Option[org.patricknoir.kafka.reactive.client.actors.protocol.ResponseInfo],headers:Map[String,String]):org.patricknoir.kafka.reactive.client.actors.protocol.StreamRequest" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -311,7 +311,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">StreamRequest</span><span class="params">(<span name="destination">destination: <a href="../../common/package$$Destination.html" class="extype" name="org.patricknoir.kafka.reactive.common.Destination">Destination</a></span>, <span name="payload">payload: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="timeout">timeout: <span class="extype" name="akka.util.Timeout">Timeout</span></span>, <span name="responseInfo">responseInfo: <span class="extype" name="scala.Option">Option</span>[<a href="package$$protocol$$ResponseInfo.html" class="extype" name="org.patricknoir.kafka.reactive.client.actors.protocol.ResponseInfo">ResponseInfo</a>]</span>)</span>
+        <span class="name">StreamRequest</span><span class="params">(<span name="destination">destination: <a href="../../common/package$$Destination.html" class="extype" name="org.patricknoir.kafka.reactive.common.Destination">Destination</a></span>, <span name="payload">payload: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="timeout">timeout: <span class="extype" name="akka.util.Timeout">Timeout</span></span>, <span name="responseInfo">responseInfo: <span class="extype" name="scala.Option">Option</span>[<a href="package$$protocol$$ResponseInfo.html" class="extype" name="org.patricknoir.kafka.reactive.client.actors.protocol.ResponseInfo">ResponseInfo</a>]</span>, <span name="headers">headers: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>)</span>
       </span>
       
       
@@ -481,6 +481,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="org.patricknoir.kafka.reactive.client.actors.protocol.StreamRequest#headers" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="headers:Map[String,String]"></a>
+      <span class="permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/actors/package$$protocol$$StreamRequest.html#headers:Map[String,String]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">headers</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      
+      
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">

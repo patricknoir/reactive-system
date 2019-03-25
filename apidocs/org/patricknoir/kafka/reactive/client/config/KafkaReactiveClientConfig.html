@@ -180,46 +180,47 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="org.patricknoir.kafka.reactive.client">client</a></dd></dl></div>
     </li><li class="current-entities indented6">
-                        <a class="object" href="" title=""></a>
-                        <a class="class" href="ClientConfig.html" title="Client configuration"></a>
-                        <a href="ClientConfig.html" title="Client configuration">
-                          ClientConfig
+                        <a class="object" href="KafkaReactiveClientConfig$.html" title=""></a>
+                        <a class="class" href="" title="Created by josee on 29/03/2017."></a>
+                        <a href="" title="Created by josee on 29/03/2017.">
+                          KafkaReactiveClientConfig
                         </a>
                       </li>
               </ul>
             </div>
           </div>
           <div id="content">
-            <body class="object value">
+            <body class="class type">
       <div id="definition">
-        <a href="ClientConfig.html" title="See companion class"><div class="big-circle object-companion-class">o</div></a>
+        <a href="KafkaReactiveClientConfig$.html" title="See companion object"><div class="big-circle class-companion-object">c</div></a>
         <p id="owner"><a href="../../../../../index.html" class="extype" name="org">org</a>.<a href="../../../../index.html" class="extype" name="org.patricknoir">patricknoir</a>.<a href="../../../index.html" class="extype" name="org.patricknoir.kafka">kafka</a>.<a href="../../index.html" class="extype" name="org.patricknoir.kafka.reactive">reactive</a>.<a href="../index.html" class="extype" name="org.patricknoir.kafka.reactive.client">client</a>.<a href="index.html" class="extype" name="org.patricknoir.kafka.reactive.client.config">config</a></p>
-        <h1><a href="ClientConfig.html" title="See companion class">ClientConfig</a><span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html" title="Permalink">
+        <h1><a href="KafkaReactiveClientConfig$.html" title="See companion object">KafkaReactiveClientConfig</a><span class="permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
         <h3><span class="morelinks"><div>
-            Companion <a href="ClientConfig.html" title="See companion class">class ClientConfig</a>
+            Companion <a href="KafkaReactiveClientConfig$.html" title="See companion object">object KafkaReactiveClientConfig</a>
           </div></span></h3>
       </div>
 
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">object</span>
+        <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">ClientConfig</span>
+        <span class="name">KafkaReactiveClientConfig</span><span class="params">(<span name="parallelism">parallelism: <span class="extype" name="scala.Int">Int</span></span>, <span name="responseTopic">responseTopic: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="consumerConfig">consumerConfig: <span class="extype" name="akka.kafka.ConsumerSettings">ConsumerSettings</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="producerConfig">producerConfig: <span class="extype" name="akka.kafka.ProducerSettings">ProducerSettings</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Created by josee on 29/03/2017.
+</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -245,7 +246,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="org.patricknoir.kafka.reactive.client.config.ClientConfig"><span>ClientConfig</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="org.patricknoir.kafka.reactive.client.config.KafkaReactiveClientConfig"><span>KafkaReactiveClientConfig</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -263,7 +264,26 @@
 
       <div id="template">
         <div id="allMembers">
-        
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="org.patricknoir.kafka.reactive.client.config.KafkaReactiveClientConfig#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(parallelism:Int,responseTopic:String,consumerConfig:akka.kafka.ConsumerSettings[String,String],producerConfig:akka.kafka.ProducerSettings[String,String]):org.patricknoir.kafka.reactive.client.config.KafkaReactiveClientConfig"></a><a id="&lt;init&gt;:KafkaReactiveClientConfig"></a>
+      <span class="permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#&lt;init&gt;(parallelism:Int,responseTopic:String,consumerConfig:akka.kafka.ConsumerSettings[String,String],producerConfig:akka.kafka.ProducerSettings[String,String]):org.patricknoir.kafka.reactive.client.config.KafkaReactiveClientConfig" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">KafkaReactiveClientConfig</span><span class="params">(<span name="parallelism">parallelism: <span class="extype" name="scala.Int">Int</span></span>, <span name="responseTopic">responseTopic: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="consumerConfig">consumerConfig: <span class="extype" name="akka.kafka.ConsumerSettings">ConsumerSettings</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="producerConfig">producerConfig: <span class="extype" name="akka.kafka.ProducerSettings">ProducerSettings</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>)</span>
+      </span>
+      
+      
+    </li></ol>
+            </div>
 
         
 
@@ -275,7 +295,7 @@
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -291,7 +311,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html###():Int" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -307,7 +327,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -320,26 +340,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="org.patricknoir.kafka.reactive.client.config.ClientConfig#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply(config:com.typesafe.config.Config):org.patricknoir.kafka.reactive.client.config.ClientConfig"></a><a id="apply(Config):ClientConfig"></a>
-      <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#apply(config:com.typesafe.config.Config):org.patricknoir.kafka.reactive.client.config.ClientConfig" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">apply</span><span class="params">(<span name="config">config: <span class="extype" name="com.typesafe.config.Config">Config</span></span>)</span><span class="result">: <a href="ClientConfig.html" class="extype" name="org.patricknoir.kafka.reactive.client.config.ClientConfig">ClientConfig</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">Creates a <a href="ClientConfig.html" class="extype" name="org.patricknoir.kafka.reactive.client.config.ClientConfig">ClientConfig</a> from a <span class="extype" name="Config">Config</span> instance.</p><div class="fullcomment"><div class="comment cmt"><p>Creates a <a href="ClientConfig.html" class="extype" name="org.patricknoir.kafka.reactive.client.config.ClientConfig">ClientConfig</a> from a <span class="extype" name="Config">Config</span> instance.</p></div><dl class="paramcmts block"><dt class="param">config</dt><dd class="cmt"><p>typesafe config instance to be used to build this ClientConfig.</p></dd><dt>returns</dt><dd class="cmt"><p>a valid ClientConfig instance.</p></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -355,7 +359,7 @@
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#clone():Object" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -374,27 +378,26 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="org.patricknoir.kafka.reactive.client.config.ClientConfig#default" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="default:org.patricknoir.kafka.reactive.client.config.ClientConfig"></a><a id="default:ClientConfig"></a>
+    </li><li name="org.patricknoir.kafka.reactive.client.config.KafkaReactiveClientConfig#consumerConfig" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="consumerConfig:akka.kafka.ConsumerSettings[String,String]"></a><a id="consumerConfig:ConsumerSettings[String,String]"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#default:org.patricknoir.kafka.reactive.client.config.ClientConfig" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#consumerConfig:akka.kafka.ConsumerSettings[String,String]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">lazy val</span>
+        <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">default</span><span class="result">: <a href="ClientConfig.html" class="extype" name="org.patricknoir.kafka.reactive.client.config.ClientConfig">ClientConfig</a></span>
+        <span class="name">consumerConfig</span><span class="result">: <span class="extype" name="akka.kafka.ConsumerSettings">ConsumerSettings</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>
       </span>
       
-      <p class="shortcomment cmt">Default ClientConfig which reads the configuration
-from the <code>application.conf</code> in the current classpath.</p>
+      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -407,26 +410,10 @@ from the <code>application.conf</code> in the current classpath.</p>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
-      <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#equals(x$1:Any):Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#finalize():Unit" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -448,7 +435,7 @@ from the <code>application.conf</code> in the current classpath.</p>
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -461,26 +448,10 @@ from the <code>application.conf</code> in the current classpath.</p>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="hashCode():Int"></a>
-      <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#hashCode():Int" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -496,7 +467,7 @@ from the <code>application.conf</code> in the current classpath.</p>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -512,7 +483,7 @@ from the <code>application.conf</code> in the current classpath.</p>
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#notify():Unit" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -528,7 +499,7 @@ from the <code>application.conf</code> in the current classpath.</p>
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -541,10 +512,58 @@ from the <code>application.conf</code> in the current classpath.</p>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="org.patricknoir.kafka.reactive.client.config.KafkaReactiveClientConfig#parallelism" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="parallelism:Int"></a>
+      <span class="permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#parallelism:Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">parallelism</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      
+      
+    </li><li name="org.patricknoir.kafka.reactive.client.config.KafkaReactiveClientConfig#producerConfig" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="producerConfig:akka.kafka.ProducerSettings[String,String]"></a><a id="producerConfig:ProducerSettings[String,String]"></a>
+      <span class="permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#producerConfig:akka.kafka.ProducerSettings[String,String]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">producerConfig</span><span class="result">: <span class="extype" name="akka.kafka.ProducerSettings">ProducerSettings</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      
+      
+    </li><li name="org.patricknoir.kafka.reactive.client.config.KafkaReactiveClientConfig#responseTopic" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="responseTopic:String"></a>
+      <span class="permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#responseTopic:String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">responseTopic</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -557,26 +576,10 @@ from the <code>application.conf</code> in the current classpath.</p>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="toString():String"></a>
-      <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#toString():String" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#wait():Unit" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -598,7 +601,7 @@ from the <code>application.conf</code> in the current classpath.</p>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -620,7 +623,7 @@ from the <code>application.conf</code> in the current classpath.</p>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/ClientConfig$.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../../../org/patricknoir/kafka/reactive/client/config/KafkaReactiveClientConfig.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -649,7 +652,15 @@ from the <code>application.conf</code> in the current classpath.</p>
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="scala.Serializable">
+              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.Product">
+              <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
+            </div><div class="parent" name="scala.Equals">
+              <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>

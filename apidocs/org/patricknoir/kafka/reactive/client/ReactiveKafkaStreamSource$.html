@@ -227,9 +227,9 @@ as its semantic.">
                         </a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="ReactiveClientStream.html" title="Concrete implementation of a ReactiveClient using Reactive Streams"></a>
-                        <a href="ReactiveClientStream.html" title="Concrete implementation of a ReactiveClient using Reactive Streams">
-                          ReactiveClientStream
+                        <a class="class" href="ReactiveKafkaClient.html" title="Concrete implementation of a ReactiveClient using Reactive Streams"></a>
+                        <a href="ReactiveKafkaClient.html" title="Concrete implementation of a ReactiveClient using Reactive Streams">
+                          ReactiveKafkaClient
                         </a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
@@ -387,9 +387,9 @@ as its semantic.">
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="org.patricknoir.kafka.reactive.client.ReactiveKafkaStreamSource#atMostOnce" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="atMostOnce(responseTopic:String,bootstrapServers:Set[String],clientId:String,groupId:String,maxConcurrency:Int)(implicitsystem:akka.actor.ActorSystem,implicitec:scala.concurrent.ExecutionContext):akka.stream.scaladsl.Source[org.patricknoir.kafka.reactive.common.KafkaResponseEnvelope,_]"></a><a id="atMostOnce(String,Set[String],String,String,Int)(ActorSystem,ExecutionContext):Source[KafkaResponseEnvelope,_]"></a>
+      <a id="atMostOnce(responseTopic:String,consumerSettings:akka.kafka.ConsumerSettings[String,String],maxConcurrency:Int)(implicitsystem:akka.actor.ActorSystem,implicitec:scala.concurrent.ExecutionContext):akka.stream.scaladsl.Source[org.patricknoir.kafka.reactive.common.KafkaResponseEnvelope,_]"></a><a id="atMostOnce(String,ConsumerSettings[String,String],Int)(ActorSystem,ExecutionContext):Source[KafkaResponseEnvelope,_]"></a>
       <span class="permalink">
-      <a href="../../../../../org/patricknoir/kafka/reactive/client/ReactiveKafkaStreamSource$.html#atMostOnce(responseTopic:String,bootstrapServers:Set[String],clientId:String,groupId:String,maxConcurrency:Int)(implicitsystem:akka.actor.ActorSystem,implicitec:scala.concurrent.ExecutionContext):akka.stream.scaladsl.Source[org.patricknoir.kafka.reactive.common.KafkaResponseEnvelope,_]" title="Permalink">
+      <a href="../../../../../org/patricknoir/kafka/reactive/client/ReactiveKafkaStreamSource$.html#atMostOnce(responseTopic:String,consumerSettings:akka.kafka.ConsumerSettings[String,String],maxConcurrency:Int)(implicitsystem:akka.actor.ActorSystem,implicitec:scala.concurrent.ExecutionContext):akka.stream.scaladsl.Source[org.patricknoir.kafka.reactive.common.KafkaResponseEnvelope,_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -398,7 +398,7 @@ as its semantic.">
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">atMostOnce</span><span class="params">(<span name="responseTopic">responseTopic: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="bootstrapServers">bootstrapServers: <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="clientId">clientId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="groupId">groupId: <span class="extype" name="scala.Predef.String">String</span> = <span class="symbol">&quot;group1&quot;</span></span>, <span name="maxConcurrency">maxConcurrency: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="ec">ec: <span class="extype" name="scala.concurrent.ExecutionContext">ExecutionContext</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<a href="../common/package$$KafkaResponseEnvelope.html" class="extype" name="org.patricknoir.kafka.reactive.common.KafkaResponseEnvelope">KafkaResponseEnvelope</a>, _]</span>
+        <span class="name">atMostOnce</span><span class="params">(<span name="responseTopic">responseTopic: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="consumerSettings">consumerSettings: <span class="extype" name="akka.kafka.ConsumerSettings">ConsumerSettings</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="maxConcurrency">maxConcurrency: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>, <span name="ec">ec: <span class="extype" name="scala.concurrent.ExecutionContext">ExecutionContext</span></span>)</span><span class="result">: <span class="extype" name="akka.stream.scaladsl.Source">Source</span>[<a href="../common/package$$KafkaResponseEnvelope.html" class="extype" name="org.patricknoir.kafka.reactive.common.KafkaResponseEnvelope">KafkaResponseEnvelope</a>, _]</span>
       </span>
       
       
@@ -424,22 +424,6 @@ as its semantic.">
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="org.patricknoir.kafka.reactive.client.ReactiveKafkaStreamSource#createConsumerSettings" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="createConsumerSettings(servers:Set[String],clientId:String,groupId:String)(implicitsystem:akka.actor.ActorSystem):akka.kafka.ConsumerSettings[String,String]"></a><a id="createConsumerSettings(Set[String],String,String)(ActorSystem):ConsumerSettings[String,String]"></a>
-      <span class="permalink">
-      <a href="../../../../../org/patricknoir/kafka/reactive/client/ReactiveKafkaStreamSource$.html#createConsumerSettings(servers:Set[String],clientId:String,groupId:String)(implicitsystem:akka.actor.ActorSystem):akka.kafka.ConsumerSettings[String,String]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">createConsumerSettings</span><span class="params">(<span name="servers">servers: <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="clientId">clientId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="groupId">groupId: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="system">system: <span class="extype" name="akka.actor.ActorSystem">ActorSystem</span></span>)</span><span class="result">: <span class="extype" name="akka.kafka.ConsumerSettings">ConsumerSettings</span>[<span class="extype" name="java.lang.String">String</span>, <span class="extype" name="java.lang.String">String</span>]</span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">

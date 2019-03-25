@@ -145,7 +145,7 @@ val dest = (baseDirectory / "docs")
 
 val commonSettings = Seq(
   organization := "org.patricknoir.kafka",
-  version := "0.4.0-SNAPSHOT",
+  version := "0.4.0",
   scalaVersion := "2.12.1",
   fork in run := true,
   fork in Test := true,

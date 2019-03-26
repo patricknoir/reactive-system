@@ -1,0 +1,20 @@
+{
+  "package" : {
+    "name" : "reactive-system_2.12",
+    "repo" : "releases",
+    "subject"  : "patricknoir",
+    "vcs_url"  : "https://github.com/patricknoir/kafka-reactive-service.git",
+    "licenses" : ["Apache-2.0"]
+  },
+  "version" : {
+    "name" : "0.4.0",
+    "released" : "2019-03-25",
+    "vcs_tag" : "0.4.0"
+  },
+  "files" : [
+    {
+      "includePattern" : "target/scala-2.12/(.*)",
+      "uploadPattern"  : "releases/org/patricknoir/kafka"
+    }
+  ]
+}

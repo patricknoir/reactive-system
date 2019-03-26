@@ -14,7 +14,7 @@
   "files" : [
     {
       "includePattern" : "target/scala-2.12/(.*)",
-      "uploadPattern"  : "releases/org/patricknoir/kafka"
+      "uploadPattern"  : "releases/org/patricknoir/kafka/reactive-system_2.12/$1"
     }
   ]
 }

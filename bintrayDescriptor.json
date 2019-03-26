@@ -1,6 +1,6 @@
 {
   "package" : {
-    "name" : "reactive-system_2.12",
+    "name" : "reactive-system",
     "repo" : "releases",
     "subject"  : "patricknoir",
     "vcs_url"  : "https://github.com/patricknoir/kafka-reactive-service.git",
